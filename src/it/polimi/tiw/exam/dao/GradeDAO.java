@@ -16,10 +16,11 @@ public class GradeDAO {
 		this.connection=connection;
 	}
 	
-	public List<Grade> findAllGrades(int id_Appeal) throws SQLException{
+	public List<Grade> getGradesByAppealId(int id_Appeal) throws SQLException{
 		List<Grade> grades=new ArrayList<Grade>();
 		String query="SELECT * FROM exam WHERE id_app=? ORDER BY absent DESC, failed DESC, "
-				+ "recalled DESC, grade ASC, merit ASC";
+				+ "recalled DESC, grade ASC, merit ASC";			 //update to counter not-entered grades
+																	 //update to include join with student (see specifics)
 				
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
@@ -65,9 +66,9 @@ public class GradeDAO {
 		return grades;
     }
 	
-	public int insertGrade(Grade grade) throws SQLException {
+	public int insertGrade(Grade grade) throws SQLException { //change params to student id and appeal id
 		int code = 0;
-		String query = "INSERT into exam (id_app, id_stud, state, failed, recalled, absent, grade, merit)   VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+		String query = "INSERT into exam (id_app, id_stud, state, failed, recalled, absent, grade, merit)   VALUES(?, ?, not entered , null, ?, ?, ?, ?)";
 
 		PreparedStatement pstatement = null;
 		try {

@@ -15,8 +15,9 @@ public class CourseDAO {
         this.connection=connection;
     }
     
+    //introduce getCourseById
     
-    public List<Course> findCourses(int id) throws SQLException {
+    public List<Course> getCoursesByProfessorId(int id) throws SQLException {
     	List<Course> courses= new ArrayList<Course>();
     	String query= "SELECT * FROM course WHERE id_professor=? ORDER BY title DESC";
     	
@@ -58,7 +59,7 @@ public class CourseDAO {
 		return courses;
     }
 
-    public int createCourse(Course course) throws SQLException {
+    public int createCourse(Course course) throws SQLException { //may not be necessary
 		int code = 0;
 		String query = "INSERT into courses (id_course,id_professor,title) VALUES(?, ?, ?)";
 

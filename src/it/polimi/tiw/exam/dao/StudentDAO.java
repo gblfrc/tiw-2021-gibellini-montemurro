@@ -16,7 +16,7 @@ public class StudentDAO {
 	
 	
 	// method to get information about students given their id
-	public Student getStudentInfoById(int id) throws SQLException {
+	public Student getStudentById(int id) throws SQLException {
 		
 		String query = "SELECT * FROM Student WHERE id_student = ?";
 		PreparedStatement statement = null;

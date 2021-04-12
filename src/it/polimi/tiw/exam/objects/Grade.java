@@ -1,9 +1,10 @@
 package it.polimi.tiw.exam.objects;
 
-public class Grade {
+public class Grade { //include student's info (see specifics)
 	private int id_app;
 	private int id_stud;
 	private String state;
+	//private String grade; Grade as a string
 	private boolean failed;
 	private boolean recalled;
 	private boolean absent;

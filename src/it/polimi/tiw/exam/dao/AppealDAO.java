@@ -16,7 +16,7 @@ public class AppealDAO {
 	}
 	
 	
-	public List<Appeal> getAppealsByCourse(Course course) throws SQLException {
+	public List<Appeal> getAppealsByCourse(Course course) throws SQLException { //needs Course Object
 		
 		String query = "SELECT * FROM Appeal WHERE id_course = ?";
 		PreparedStatement statement = null;
@@ -25,8 +25,8 @@ public class AppealDAO {
 		
 		try {
 			statement = connection.prepareStatement(query);
-			statement.setInt(1, course.getId()); 	//update this after seeing which getter for courseId
-												 	//is actually implemented in Course Object
+			statement.setInt(1, course.getCourseId()); 		//update this after seeing which getter for courseId
+												 			//is actually implemented in Course Object
 			rs = statement.executeQuery();
 			if(rs.next()==true) {
 				Appeal temp = new Appeal();		
