@@ -57,10 +57,10 @@ public class CourseDAO {
 			
 		return courses;
     }
-
+    
     public int createCourse(Course course) throws SQLException {
 		int code = 0;
-		String query = "INSERT into courses (id_course,id_professor,title) VALUES(?, ?, ?)";
+		String query = "INSERT into courses (id_course,id_professor,title)   VALUES(?, ?, ?)";
 
 		PreparedStatement pstatement = null;
 		try {
@@ -83,5 +83,4 @@ public class CourseDAO {
 		}
 		return code;
 	}
-    
 }
