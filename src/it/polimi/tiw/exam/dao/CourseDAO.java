@@ -32,8 +32,8 @@ public class CourseDAO {
 			
 			while(result.next()) {
 				Course course=new Course();
-				course.setId_course(result.getInt("id_course"));
-				course.setId_professor(result.getInt("id_professor"));
+				course.setCourseId(result.getInt("id_course"));
+				course.setProfessorId(result.getInt("id_professor"));
 				course.setTitle(result.getString("title"));
 				
 				courses.add(course);
@@ -67,8 +67,8 @@ public class CourseDAO {
 		try {
 			pstatement = connection.prepareStatement(query);
 
-			pstatement.setInt(1, course.getId_course());
-			pstatement.setInt(2, course.getId_professor());
+			pstatement.setInt(1, course.getCourseId());
+			pstatement.setInt(2, course.getProfessorId());
 			pstatement.setString(3, course.getTitle());
 
 			code = pstatement.executeUpdate();
