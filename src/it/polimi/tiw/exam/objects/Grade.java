@@ -1,91 +1,99 @@
 package it.polimi.tiw.exam.objects;
 
-public class Grade {
-	private int id_app;
-	private int id_stud;
+public class Grade { //include student's info (see specifics)
+	private int appealId;
+	private int studentId;
+	private String studentSurname;
+	private String studentName;
+	private String email;
+	private String degreeCourse;
+	private String grade; 
 	private String state;
-	private boolean failed;
-	private boolean recalled;
-	private boolean absent;
-	private int grade;
-	private boolean merit;
+	
 	
 	public Grade() {
 		super();
 	}
 	
-	public Grade(int id_app, int id_stud, String state, boolean failed, boolean recalled, boolean absent, int grade, boolean merit) {
-		this.id_app = id_app;
-		this.id_stud = id_stud;
-		this.state = state;
-		this.failed = failed;
-		this.recalled = recalled;
-		this.absent = absent;
+	
+	public Grade(int appealId, int studentId, String studentSurname, String studentName, String email,
+			String degreeCourse, String grade, String state) {
+		this.appealId = appealId;
+		this.studentId = studentId;
+		this.studentSurname = studentSurname;
+		this.studentName = studentName;
+		this.email = email;
+		this.degreeCourse = degreeCourse;
 		this.grade = grade;
-		this.merit = merit;
+		this.state = state;
+	}
+
+
+	//getters
+	
+	public int getAppealId() {
+		return appealId;
+	}
+
+	public int getStudentId() {
+		return studentId;
 	}
 	
-	public int getId_app() {
-		return id_app;
+	public String getStudentSurname() {
+		return studentSurname;
 	}
-
-	public void setId_app(int id_app) {
-		this.id_app = id_app;
+	
+	public String getStudentName() {
+		return studentName;
 	}
-
-	public int getId_stud() {
-		return id_stud;
+	
+	public String getEmail() {
+		return email;
 	}
-
-	public void setId_stud(int id_stud) {
-		this.id_stud = id_stud;
+	
+	public String getDegreeCourse() {
+		return degreeCourse;
 	}
-
+	
+	public String getGrade() {
+		return grade;
+	}
+	
 	public String getState() {
 		return state;
 	}
+		
+	//setters
+	
+	public void setAppealId(int appealId) {
+		this.appealId = appealId;
+	}
 
+	public void setStudentId(int studentId) {
+		this.studentId = studentId;
+	}
+
+	public void setStudentSurname(String studentSurname) {
+		this.studentSurname = studentSurname;
+	}	
+
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setDegreeCourse(String degreeCourse) {
+		this.degreeCourse = degreeCourse;
+	}
 	public void setState(String state) {
-		this.state = state;
+		this.state=state;
 	}
 
-	public boolean isFailed() {
-		return failed;
-	}
-
-	public void setFailed(boolean failed) {
-		this.failed = failed;
-	}
-
-	public boolean isRecalled() {
-		return recalled;
-	}
-
-	public void setRecalled(boolean recalled) {
-		this.recalled = recalled;
-	}
-
-	public boolean isAbsent() {
-		return absent;
-	}
-
-	public void setAbsent(boolean absent) {
-		this.absent = absent;
-	}
-
-	public int getGrade() {
-		return grade;
-	}
-
-	public void setGrade(int grade) {
+	public void setGrade(String grade) {
 		this.grade = grade;
 	}
 
-	public boolean isMerit() {
-		return merit;
-	}
-
-	public void setMerit(boolean merit) {
-		this.merit = merit;
-	}
 }
