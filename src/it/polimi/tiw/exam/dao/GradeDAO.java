@@ -782,8 +782,8 @@ public class GradeDAO {
 	
 	public List<Grade> getGradesByGradeDesc(int appealId) throws SQLException{
 		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_app=? ORDER BY e2.merit DESC, e2.grade DESC,e2.recalled DESC,"
-				+ " e2.absent DESC, e2.failed DESC UNION SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='not entered'";
+		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY e1.merit DESC, e1.grade DESC,e1.recalled DESC,"
+				+ " e1.absent DESC, e1.failed DESC UNION SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_app=? and e2.state='not entered'";
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
 		
@@ -1038,7 +1038,7 @@ public class GradeDAO {
 					pstatement.setBoolean(3, false);
 					pstatement.setBoolean(4, false);
 					pstatement.setInt(5, 30);
-					pstatement.setBoolean(6, false);
+					pstatement.setBoolean(6, true);
 				}
 				else {
 					pstatement.setBoolean(2, false);
@@ -1069,7 +1069,7 @@ public class GradeDAO {
 	
 	public Grade getResultByAppealAndStudent(int appealId, int studentId) throws SQLException {
 		Grade grade=null;
-		String query="SELECT * FROM exam WHERE id_app=? and id_stud=?";
+		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.id_student=?";
 		
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
