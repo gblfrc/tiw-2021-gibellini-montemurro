@@ -15,7 +15,7 @@ public class UserDAO {
 	
 	public User getUser (int id, String pwd) throws SQLException{
 		
-		String query = "SELECT * FROM ? WHERE id_professor = ? and password = ?";
+		String query = "SELECT * FROM professor WHERE id_professor = ? and password = ?";
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		User result = null;
@@ -23,9 +23,8 @@ public class UserDAO {
 		//search for user given credentials into professor table
 		try {
 			statement = connection.prepareStatement(query);
-			statement.setString(1, "Professor");
-			statement.setInt(2, id);
-			statement.setString(3, pwd);
+			statement.setInt(1, id);
+			statement.setString(2, pwd);
 			
 			rs = statement.executeQuery();
 			
@@ -53,10 +52,11 @@ public class UserDAO {
 		//search for user given credentials into student table
 		if (result==null) {
 			try {
+				query = "SELECT * FROM student WHERE id_student = ? and password = ?";
+				
 				statement = connection.prepareStatement(query);
-				statement.setString(1, "Student");
-				statement.setInt(2, id);
-				statement.setString(3, pwd);
+				statement.setInt(1, id);
+				statement.setString(2, pwd);
 				
 				rs = statement.executeQuery();
 				
