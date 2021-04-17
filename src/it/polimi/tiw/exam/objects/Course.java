@@ -1,38 +1,44 @@
 package it.polimi.tiw.exam.objects;
 
 public class Course {
-	private int id_course;
-	private int id_professor;
+	private int courseId;
+	private int professorId;
 	private String title;
 	
 	public Course() {
 		super();
 	}
 
-	public Course(int id_course, int id_professor, String title) {
-		this.id_course=id_course;
-		this.id_professor=id_course;
+	public Course(int courseId, int professorId, String title) {
+		this.courseId=courseId;
+		this.professorId=professorId;
 		this.title=title;
 	}
 	
-	public int getId_course() {
-		return id_course;
+	
+	//getters
+	
+	public int getCourseId() {
+		return courseId;
 	}
 
-	public void setId_course(int id_course) {
-		this.id_course = id_course;
-	}
-
-	public int getId_professor() {
-		return id_professor;
-	}
-
-	public void setId_professor(int id_professor) {
-		this.id_professor = id_professor;
+	public int getProfessorId() {
+		return professorId;
 	}
 
 	public String getTitle() {
 		return title;
+	}
+
+	
+	//setters
+	
+	public void setCourseId(int courseId) {
+		this.courseId = courseId;
+	}
+
+	public void setProfessorId(int professorId) {
+		this.professorId = professorId;
 	}
 
 	public void setTitle(String title) {
