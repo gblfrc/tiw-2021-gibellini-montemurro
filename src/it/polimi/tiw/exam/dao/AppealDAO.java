@@ -29,7 +29,7 @@ public class AppealDAO {
 			if(rs.next()==true) {
 				Appeal temp = new Appeal();		
 				
-				temp.setAppealId(rs.getInt("id_app"));
+				temp.setAppealId(rs.getInt("id_appeal"));
 				temp.setCourseId(rs.getInt("id_course"));
 				temp.setDate(rs.getDate("date")); 	// may want to check if this works later on
 				
@@ -49,7 +49,38 @@ public class AppealDAO {
 				throw new SQLException ("Couldn't close Statement");
 			};
 		};
-		
 		return resultList;
 	}
+	
+	public Appeal getAppealById(int id) throws SQLException{
+		String query = "SELECT * FROM appeal WHERE id_appeal = ?";
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		Appeal result = null;
+		try {
+			statement = connection.prepareStatement(query);
+			statement.setInt(1, id);
+			rs = statement.executeQuery();
+			if (rs.next()==true) {
+				result = new Appeal(rs.getInt("id_appeal"),
+									rs.getInt("id_course"),
+									rs.getDate("date"));
+			}
+		} finally {
+			try {
+				if (rs!=null) rs.close();
+			} catch (Exception e) {
+				throw new SQLException ("Couldn't close ResultSet");
+			};
+			try {
+				if (statement!=null) statement.close();
+			} catch (Exception e) {
+				throw new SQLException ("Couldn't close Statement");
+			};
+		};
+		return result;
+	}
+	
+	
+	
 }

@@ -1,16 +1,14 @@
 package it.polimi.tiw.exam.objects;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public class Report {
 	
 	int reportId;
 	Appeal appeal;
-	LocalDate creationDate;
-	LocalTime creationTime;
-	List<Student> students;
+	String creationDate;
+	String creationTime;
+	List<Grade> grades;
 	
 	//default constructor
 	public Report() {
@@ -18,12 +16,12 @@ public class Report {
 	}
 	
 	//constructor with attributes
-	public Report (int id, Appeal appeal, LocalDate creationDate, LocalTime creationTime, List<Student> students) {
+	public Report (int id, Appeal appeal, String creationDate, String creationTime, List<Grade> grades) {
 		this.reportId=id;
 		this.appeal=appeal;
 		this.creationDate=creationDate;
 		this.creationTime=creationTime;
-		this.students=students;
+		this.grades=grades;
 	}
 	
 	
@@ -37,16 +35,16 @@ public class Report {
 		return appeal;
 	}
 	
-	public LocalDate getCreationDate() {
+	public String getCreationDate() {
 		return creationDate;
 	}
 	
-	public LocalTime getCreationTime() {
+	public String getCreationTime() {
 		return creationTime;
 	}
 	
-	public List<Student> getStudents(){
-		return students;
+	public List<Grade> getGrades(){
+		return grades;
 	}
 	
 	
@@ -60,16 +58,16 @@ public class Report {
 		this.appeal=appeal;
 	}
 	
-	public void setCreationDate (LocalDate date) {
+	public void setCreationDate (String date) {
 		this.creationDate=date;
 	}
 	
-	public void setCreationTime (LocalTime time) {
+	public void setCreationTime (String time) {
 		this.creationTime=time;
 	}
 	
-	public void setStudents(List<Student> students) {
-		this.students=students;
+	public void setGrades(List<Grade> grades) {
+		this.grades=grades;
 	}
 
 }
