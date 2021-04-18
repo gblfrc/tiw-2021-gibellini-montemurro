@@ -916,9 +916,8 @@ public class GradeDAO {
 				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_app=? and e2.state='refused' UNION"
 				+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_app=? and e3.state='published' UNION"
 				+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_app=? and e4.state='entered' UNION"
-				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='not entered'";			 //update to counter not-entered grades
-																	 //update to include join with student (see specifics)
-				
+				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='not entered'";	
+		
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
 		
@@ -1016,21 +1015,21 @@ public class GradeDAO {
 				pstatement.setBoolean(3, false);
 				pstatement.setBoolean(4, false);
 				pstatement.setNull(5, java.sql.Types.INTEGER);
-				pstatement.setBoolean(6, false);
+				pstatement.setNull(6, java.sql.Types.BOOLEAN);
 			}
 			else if(grade.getGrade().equals("recalled")) {
 				pstatement.setBoolean(2, false);
 				pstatement.setBoolean(3, true);
 				pstatement.setBoolean(4, false);
 				pstatement.setNull(5, java.sql.Types.INTEGER);
-				pstatement.setBoolean(6, false);
+				pstatement.setNull(6, java.sql.Types.BOOLEAN);
 			}
 			else if(grade.getGrade().equals("absent")) {
 				pstatement.setBoolean(2, false);
 				pstatement.setBoolean(3, false);
 				pstatement.setBoolean(4, true);
 				pstatement.setNull(5, java.sql.Types.INTEGER);
-				pstatement.setBoolean(6, false);
+				pstatement.setNull(6, java.sql.Types.BOOLEAN);
 			}
 			else {
 				if(grade.getGrade().equals("30 e lode")) {
@@ -1045,7 +1044,7 @@ public class GradeDAO {
 					pstatement.setBoolean(3, false);
 					pstatement.setBoolean(4, false);
 					pstatement.setInt(5, Integer.parseInt(grade.getGrade()));
-					pstatement.setBoolean(6, false);
+					pstatement.setNull(6, java.sql.Types.BOOLEAN);
 				}
 			}
 			
