@@ -7,7 +7,9 @@ public class User {
 	
 	
 	//default constructor
-	public User() {}
+	public User() {
+		super();
+	}
 	
 	//constructor with attributes
 	public User(int id, String rights) {

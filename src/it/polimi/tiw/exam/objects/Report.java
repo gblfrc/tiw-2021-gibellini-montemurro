@@ -12,10 +12,12 @@ public class Report {
 	LocalTime creationTime;
 	List<Student> students;
 	
+	//default constructor
 	public Report() {
 		super();
 	}
 	
+	//constructor with attributes
 	public Report (int id, Appeal appeal, LocalDate creationDate, LocalTime creationTime, List<Student> students) {
 		this.reportId=id;
 		this.appeal=appeal;

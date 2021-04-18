@@ -10,7 +10,9 @@ public class Student {
 	private String degreeCourse;
 	
 	//default constructor
-	public Student() {}
+	public Student() {
+		super();
+	}
 	
 	
 	//constructor given all attributes

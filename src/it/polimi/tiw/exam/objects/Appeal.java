@@ -9,7 +9,9 @@ public class Appeal {
 	private Date date;
 	
 	//default constructor
-	public Appeal() {}
+	public Appeal() {
+		super();
+	}
 	
 	//constructor with attributes
 	public Appeal (int id, int courseId, Date date) {
