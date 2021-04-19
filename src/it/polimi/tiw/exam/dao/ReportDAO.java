@@ -44,10 +44,8 @@ public class ReportDAO {
 					statement.close();
 			} catch (Exception e) {
 				throw new SQLException("Couldn't close Statement");
-			}
-			;
-		}
-		;
+			};
+		};
 		return result;
 	}
 
