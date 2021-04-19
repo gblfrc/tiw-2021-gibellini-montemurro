@@ -28,7 +28,7 @@ import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.dao.UserDAO;
 
-@WebServlet("/getAccess")
+@WebServlet("/GetAccess")
 public class GetAccess extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
