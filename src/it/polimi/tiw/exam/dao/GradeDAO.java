@@ -1066,6 +1066,45 @@ public class GradeDAO {
 		return code;
 	}
 	
+	/**
+	 * @ensures \result is either '1', in case update query was correct, or '0' in case something went wrong
+	 */
+	public int refuseGrade(int appealId, int studentId) throws SQLException{
+		connection.setAutoCommit(false);
+		String query = "UPDATE exam SET state=refused, failed='1', recalled='0', absent='0', grade=null, merit=null " + 
+					   "WHERE id_appeal = ? and id_student = ?";
+		PreparedStatement pstatement = null;
+		ResultSet rs = null;
+		int exitCode = 1;
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1, appealId);
+			pstatement.setInt(2, studentId);
+			pstatement.executeUpdate();
+			connection.commit();
+		} catch (SQLException e){
+			connection.rollback();
+			exitCode = 0;
+		} finally {
+			connection.setAutoCommit(true);
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close ResultSet");
+			};
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close Statement");
+			};
+		};
+		return exitCode;
+	}
+	
+	
+
 	public Grade getResultByAppealAndStudent(int appealId, int studentId) throws SQLException {
 		Grade grade=null;
 		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.id_student=?";

@@ -2,7 +2,6 @@ package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
@@ -12,6 +11,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.thymeleaf.TemplateEngine;
 
 /*import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -26,25 +27,23 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 */
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
+import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 import it.polimi.tiw.exam.dao.UserDAO;
 
 @WebServlet("/GetAccess")
 public class GetAccess extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	// private TemplateEngine templateEngine;
+	private TemplateEngine templateEngine;
 
 	public GetAccess() {
 		super();
 	}
 
 	public void init() throws ServletException {
-		try {
-			connection = ConnectionHandler.getConnection(getServletContext());
-			// thymeleaf
-		} catch (UnavailableException e) {
-			throw new ServletException(e.getMessage());
-		}
+    	ServletContext servletContext = getServletContext();
+    	connection = ConnectionHandler.getConnection(servletContext);
+    	templateEngine = TemplateEngineHandler.getEngine(servletContext);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
