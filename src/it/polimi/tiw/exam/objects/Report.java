@@ -1,13 +1,15 @@
 package it.polimi.tiw.exam.objects;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
 
 public class Report {
 	
 	int reportId;
 	Appeal appeal;
-	String creationDate;
-	String creationTime;
+	Date creationDate;
+	Time creationTime;
 	List<Grade> grades;
 	
 	//default constructor
@@ -16,7 +18,7 @@ public class Report {
 	}
 	
 	//constructor with attributes
-	public Report (int id, Appeal appeal, String creationDate, String creationTime, List<Grade> grades) {
+	public Report (int id, Appeal appeal, Date creationDate, Time creationTime, List<Grade> grades) {
 		this.reportId=id;
 		this.appeal=appeal;
 		this.creationDate=creationDate;
@@ -35,11 +37,11 @@ public class Report {
 		return appeal;
 	}
 	
-	public String getCreationDate() {
+	public Date getCreationDate() {
 		return creationDate;
 	}
 	
-	public String getCreationTime() {
+	public Time getCreationTime() {
 		return creationTime;
 	}
 	
@@ -58,11 +60,11 @@ public class Report {
 		this.appeal=appeal;
 	}
 	
-	public void setCreationDate (String date) {
+	public void setCreationDate (Date date) {
 		this.creationDate=date;
 	}
 	
-	public void setCreationTime (String time) {
+	public void setCreationTime (Time time) {
 		this.creationTime=time;
 	}
 	
