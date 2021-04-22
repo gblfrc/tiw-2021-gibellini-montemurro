@@ -34,5 +34,8 @@
 *.tar.gz
 *.rar
 
+# Ignore the whole .lib folder
+.lib/
+
 /build/
 /bin/
