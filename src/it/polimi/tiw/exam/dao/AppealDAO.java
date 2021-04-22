@@ -16,7 +16,7 @@ public class AppealDAO {
 	
 	public List<Appeal> getAppealsByCourse(Course course) throws SQLException { //needs Course Object
 		
-		String query = "SELECT * FROM Appeal WHERE id_course = ?";
+		String query = "SELECT * FROM Appeal WHERE id_course = ? ORDER BY date DESC";
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		List<Appeal> resultList = new LinkedList<>();
@@ -26,7 +26,7 @@ public class AppealDAO {
 			statement.setInt(1, course.getCourseId()); 		//update this after seeing which getter for courseId
 												 			//is actually implemented in Course Object
 			rs = statement.executeQuery();
-			if(rs.next()==true) {
+			while(rs.next()==true) {
 				Appeal temp = new Appeal();		
 				
 				temp.setAppealId(rs.getInt("id_appeal"));

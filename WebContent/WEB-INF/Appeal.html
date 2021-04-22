@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>List of your courses</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+<h1>Welcome to appeals page </h1>
+<h2>Select an appeal to see its subscribers</h2>
+<table border="1">
+	<thead>
+		<th>Appeal date</th>
+	</thead>
+	<tbody th:remove="all-but-first">
+			<tr th:each="appeal : ${appeals}" >
+				<td th:text="${appeal.date}">2000-02-16</td></tr>
+	</tbody>
+</table>
+</body>
+</html>

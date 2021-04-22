@@ -1,5 +1,6 @@
 package it.polimi.tiw.exam.dao;
 
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,7 @@ public class GradeDAO {
 	
 	public List<Grade> getGradesByAppealId(int appealId) throws SQLException{
 		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ";			 
+		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ";			 
 		
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
@@ -31,7 +32,7 @@ public class GradeDAO {
 			
 			while(result.next()) {
 				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
+				grade.setAppealId(result.getInt("id_appeal"));
 				grade.setStudentId(result.getInt("id_student"));
 				grade.setStudentSurname(result.getString("surname"));
 				grade.setStudentName(result.getString("name"));
@@ -79,11 +80,25 @@ public class GradeDAO {
 		return grades;
     }
 	
-	public List<Grade> getGradesByStudentIdAsc(int appealId) throws SQLException{
+	public List<Grade> getGradesByFieldAsc(int appealId, String field) throws SQLException,InvalidParameterException{
 		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.id_student ASC";
-																	 
-				
+		String query;
+		if(field.equals("studentId"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.id_student ASC";
+		else if(field.equals("surname"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname ASC";
+		else if(field.equals("name"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname ASC";													 
+		else if(field.equals("email"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.email ASC";		
+		else if(field.equals("degree_course"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.degree_course ASC";
+		else if(field.equals("grade")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered' UNION"
+				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? ORDER BY e2.absent DESC, e2.failed DESC, "
+				+ "e2.recalled DESC, e2.grade ASC, e2.merit ASC";}
+		else if(field.equals("state")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered' UNION"
+				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='entered' UNION"
+				+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_appeal=? and e3.state='published' UNION"
+				+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_appeal=? and e4.state='refused' UNION"
+				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='recorded'";}
+		else {
+			throw new InvalidParameterException();
+		}
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
 		
@@ -95,7 +110,7 @@ public class GradeDAO {
 			
 			while(result.next()) {
 				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
+				grade.setAppealId(result.getInt("id_appeal"));
 				grade.setStudentId(result.getInt("id_student"));
 				grade.setStudentSurname(result.getString("surname"));
 				grade.setStudentName(result.getString("name"));
@@ -143,10 +158,24 @@ public class GradeDAO {
 		return grades;
     }
 	
-	public List<Grade> getGradesByStudentIdDesc(int appealId) throws SQLException{
+	public List<Grade> getGradesByFieldDesc(int appealId, String field) throws SQLException,InvalidParameterException{
 		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.id_student DESC";
-				
+		String query;
+		if(field.equals("studentId"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.id_student DESC";
+		else if(field.equals("surname"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname DESC";
+		else if(field.equals("name"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname DESC";													 
+		else if(field.equals("email"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.email DESC";		
+		else if(field.equals("degree_course"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.degree_course DESC";
+		else if(field.equals("grade")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY e1.merit DESC, e1.grade DESC,e1.recalled DESC,"
+				+ " e1.absent DESC, e1.failed DESC UNION SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='not entered'";}
+		else if(field.equals("state")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='recorded' UNION"
+				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='refused' UNION"
+				+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_appeal=? and e3.state='published' UNION"
+				+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_appeal=? and e4.state='entered' UNION"
+				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered'";}	
+		else {
+			throw new InvalidParameterException();
+		}
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
 		
@@ -158,7 +187,7 @@ public class GradeDAO {
 			
 			while(result.next()) {
 				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
+				grade.setAppealId(result.getInt("id_appeal"));
 				grade.setStudentId(result.getInt("id_student"));
 				grade.setStudentSurname(result.getString("surname"));
 				grade.setStudentName(result.getString("name"));
@@ -206,780 +235,9 @@ public class GradeDAO {
 		return grades;
     }
 	
-	public List<Grade> getGradesBySurnameAsc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.surname ASC";
-																	
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesBySurnameDesc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.surname DESC";
-																	
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByNameAsc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.name ASC";
-																	
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByNameDesc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.name DESC";
-																
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByEmailAsc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.email ASC";
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByEmailDesc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.email DESC";	
-																	 
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByDegreeCourseAsc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.degree_course ASC";
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByDegreeCourseDesc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY s1.degree_course DESC";
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByGradeAsc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='not entered' UNION"
-		+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_app=? ORDER BY e2.absent DESC, e2.failed DESC, "
-		+ "e2.recalled DESC, e2.grade ASC, e2.merit ASC";
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByGradeDesc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? ORDER BY e1.merit DESC, e1.grade DESC,e1.recalled DESC,"
-				+ " e1.absent DESC, e1.failed DESC UNION SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_app=? and e2.state='not entered'";
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByStateAsc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='not entered' UNION"
-				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_app=? and e2.state='entered' UNION"
-				+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_app=? and e3.state='published' UNION"
-				+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_app=? and e4.state='refused' UNION"
-				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='recorded'";			 
-				
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public List<Grade> getGradesByStateDesc(int appealId) throws SQLException{
-		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='recorded' UNION"
-				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_app=? and e2.state='refused' UNION"
-				+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_app=? and e3.state='published' UNION"
-				+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_app=? and e4.state='entered' UNION"
-				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_app=? and e1.state='not entered'";	
-		
-		ResultSet result=null;
-		PreparedStatement pstatement=null;
-		
-		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_app"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
-				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
-				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
-				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
-					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
-				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
-			}
-		
-		} catch (SQLException e) {
-			throw new SQLException(e);
-
-		} finally {
-			try {
-				if (result != null)
-					result.close();
-			} catch (Exception e1) {
-				throw new SQLException(e1);
-			}
-			try {
-				if (pstatement != null)
-					pstatement.close();
-			} catch (Exception e2) {
-				throw new SQLException(e2);
-			}
-		}
-			
-		return grades;
-    }
-	
-	public int insertGrade(int appealId, int studentId) throws SQLException { //change params to student id and appeal id
+	public int insertGrade(int appealId, int studentId) throws SQLException {
 		int code = 0;
-		String query = "INSERT into exam (id_app, id_student, state, failed, recalled, absent, grade, merit)   VALUES(?, ?, not entered , null, null, null, null, null)";
+		String query = "INSERT into exam (id_appeal, id_student, state, failed, recalled, absent, grade, merit)   VALUES(?, ?, not entered , null, null, null, null, null)";
 
 		PreparedStatement pstatement = null;
 		try {
@@ -1003,7 +261,7 @@ public class GradeDAO {
 	}
 	
 	public int editGrade(Grade grade) throws SQLException {
-		String query = "UPDATE exam SET state=?, failed=?, recalled=?, absent=?, grade=?, merit=? WHERE id_app=? and id_stud=?" ;
+		String query = "UPDATE exam SET state=?, failed=?, recalled=?, absent=?, grade=?, merit=? WHERE id_appeal=? and id_student=?" ;
 		PreparedStatement pstatement = null;
 		int code = 0;
 		try {
@@ -1065,7 +323,6 @@ public class GradeDAO {
 		}
 		return code;
 	}
-	
 	/**
 	 * @ensures \result is either '1', in case update query was correct, or '0' in case something went wrong
 	 */

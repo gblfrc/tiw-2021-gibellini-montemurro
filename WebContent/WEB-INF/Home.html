@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>List of your courses</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+<h1>Welcome to your list of courses </h1>
+<h2>Select a course to see its appeals</h2>
+<table border="1">
+	<thead>
+		<th>Course Name</th>
+		<th>Appeals Link</th>
+	</thead>
+	<tbody th:remove="all-but-first">
+		<tr th:each="course : ${courses}" >
+			<td th:text="${course.title}">TIW</td>
+			<td><a th:href="@{/getAppeal(courseId=${course.courseId})}">Appeals</a></td></tr>
+	</tbody>
+</table>
+</body>
+</html>

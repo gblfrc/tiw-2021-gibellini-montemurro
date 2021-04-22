@@ -81,7 +81,7 @@ public class GetAccess extends HttpServlet {
 			return;
 		} else {
 			request.getSession().setAttribute("user", user);
-			path = getServletContext().getContextPath() + "/Home.html";
+			path = getServletContext().getContextPath() + "/getCourses";
 			response.sendRedirect(path);
 		}
 
