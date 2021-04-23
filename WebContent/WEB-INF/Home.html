@@ -6,18 +6,20 @@
 
 </head>
 <body>
-<h1>Welcome to your list of courses </h1>
-<h2>Select a course to see its appeals</h2>
-<table border="1">
-	<thead>
-		<th>Course Name</th>
-		<th>Appeals Link</th>
-	</thead>
-	<tbody th:remove="all-but-first">
-		<tr th:each="course : ${courses}" >
-			<td th:text="${course.title}">TIW</td>
-			<td><a th:href="@{/getAppeal(courseId=${course.courseId})}">Appeals</a></td></tr>
-	</tbody>
-</table>
+	<h1>Welcome to your list of courses</h1>
+	<h2>Select a course to see its appeals</h2>
+	<table border="1">
+		<thead>
+			<th>Course Name</th>
+			<th>Appeals Link</th>
+		</thead>
+		<tbody th:remove="all-but-first">
+			<tr th:each="course : ${courses}">
+				<td th:text="${course.title}">TIW</td>
+				<td><a href="Home.html"
+					th:href="@{/GetAppeal(courseId=${course.courseId})}">Appeals</a></td>
+			</tr>
+		</tbody>
+	</table>
 </body>
 </html>
