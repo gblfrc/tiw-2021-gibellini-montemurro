@@ -10,16 +10,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Grade;
+import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
+
 
 @WebServlet("/GetResult")
 public class GetResult extends HttpServlet {
@@ -36,23 +37,50 @@ public class GetResult extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		GradeDAO gradeDao = new GradeDAO(connection);
-		Grade result = null;
-		int appId = 0;
-		int studId = 0;
-		try {
-			appId = Integer.parseInt(request.getParameter("appeal"));
-			studId = Integer.parseInt(request.getParameter("student"));
-		} catch (NumberFormatException e) {
-			//manda alla servlet di ottenimento degli appelli per lo studente loggato
-			//aggiungi messaggio di errore
+		HttpSession session = request.getSession();
+		String loginPath = getServletContext().getContextPath() + "/Login.html";
+		if (session.isNew() || session.getAttribute("user") == null) {
+			response.sendRedirect(loginPath);
+			return;
 		}
 		
-		//controllare che appId e studId non siano 0 e che studId sia quello dello studente loggato
+		//gets user
+		User user = null;
+		try {
+			user = (User)session.getAttribute("user");
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error of our servers");
+			//log again?
+			return;
+		}
+		//gets student id
+		int studId;
+		try {
+			studId = user.getPersonId();
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error of our servers");
+			return;
+		}
+		//gets appeal id
+		int appId;
+		try {
+			appId = Integer.parseInt(request.getParameter("appeal"));
+		} catch (NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unable to find appeal");
+			return;
+		}
+		
+		GradeDAO gradeDao = new GradeDAO(connection);
+		Grade result = null;
+		
+		//controllare che appId e studId non siano 0
+		
 		try {
 			result = gradeDao.getResultByAppealAndStudent(appId, studId);
 		} catch (SQLException e) {
-			//come prima per NFE
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "It seems this student never subscribed to that exam");
+			return;
 		}
 		
 		String path = "/WEB-INF/Result.html";

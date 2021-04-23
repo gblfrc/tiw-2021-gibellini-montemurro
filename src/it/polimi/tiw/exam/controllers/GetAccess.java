@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,13 +31,10 @@ import it.polimi.tiw.exam.dao.UserDAO;
 
 @WebServlet("/GetAccess")
 public class GetAccess extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-
-	public GetAccess() {
-		super();
-	}
 
 	public void init() throws ServletException {
     	ServletContext servletContext = getServletContext();
@@ -51,12 +47,13 @@ public class GetAccess extends HttpServlet {
 
 		Integer personId = null;
 		String password = null;
+		
 
 		try {
 			personId = Integer.parseInt(request.getParameter("personId"));
 			password = request.getParameter("password");
 		} catch (Exception e) {
-			response.sendRedirect(getServletContext().getContextPath() + "/login.html");
+			response.sendRedirect(getServletContext().getContextPath() + "/Login.html");
 			return;
 		}
 
@@ -81,7 +78,9 @@ public class GetAccess extends HttpServlet {
 			return;
 		} else {
 			request.getSession().setAttribute("user", user);
-			path = getServletContext().getContextPath() + "/getCourses";
+			//request.getSession().setAttribute("userId", user.getPersonId());
+			//request.getSession().setAttribute("accessRigths", user.getAccessRights());
+			path = getServletContext().getContextPath() + "/GetCourses";
 			response.sendRedirect(path);
 		}
 

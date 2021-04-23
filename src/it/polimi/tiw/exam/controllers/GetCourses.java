@@ -17,8 +17,6 @@ import javax.servlet.http.HttpSession;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
@@ -26,10 +24,8 @@ import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.objects.Course;
 import it.polimi.tiw.exam.dao.CourseDAO;
 
-/**
- * Servlet implementation class GetCourses
- */
-@WebServlet("/getCourses")
+
+@WebServlet("/GetCourses")
 public class GetCourses extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection=null;
