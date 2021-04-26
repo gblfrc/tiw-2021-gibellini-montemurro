@@ -82,19 +82,19 @@ public class GradeDAO {
 	public List<Grade> getGradesByFieldAsc(int appealId, String field) throws SQLException,InvalidParameterException{
 		List<Grade> grades=new ArrayList<Grade>();
 		String query;
-		if(field.equals("studentId"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.id_student ASC";
-		else if(field.equals("surname"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.surname ASC";
-		else if(field.equals("name"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.surname ASC";													 
-		else if(field.equals("email"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.email ASC";		
-		else if(field.equals("degree_course"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.degree_course ASC";
-		else if(field.equals("grade")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? and e1.state='not entered' UNION"
-											+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appealeal=? ORDER BY e2.absent DESC, e2.failed DESC, "
+		if(field.equals("studentId"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.id_student ASC";
+		else if(field.equals("surname"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname ASC";
+		else if(field.equals("name"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname ASC";													 
+		else if(field.equals("email"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.email ASC";		
+		else if(field.equals("degree_course"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.degree_course ASC";
+		else if(field.equals("grade")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered' UNION"
+											+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? ORDER BY e2.absent DESC, e2.failed DESC, "
 											+ "e2.recalled DESC, e2.grade ASC, e2.merit ASC";}
-		else if(field.equals("state")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? and e1.state='not entered' UNION"
-											+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appealeal=? and e2.state='entered' UNION"
-											+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_appealeal=? and e3.state='published' UNION"
-											+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_appealeal=? and e4.state='refused' UNION"
-											+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? and e1.state='recorded'";}
+		else if(field.equals("state")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered' UNION"
+											+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='entered' UNION"
+											+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_appeal=? and e3.state='published' UNION"
+											+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_appeal=? and e4.state='refused' UNION"
+											+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='recorded'";}
 		else {
 			throw new InvalidParameterException();
 		}
@@ -109,7 +109,7 @@ public class GradeDAO {
 			
 			while(result.next()) {
 				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_appealeal"));
+				grade.setAppealId(result.getInt("id_appeal"));
 				grade.setStudentId(result.getInt("id_student"));
 				grade.setStudentSurname(result.getString("surname"));
 				grade.setStudentName(result.getString("name"));
@@ -160,18 +160,18 @@ public class GradeDAO {
 	public List<Grade> getGradesByFieldDesc(int appealId, String field) throws SQLException,InvalidParameterException{
 		List<Grade> grades=new ArrayList<Grade>();
 		String query;
-		if(field.equals("studentId"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.id_student DESC";
-		else if(field.equals("surname"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.surname DESC";
-		else if(field.equals("name"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.surname DESC";													 
-		else if(field.equals("email"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.email DESC";		
-		else if(field.equals("degree_course"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY s1.degree_course DESC";
-		else if(field.equals("grade")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ORDER BY e1.merit DESC, e1.grade DESC,e1.recalled DESC,"
-				+ " e1.absent DESC, e1.failed DESC UNION SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appealeal=? and e2.state='not entered'";}
-		else if(field.equals("state")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? and e1.state='recorded' UNION"
-				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appealeal=? and e2.state='refused' UNION"
-				+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_appealeal=? and e3.state='published' UNION"
-				+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_appealeal=? and e4.state='entered' UNION"
-				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? and e1.state='not entered'";}	
+		if(field.equals("studentId"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.id_student DESC";
+		else if(field.equals("surname"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname DESC";
+		else if(field.equals("name"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.surname DESC";													 
+		else if(field.equals("email"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.email DESC";		
+		else if(field.equals("degree_course"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.degree_course DESC";
+		else if(field.equals("grade")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY e1.merit DESC, e1.grade DESC,e1.recalled DESC,"
+				+ " e1.absent DESC, e1.failed DESC UNION SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='not entered'";}
+		else if(field.equals("state")) {query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='recorded' UNION"
+				+ "SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='refused' UNION"
+				+ "SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_appeal=? and e3.state='published' UNION"
+				+ "SELECT * FROM student AS s4 join exam AS e4 on s4.id_student=e4.id_student WHERE e4.id_appeal=? and e4.state='entered' UNION"
+				+ "SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered'";}	
 		else {
 			throw new InvalidParameterException();
 		}
@@ -186,7 +186,7 @@ public class GradeDAO {
 			
 			while(result.next()) {
 				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_appealeal"));
+				grade.setAppealId(result.getInt("id_appeal"));
 				grade.setStudentId(result.getInt("id_student"));
 				grade.setStudentSurname(result.getString("surname"));
 				grade.setStudentName(result.getString("name"));
@@ -236,7 +236,7 @@ public class GradeDAO {
 	
 	public int insertGrade(int appealId, int studentId) throws SQLException {
 		int code = 0;
-		String query = "INSERT into exam (id_appealeal, id_student, state, failed, recalled, absent, grade, merit)   VALUES(?, ?, not entered , null, null, null, null, null)";
+		String query = "INSERT into exam (id_appeal, id_student, state, failed, recalled, absent, grade, merit)   VALUES(?, ?, not entered , null, null, null, null, null)";
 
 		PreparedStatement pstatement = null;
 		try {
@@ -260,7 +260,7 @@ public class GradeDAO {
 	}
 	
 	public int editGrade(Grade grade) throws SQLException {
-		String query = "UPDATE exam SET state=?, failed=?, recalled=?, absent=?, grade=?, merit=? WHERE id_appealeal=? and id_student=?" ;
+		String query = "UPDATE exam SET state=?, failed=?, recalled=?, absent=?, grade=?, merit=? WHERE id_appeal=? and id_student=?" ;
 		PreparedStatement pstatement = null;
 		int code = 0;
 		try {
@@ -328,7 +328,7 @@ public class GradeDAO {
 	public int refuseGrade(int appealId, int studentId) throws SQLException{
 		connection.setAutoCommit(false);
 		String query = "UPDATE exam SET state='refused', failed='1', recalled='0', absent='0', grade=null, merit=null " + 
-					   "WHERE id_appealeal = ? and id_student = ?";
+					   "WHERE id_appeal = ? and id_student = ?";
 		PreparedStatement pstatement = null;
 		ResultSet rs = null;
 		int exitCode = 1;
@@ -364,7 +364,7 @@ public class GradeDAO {
 	 */
 	public int reportGrade(int appealId) throws SQLException{
 		connection.setAutoCommit(false);
-		String query = "UPDATE exam SET state='reported' WHERE id_appealeal = ?";
+		String query = "UPDATE exam SET state='reported' WHERE id_appeal = ?";
 		PreparedStatement pstatement = null;
 		ResultSet rs = null;
 		int exitCode = 1;
