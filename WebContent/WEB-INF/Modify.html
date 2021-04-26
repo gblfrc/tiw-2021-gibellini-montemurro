@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Modify grade</title>
+</head>
+<body>
+	<h1>Modify grade</h1>
+	<form action="Edit" method="POST">
+		<strong>Student ID: </strong> <input type="hidden" value="studentId"
+			th:text="${studentId}"> 1492
+		<br> <strong>Name: </strong>
+		<nobr th:text="${studentName}"> John </nobr>
+		<br> <strong>Surname: </strong>
+		<nobr th:text="${studentSurname}"> Smith </nobr>
+		<br> <strong>Course title: </strong>
+		<nobr th:text="${appeal.ourseTitle}"> Metrics </nobr>
+		<br> <strong>Appeal date: </strong>
+		<nobr th:text="${studentId}"> 31/12/2020 </nobr>
+		<br> Grade: <select>
+			<option value="absent">ABSENT</option>
+			<option value="recalled">RECALLED</option>
+			<option value="failed">FAILED</option>
+			<option value="eighteen">18</option>
+			<option value="nineteen">19</option>
+			<option value="twenty">20</option>
+			<option value="twentyOne">21</option>
+			<option value="twentyTwo">22</option>
+			<option value="twentyThree">23</option>
+			<option value="twentyFour">24</option>
+			<option value="twentyFive">25</option>
+			<option value="twentySix">26</option>
+			<option value="twentySeven">27</option>
+			<option value="twentyEight">28</option>
+			<option value="twentyNine">29</option>
+			<option value="thirty">30</option>
+			<option value="thirtyWithMerit">30 WITH MERIT</option>
+		</select> <br> <br>
+		<input type="submit" value="Enter">
+	</form>
+</body>
+</html>
