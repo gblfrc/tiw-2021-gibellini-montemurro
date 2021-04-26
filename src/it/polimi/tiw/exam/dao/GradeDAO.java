@@ -19,8 +19,7 @@ public class GradeDAO {
 	
 	public List<Grade> getGradesByAppealId(int appealId) throws SQLException{
 		List<Grade> grades=new ArrayList<Grade>();
-		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appealeal=? ";			 
-		
+		String query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ";			 
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
 		
@@ -32,7 +31,7 @@ public class GradeDAO {
 			
 			while(result.next()) {
 				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_appealeal"));
+				grade.setAppealId(result.getInt("id_appeal"));
 				grade.setStudentId(result.getInt("id_student"));
 				grade.setStudentSurname(result.getString("surname"));
 				grade.setStudentName(result.getString("name"));
