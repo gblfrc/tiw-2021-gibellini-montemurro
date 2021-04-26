@@ -16,7 +16,7 @@ public class AppealDAO {
 	
 	public List<Appeal> getAppealsByCourse(Course course) throws SQLException { //needs Course Object
 		
-		String query = "SELECT * FROM Appeal WHERE id_course = ? ORDER BY date DESC";
+		String query = "SELECT * FROM Appeal JOIN Course ON Appeal.id_course = Course.id_course WHERE Appeal.id_course = ? ORDER BY date DESC";
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		List<Appeal> resultList = new LinkedList<>();
@@ -29,9 +29,10 @@ public class AppealDAO {
 			while(rs.next()==true) {
 				Appeal temp = new Appeal();		
 				
-				temp.setAppealId(rs.getInt("id_appeal"));
-				temp.setCourseId(rs.getInt("id_course"));
-				temp.setDate(rs.getDate("date")); 	// may want to check if this works later on
+				temp.setAppealId(rs.getInt("Appeal.id_appeal"));
+				temp.setCourseId(rs.getInt("Appeal.id_course"));
+				temp.setCourseTitle(rs.getString("Course.title"));
+				temp.setDate(rs.getDate("Appeal.date")); 	// may want to check if this works later on
 				
 				resultList.add(temp);
 			}
@@ -53,7 +54,7 @@ public class AppealDAO {
 	}
 	
 	public Appeal getAppealById(int id) throws SQLException{
-		String query = "SELECT * FROM appeal WHERE id_appeal = ?";
+		String query = "SELECT * FROM appeal JOIN course ON appeal.id_course = course.id_course WHERE appeal.id_appeal = ?";
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		Appeal result = null;
@@ -62,9 +63,10 @@ public class AppealDAO {
 			statement.setInt(1, id);
 			rs = statement.executeQuery();
 			if (rs.next()==true) {
-				result = new Appeal(rs.getInt("id_appeal"),
-									rs.getInt("id_course"),
-									rs.getDate("date"));
+				result = new Appeal(rs.getInt("appeal.id_appeal"),
+									rs.getInt("appeal.id_course"),
+									rs.getString("course.title"),
+									rs.getDate("appeal.date"));
 			}
 		} finally {
 			try {

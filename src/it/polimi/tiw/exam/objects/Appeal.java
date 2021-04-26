@@ -6,6 +6,7 @@ public class Appeal {
 
 	private int appealId;
 	private int courseId;
+	private String courseTitle;
 	private Date date;
 	
 	//default constructor
@@ -14,9 +15,10 @@ public class Appeal {
 	}
 	
 	//constructor with attributes
-	public Appeal (int id, int courseId, Date date) {
+	public Appeal (int id, int courseId, String courseTitle, Date date) {
 		this.appealId=id;
 		this.courseId=courseId;
+		this.courseTitle=courseTitle;
 		this.date=date;
 	}
 	
@@ -29,6 +31,10 @@ public class Appeal {
 	
 	public int getCourseId() {
 		return this.courseId;
+	}
+	
+	public String getCourseTitle() {
+		return this.courseTitle;
 	}
 	
 	public Date getDate() {
@@ -44,6 +50,10 @@ public class Appeal {
 	
 	public void setCourseId(int id) {
 		this.courseId=id;
+	}
+	
+	public void setCourseTitle(String title) {
+		this.courseTitle=title;
 	}
 	
 	public void setDate(Date date) {
