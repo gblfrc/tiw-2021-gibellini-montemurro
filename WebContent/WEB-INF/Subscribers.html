@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>List of your courses</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+	<h1>Welcome to subscribers page</h1>
+	<table border="1">
+		<thead>
+			<tr>
+				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=studentId)}">StudentId</a></th>
+				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=surname)}">Surname</a></th>
+				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=name)}">Name</a></th>
+				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=email)}">Email</a></th>
+				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=degree_course)}">Degree course</a></th>
+				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=grade)}">Grade</a></th>
+				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=state)}">State</a></th>
+				<th>Edit Links</th>
+				<th><a href="Login.html" th:href="@{/PublishGrade(appeal=${appId})}">Publish</a></th>
+			</tr>
+		</thead>
+		<tbody th:remove="all-but-first">
+			<tr th:each="gr : ${grades}">
+				<td th:text=${gr.studentId}>0</td>
+				<td th:text=${gr.studentSurname}>Resta</td>
+				<td th:text=${gr.studentName}>Ferruccio</td>
+				<td th:text=${gr.email}>ferruccio.resta@mail.polimi.it</td>
+				<td th:text=${gr.degreeCourse}>Ingegneria Informatica</td>
+				<td th:text=${gr.grade}>30</td>
+				<td th:text=${gr.state}>entered</td>
+				<td><a href="Home.html"
+					th:href="@{/EditGrade}">Edit</a></td>
+			</tr>
+		</tbody>
+	</table>
+
+</body>
+</html>
