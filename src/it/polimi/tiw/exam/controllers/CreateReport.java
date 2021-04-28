@@ -35,7 +35,7 @@ public class CreateReport extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int appId;
 		try {
-			appId = Integer.parseInt(request.getParameter("appealId"));
+			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't evade the request");
 			return;

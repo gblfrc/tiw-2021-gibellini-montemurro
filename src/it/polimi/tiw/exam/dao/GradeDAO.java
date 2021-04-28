@@ -276,6 +276,62 @@ public class GradeDAO {
 		return code;
 	}
 	
+	public void enterGrade(int appealId, int studentId, String gradeValue) throws SQLException {
+		String query="UPDATE exam SET state='entered', failed=?, recalled=?, absent=?, grade=?, merit=? WHERE id_appeal=? and id_student=?";
+
+		PreparedStatement pstatement = null;
+		try {
+			pstatement = connection.prepareStatement(query);
+
+			if(gradeValue.equalsIgnoreCase("failed")) {
+				pstatement.setBoolean(1, true);
+				pstatement.setBoolean(2, false);
+				pstatement.setBoolean(3, false);
+				pstatement.setNull(4, java.sql.Types.INTEGER);
+				pstatement.setNull(5, java.sql.Types.BOOLEAN);
+			}
+			else if(gradeValue.equalsIgnoreCase("recalled")) {
+				pstatement.setBoolean(1, false);
+				pstatement.setBoolean(2, true);
+				pstatement.setBoolean(3, false);
+				pstatement.setNull(4, java.sql.Types.INTEGER);
+				pstatement.setNull(5, java.sql.Types.BOOLEAN);
+			}
+			else if(gradeValue.equalsIgnoreCase("absent")) {
+				pstatement.setBoolean(1, false);
+				pstatement.setBoolean(2, false);
+				pstatement.setBoolean(3, true);
+				pstatement.setNull(4, java.sql.Types.INTEGER);
+				pstatement.setNull(5, java.sql.Types.BOOLEAN);
+			}
+			else if(gradeValue.equalsIgnoreCase("30 with merit")){
+				pstatement.setBoolean(1, false);
+				pstatement.setBoolean(2, false);
+				pstatement.setBoolean(3, false);
+				pstatement.setInt(4, 30);
+				pstatement.setBoolean(5, true);	
+			}
+			else {
+				pstatement.setBoolean(1, false);
+				pstatement.setBoolean(2, false);
+				pstatement.setBoolean(3, false);
+				pstatement.setInt(4, Integer.parseInt(gradeValue));
+				pstatement.setBoolean(5, false);
+			}
+			pstatement.setInt(6, appealId);
+			pstatement.setInt(7, studentId);
+			pstatement.executeUpdate();
+			} catch (SQLException e) {
+			throw new SQLException(e);
+		} finally {
+			try {
+				pstatement.close();
+			} catch (Exception e1) {}
+		}	
+	}
+	
+	
+	
 	public int editGrade(Grade grade) throws SQLException {
 		String query = "UPDATE exam SET state=?, failed=?, recalled=?, absent=?, grade=?, merit=? WHERE id_appeal=? and id_student=?" ;
 		PreparedStatement pstatement = null;

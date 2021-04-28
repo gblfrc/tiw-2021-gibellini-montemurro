@@ -3,20 +3,29 @@
 <head>
 <title>List of your courses</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
+<link rel="stylesheet" type="text/css" media="all"
+	href="css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
 	<h1>Welcome to subscribers page</h1>
 	<table border="1">
 		<thead>
 			<tr>
-				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=studentId)}">StudentId</a></th>
-				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=surname)}">Surname</a></th>
-				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=name)}">Name</a></th>
-				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=email)}">Email</a></th>
-				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=degree_course)}">Degree course</a></th>
-				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=grade)}">Grade</a></th>
-				<th><a href="Login.html" th:href="@{/GetFieldAsc(appeal=${appId},field=state)}">State</a></th>
+				<th><a href="Login.html"
+					th:href="@{/GetSubscribers(appeal=${appId},field='studentId',changeOrder='true')}">StudentId</a></th>
+				<th><a href="Login.html"
+					th:href="@{/GetSubscribers(appeal=${appId},field='surname',changeOrder='true')}">Surname</a></th>
+				<th><a href="Login.html"
+					th:href="@{/GetSubscribers(appeal=${appId},field='name',changeOrder='true')}">Name</a></th>
+				<th><a href="Login.html"
+					th:href="@{/GetSubscribers(appeal=${appId},field='email',changeOrder='true')}">Email</a></th>
+				<th><a href="Login.html"
+					th:href="@{/GetSubscribers(appeal=${appId},field='degree_course',changeOrder='true')}">Degree
+						course</a></th>
+				<th><a href="Login.html"
+					th:href="@{/GetSubscribers(appeal=${appId},field='grade',changeOrder='true')}">Grade</a></th>
+				<th><a href="Login.html"
+					th:href="@{/GetSubscribers(appeal=${appId},field='state',changeOrder='true')}">State</a></th>
 				<th>Edit Links</th>
 			</tr>
 		</thead>
@@ -27,14 +36,24 @@
 				<td th:text=${gr.studentName}>Ferruccio</td>
 				<td th:text=${gr.email}>ferruccio.resta@mail.polimi.it</td>
 				<td th:text=${gr.degreeCourse}>Ingegneria Informatica</td>
-				<td th:text=${gr.grade}>30</td>
-				<td th:text=${gr.state}>entered</td>
+				<td th:text=${#strings.toUpperCase(gr.grade)}
+					th:class="${#strings.equalsIgnoreCase(gr.grade, 'recalled') or
+							    #strings.equalsIgnoreCase(gr.grade, 'failed') or
+								#strings.equalsIgnoreCase(gr.grade, 'absent') ? 'fail' : 'passed'}"
+					class="passed">30</td>
+				<td th:text=${#strings.toUpperCase(gr.state)}>entered</td>
 				<td><a href="Home.html"
-					th:href="@{/GetModify(appeal=${appId}, studentId=${gr.studentId}, surname=${gr.studentSurname},
-					name=${gr.studentName})}">Edit</a></td>
+					th:href="@{/GetModify(appealId=${gr.appealId},studentId=${gr.studentId})}">Edit</a></td>
 			</tr>
 		</tbody>
 	</table>
- 	<div><a href="Login.html" th:href="@{/PublishGrade(appeal=${appId})}"><button>Publish</button></a></div>
+	<div>
+		<a href="Login.html" th:href="@{/PublishGrade(appeal=${appId})}"><button>Publish</button></a>
+	</div>
+
+	<form action="CreateReport" method="POST">
+		<input type="hidden" name="appeal" th:value="${appId}"><input
+			type="submit" value="Report">
+	</form>
 </body>
 </html>

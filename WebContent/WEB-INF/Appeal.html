@@ -16,9 +16,13 @@
 		</thead>
 		<tbody th:remove="all-but-first">
 			<tr th:each="app : ${appeals}">
+
 				<td><a href="Home.html"
-					th:href="@{/GetResult(appeal=${app.appealId})}"
-					th:text="${app.date}"> 2000-02-16</a></td>
+					th:href="${#strings.equalsIgnoreCase(session.user.accessRights,'Professor')}? 
+					@{/GetSubscribers(appeal=${app.appealId})} : 
+					@{/GetResult(appeal=${app.appealId})} "
+					th:text="${app.date}"> 1999-04-03</a></td>
+
 			</tr>
 		</tbody>
 	</table>

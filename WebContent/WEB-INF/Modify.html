@@ -7,34 +7,35 @@
 <body>
 	<h1>Modify grade</h1>
 	<form action="Edit" method="POST">
-		<strong>Student ID: </strong> <input type="hidden" value="studentId"
-			th:text="${studentId}"> 1492
+		<strong>Student ID: </strong> <input type="hidden" name="studentId" th:value="${grade.studentId}"
+			th:text="${grade.studentId}"> 1492
+		<input type="hidden" name="appealId" th:value="${grade.appealId}">
 		<br> <strong>Name: </strong>
-		<nobr th:text="${studentName}"> John </nobr>
+		<nobr th:text="${grade.studentName}"> John </nobr>
 		<br> <strong>Surname: </strong>
-		<nobr th:text="${studentSurname}"> Smith </nobr>
+		<nobr th:text="${grade.studentSurname}"> Smith </nobr>
 		<br> <strong>Course title: </strong>
 		<nobr th:text="${appeal.courseTitle}"> Metrics </nobr>
 		<br> <strong>Appeal date: </strong>
 		<nobr th:text="${appeal.date}"> 31/12/2020 </nobr>
-		<br> Grade: <select>
+		<br> Grade: <select name="gradeValue">
 			<option value="absent">ABSENT</option>
 			<option value="recalled">RECALLED</option>
 			<option value="failed">FAILED</option>
-			<option value="eighteen">18</option>
-			<option value="nineteen">19</option>
-			<option value="twenty">20</option>
-			<option value="twentyOne">21</option>
-			<option value="twentyTwo">22</option>
-			<option value="twentyThree">23</option>
-			<option value="twentyFour">24</option>
-			<option value="twentyFive">25</option>
-			<option value="twentySix">26</option>
-			<option value="twentySeven">27</option>
-			<option value="twentyEight">28</option>
-			<option value="twentyNine">29</option>
-			<option value="thirty">30</option>
-			<option value="thirtyWithMerit">30 WITH MERIT</option>
+			<option value="18">18</option>
+			<option value="19">19</option>
+			<option value="20">20</option>
+			<option value="21">21</option>
+			<option value="22">22</option>
+			<option value="23">23</option>
+			<option value="24">24</option>
+			<option value="25">25</option>
+			<option value="26">26</option>
+			<option value="27">27</option>
+			<option value="28">28</option>
+			<option value="29">29</option>
+			<option value="30">30</option>
+			<option value="30 with merit">30 WITH MERIT</option>
 		</select> <br> <br>
 		<input type="submit" value="Enter">
 	</form>

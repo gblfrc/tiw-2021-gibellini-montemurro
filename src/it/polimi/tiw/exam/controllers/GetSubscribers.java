@@ -46,19 +46,43 @@ public class GetSubscribers extends HttpServlet {
 			return;
 		}
 		
+		Boolean changeOrder=false;
+		String field=null;
+		try {
+			changeOrder=Boolean.parseBoolean(request.getParameter("changeOrder"));
+			field=request.getParameter("field");
+			
+			if((session.getAttribute(field+ "Order")==null||session.getAttribute(field+ "Order")=="DESC") && changeOrder) {
+				session.setAttribute(field+ "Order", "ASC");
+			}
+			else if(session.getAttribute(field+ "Order")=="ASC" && changeOrder) {
+				session.setAttribute(field+ "Order", "DESC");
+			}
+			
+		} catch (Exception e) {
+			changeOrder=false;
+			field=null;
+		}
+		
+		
 		Integer appId = null;
 		try {
-			appId = Integer.parseInt(request.getParameter("appealId"));
+			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (NumberFormatException| NullPointerException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 			return;
 		}
+		
 		User user = (User) session.getAttribute("user");
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		List<Grade> grades= new ArrayList<Grade>();
 		
 		try {
-			if(user.getAccessRights().equals("Professor")) grades=gradeDAO.getGradesByAppealId(appId);
+			if(user.getAccessRights().equals("Professor")) {
+				if(field==null || session.getAttribute(field+ "Order")==null) grades=gradeDAO.getGradesByAppealId(appId);
+				else if (session.getAttribute(field+ "Order")=="ASC") grades=gradeDAO.getGradesByFieldAsc(appId,field);
+				else if (session.getAttribute(field+ "Order")=="DESC") grades=gradeDAO.getGradesByFieldDesc(appId,field);
+			}
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find grades");
 			return;
