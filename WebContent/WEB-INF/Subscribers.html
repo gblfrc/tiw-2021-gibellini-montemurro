@@ -30,16 +30,16 @@
 			</tr>
 		</thead>
 		<tbody th:remove="all-but-first">
-			<tr th:each="gr : ${grades}">
+			<tr th:each="gr,iterStat : ${grades}" th:class="${iterStat.even} ? 'even'">
 				<td th:text=${gr.studentId}>0</td>
 				<td th:text=${gr.studentSurname}>Resta</td>
 				<td th:text=${gr.studentName}>Ferruccio</td>
 				<td th:text=${gr.email}>ferruccio.resta@mail.polimi.it</td>
 				<td th:text=${gr.degreeCourse}>Ingegneria Informatica</td>
-				<td th:text=${#strings.toUpperCase(gr.grade)}
+				<td th:text="${#strings.equals(gr.state, 'not entered') ? 'null' : #strings.toUpperCase(gr.grade)}"
 					th:class="${#strings.equalsIgnoreCase(gr.grade, 'recalled') or
 							    #strings.equalsIgnoreCase(gr.grade, 'failed') or
-								#strings.equalsIgnoreCase(gr.grade, 'absent') ? 'fail' : 'passed'}"
+								#strings.equalsIgnoreCase(gr.grade, 'absent')} ? 'fail' : (${not #strings.equalsIgnoreCase(gr.grade, '0')} ? 'passed')"
 					class="passed">30</td>
 				<td th:text=${#strings.toUpperCase(gr.state)}>ENTERED</td>
 				<td><a href="Home.html"
