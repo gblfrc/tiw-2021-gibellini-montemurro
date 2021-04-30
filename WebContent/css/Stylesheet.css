@@ -1,0 +1,14 @@
+@charset "ISO-8859-1";
+
+tr.even {
+	background-color: grey;
+}
+
+td.fail {
+	background-color: red;
+	text-align: center;
+}
+td.passed {
+	background-color: green;
+	text-align: center;
+}

@@ -4,11 +4,11 @@
 <title>List of your courses</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" media="all"
-	href="css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
+	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
 	<h1>Welcome to subscribers page</h1>
-	<table border="1">
+	<table border="3">
 		<thead>
 			<tr>
 				<th><a href="Login.html"
@@ -41,7 +41,7 @@
 							    #strings.equalsIgnoreCase(gr.grade, 'failed') or
 								#strings.equalsIgnoreCase(gr.grade, 'absent') ? 'fail' : 'passed'}"
 					class="passed">30</td>
-				<td th:text=${#strings.toUpperCase(gr.state)}>entered</td>
+				<td th:text=${#strings.toUpperCase(gr.state)}>ENTERED</td>
 				<td><a href="Home.html"
 					th:href="@{/GetModify(appealId=${gr.appealId},studentId=${gr.studentId})}">Edit</a></td>
 			</tr>
