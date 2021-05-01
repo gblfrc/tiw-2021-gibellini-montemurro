@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import it.polimi.tiw.exam.objects.*;
@@ -436,8 +437,8 @@ public class GradeDAO {
 	 * @ensures \result is either '1', in case update query was correct, or '0' in case something went wrong
 	 */
 	public int reportGrade(int appealId) throws SQLException{
-		connection.setAutoCommit(false);
-		String query = "UPDATE exam SET state='reported' WHERE id_appeal = ?";
+		connection.setAutoCommit(false); //may want to remove this and handle all report commits in ReportDAO
+		String query = "UPDATE exam SET state='recorded' WHERE id_appeal = ? and state = 'published'";
 		PreparedStatement pstatement = null;
 		ResultSet rs = null;
 		int exitCode = 1;
@@ -447,6 +448,7 @@ public class GradeDAO {
 			pstatement.executeUpdate();
 			connection.commit();
 		} catch (SQLException e){
+			e.printStackTrace();
 			connection.rollback();
 			exitCode = 0;
 		} finally {
@@ -546,4 +548,65 @@ public class GradeDAO {
 		}
 		return grade;		
 	}
+	
+	public List<Grade> getRecordedGrades (Report report) throws SQLException{
+		Grade grade=null;
+		String query="SELECT * FROM exam JOIN report ON exam.id_appeal = report.id_appeal "
+									  + "JOIN student ON exam.id_student = student.id_student "
+									  + "WHERE exam.state='recorded' and exam.id_appeal=?";
+		ResultSet result=null;
+		PreparedStatement pstatement=null;
+		List<Grade> resultList = new LinkedList<>();
+		try {
+			pstatement=connection.prepareStatement(query);
+			pstatement.setInt(1, report.getAppeal().getAppealId());
+			result=pstatement.executeQuery();
+			while (result.next()) {
+				grade = new Grade();
+				grade.setAppealId(result.getInt("exam.id_appeal"));
+				grade.setStudentId(result.getInt("exam.id_student"));
+				grade.setStudentSurname(result.getString("student.surname"));
+				grade.setStudentName(result.getString("student.name"));
+				grade.setEmail(result.getString("student.email"));
+				grade.setDegreeCourse(result.getString("student.degree_course"));
+				if(result.getBoolean("exam.failed")==true) {
+					grade.setGrade("failed");
+				}
+				else if(result.getBoolean("exam.recalled")==true) {
+					grade.setGrade("recalled");
+				}
+				else if(result.getBoolean("exam.absent")==true) {
+					grade.setGrade("absent");
+				}
+				else {
+					if(result.getBoolean("exam.merit")==true) {
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+					}
+					else {
+						grade.setGrade(Integer.toString(result.getInt("grade")));
+					}
+				}
+				grade.setState(result.getString("exam.state"));
+				resultList.add(grade);
+			}
+		} catch (SQLException e) {
+			throw new SQLException(e);
+
+		} finally {
+			try {
+				if (result != null)
+					result.close();
+			} catch (Exception e1) {
+				throw new SQLException("Cannot close result");
+			}
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (Exception e1) {
+				throw new SQLException("Cannot close statement");
+			}
+		}
+		return resultList;		
+	}
+	
 }

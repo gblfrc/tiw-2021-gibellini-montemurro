@@ -66,8 +66,9 @@ public class ReportDAO {
 				result.setReportId(rs.getInt("id_report"));
 				result.setAppeal(appeal);
 				result.setCreationDate(rs.getDate("date"));
-				result.setCreationTime(rs.getTime("time"));
-				// result.setGrades complete this statement after finalizing GradeDAO
+				result.setCreationTime(rs.getTime("hour"));
+				GradeDAO gradeDao = new GradeDAO(connection);
+				result.setGrades(gradeDao.getRecordedGrades(result)); //check after finalizing db for reports
 			}
 		} finally {
 			try {
@@ -90,18 +91,18 @@ public class ReportDAO {
 	}
 
 	public void createReport(int appealId) throws SQLException {
-		connection.setAutoCommit(false);
 		GradeDAO gradeDao = new GradeDAO(connection); //may want to check SQLExceptions
 		int code = gradeDao.reportGrade(appealId);
 		if (code == 1) {
 			String query = "INSERT INTO report(id_appeal, date, hour) VALUES (?, ?, ?)";
 			PreparedStatement pstatement = null;
 			ResultSet rs = null;
+			connection.setAutoCommit(false);
 			try {
 				pstatement = connection.prepareStatement(query);
 				pstatement.setInt(1, appealId);
 				pstatement.setDate(2, new Date(Calendar.getInstance().getTime().getTime())); //introduces the current date
-				pstatement.setTime(2, new Time(Calendar.getInstance().getTime().getTime())); //introduces the current time
+				pstatement.setTime(3, new Time(Calendar.getInstance().getTime().getTime())); //introduces the current time
 				pstatement.executeUpdate();
 				connection.commit();
 			} catch (SQLException e) {

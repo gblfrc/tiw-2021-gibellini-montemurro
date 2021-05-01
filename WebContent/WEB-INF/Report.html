@@ -38,10 +38,10 @@
 			<th>Grade</th>
 		</tr>
 		<tbody th:remove="all-but-first">
-			<tr th:each="grade : ${report.grades}"
-				th:class="${grade.even}? 'even'">
+			<tr th:each="grade,iterStat : ${report.grades}"
+				th:class="${iterStat.even}? 'even'">
 				<td th:text="${grade.studentId}">1492</td>
-				<td th:text="${grade.studentSurame}">Smith</td>
+				<td th:text="${grade.studentSurname}">Smith</td>
 				<td th:text="${grade.studentName}">John</td>
 				<td th:text="${#strings.toUpperCase(grade.grade)}"
 					th:class="${#strings.equalsIgnoreCase(grade.grade, 'recalled') or
