@@ -174,9 +174,9 @@ public class GradeDAO {
 		else if(field.equals("name"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.name DESC";													 
 		else if(field.equals("email"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.email DESC";		
 		else if(field.equals("degree_course"))query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.degree_course DESC";
-		else if(field.equals("grade")) {query="((SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=?)" +" UNION"+" (SELECT * FROM student AS s2 "
-				+ "join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='not entered'))ORDER BY e1.merit DESC, "
-				+ "e1.grade DESC,e1.recalled DESC, e1.absent DESC, e1.failed DESC";}
+		else if(field.equals("grade")) {query="(SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=?" +" UNION"+" SELECT * FROM student AS s2 "
+				+ "join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='not entered')ORDER BY merit DESC, "
+				+ "grade DESC,recalled DESC, absent DESC,failed DESC";}
 		else if(field.equals("state")) {query="(SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='recorded')"+" UNION"
 				+ "(SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='refused')"+" UNION"
 				+ "(SELECT * FROM student AS s3 join exam AS e3 on s3.id_student=e3.id_student WHERE e3.id_appeal=? and e3.state='published')"+" UNION"
@@ -251,6 +251,7 @@ public class GradeDAO {
 			
 		return grades;
     }
+	
 	
 	public int insertGrade(int appealId, int studentId) throws SQLException {
 		int code = 0;
