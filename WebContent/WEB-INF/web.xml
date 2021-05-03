@@ -29,7 +29,6 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>SessionChecker</filter-name>
-		<url-pattern>/GetAccess</url-pattern>
 		<url-pattern>/GetCourses</url-pattern>
 		<url-pattern>/GetAppeal</url-pattern>
 		<url-pattern>/GetResult</url-pattern>

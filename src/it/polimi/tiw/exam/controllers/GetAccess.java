@@ -47,7 +47,6 @@ public class GetAccess extends HttpServlet {
 
 		Integer personId = null;
 		String password = null;
-		
 
 		try {
 			personId = Integer.parseInt(request.getParameter("personId"));
@@ -58,7 +57,7 @@ public class GetAccess extends HttpServlet {
 		}
 
 		if (password == null || password.isEmpty()) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Not possible to check credentials");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Impossible to check credentials");
 			return;
 		}
 
@@ -68,13 +67,13 @@ public class GetAccess extends HttpServlet {
 		try {
 			user = userDAO.getUser(personId, password);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not Possible to access DB");
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
 			return;
 		}
 
 		String path;
 		if (user == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unavailable user");
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
 			return;
 		} else {
 			request.getSession().setAttribute("user", user);
