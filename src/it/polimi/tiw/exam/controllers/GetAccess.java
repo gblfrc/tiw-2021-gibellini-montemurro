@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 
 /*import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -28,18 +29,19 @@ import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 import it.polimi.tiw.exam.dao.UserDAO;
+import it.polimi.tiw.exam.forms.UserForm;
 
 @WebServlet("/GetAccess")
 public class GetAccess extends HttpServlet {
-	
+
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
 	public void init() throws ServletException {
-    	ServletContext servletContext = getServletContext();
-    	connection = ConnectionHandler.getConnection(servletContext);
-    	templateEngine = TemplateEngineHandler.getEngine(servletContext);
+		ServletContext servletContext = getServletContext();
+		connection = ConnectionHandler.getConnection(servletContext);
+		templateEngine = TemplateEngineHandler.getEngine(servletContext);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -56,14 +58,19 @@ public class GetAccess extends HttpServlet {
 			return;
 		}
 
-		if (password == null || password.isEmpty()) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Impossible to check credentials");
-			return;
-		}
-
+		UserForm uf = new UserForm(personId, password);
 		UserDAO userDAO = new UserDAO(connection);
 		User user = null;
 
+		if (!uf.isValid()) {
+			String path = "/Login.html";
+			ServletContext servletContext = getServletContext();
+			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+			ctx.setVariable("form", uf);
+			templateEngine.process(path, ctx, response.getWriter());
+			return;
+		} 
+		
 		try {
 			user = userDAO.getUser(personId, password);
 		} catch (SQLException e) {
@@ -82,10 +89,12 @@ public class GetAccess extends HttpServlet {
 		}
 
 	}
-	
+
 	public void destroy() {
 		try {
-		ConnectionHandler.closeConnection(connection);
-		} catch (SQLException e) {};
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+		}
+		;
 	}
 }
