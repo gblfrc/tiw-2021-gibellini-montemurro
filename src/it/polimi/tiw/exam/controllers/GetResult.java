@@ -40,12 +40,6 @@ public class GetResult extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
-		String loginPath = getServletContext().getContextPath() + "/Login.html";
-		if (session.isNew() || session.getAttribute("user") == null) {
-			response.sendRedirect(loginPath);
-			return;
-		}
-		
 		//gets user
 		User user = null;
 		try {

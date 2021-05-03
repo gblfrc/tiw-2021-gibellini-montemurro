@@ -27,12 +27,6 @@ public class Edit extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String loginpath = getServletContext().getContextPath() + "/Login.html";
-		HttpSession session = request.getSession();
-		if (session.isNew() || session.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		}
 		int appealId=Integer.parseInt(request.getParameter("appealId"));
 		int studentId=Integer.parseInt(request.getParameter("studentId"));
 		String gradeValue=request.getParameter("gradeValue");

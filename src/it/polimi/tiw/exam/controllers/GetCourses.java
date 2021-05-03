@@ -46,14 +46,7 @@ public class GetCourses extends HttpServlet {
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String loginpath = getServletContext().getContextPath() + "/login.html";
 		HttpSession session = request.getSession();
-		
-		if (session.isNew() || session.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		}
-		
 		User user = (User) session.getAttribute("user");
 		CourseDAO courseDAO= new CourseDAO(connection);
 		List<Course> courses= new ArrayList<Course>();

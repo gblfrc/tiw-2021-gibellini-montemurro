@@ -78,8 +78,6 @@ public class GetAccess extends HttpServlet {
 			return;
 		} else {
 			request.getSession().setAttribute("user", user);
-			//request.getSession().setAttribute("userId", user.getPersonId());
-			//request.getSession().setAttribute("accessRigths", user.getAccessRights());
 			path = getServletContext().getContextPath() + "/GetCourses";
 			response.sendRedirect(path);
 		}

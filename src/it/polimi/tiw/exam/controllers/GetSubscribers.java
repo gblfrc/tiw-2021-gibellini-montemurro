@@ -38,14 +38,7 @@ public class GetSubscribers extends HttpServlet {
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String loginpath = getServletContext().getContextPath() + "/Login.html";
 		HttpSession session = request.getSession();
-		
-		if (session.isNew() || session.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		}
-		
 		Boolean changeOrder=false;
 		String field=null;
 		try {
