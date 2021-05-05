@@ -36,13 +36,9 @@ public class GetCourses extends HttpServlet {
     }
       
 	public void init() throws ServletException {
-		try {
-			ServletContext servletContext = getServletContext();
-			connection = ConnectionHandler.getConnection(getServletContext());
-			templateEngine = TemplateEngineHandler.getEngine(servletContext);
-		} catch (UnavailableException e) {
-			throw new ServletException(e.getMessage());
-		}
+		ServletContext servletContext = getServletContext();
+		connection = ConnectionHandler.getConnection(getServletContext());
+		templateEngine = TemplateEngineHandler.getEngine(servletContext);
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

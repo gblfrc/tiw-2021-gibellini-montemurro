@@ -20,6 +20,7 @@ import org.thymeleaf.context.WebContext;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.CourseDAO;
 import it.polimi.tiw.exam.objects.Course;
+import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
@@ -51,8 +52,21 @@ public class GetAppeal extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 			return;
 		}
-
+		HttpSession session=request.getSession();
+		
 		CourseDAO coursesDAO = new CourseDAO(connection);
+		User user=null;
+		try {
+			user=(User)session.getAttribute("user");
+			if(coursesDAO.hasCourse(cId, user.getPersonId(), user.getAccessRights())==false) {
+				response.sendRedirect(getServletContext().getContextPath()+"/GetCourses");
+				return;
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Illegal course request");
+			return;
+		}
+		
 		Course course = null;
 		List<Appeal> appeals=new LinkedList<>();
 		try {
@@ -63,7 +77,7 @@ public class GetAppeal extends HttpServlet {
 			}
 			
 			AppealDAO appealDAO = new AppealDAO(connection);
-			appeals = appealDAO.getAppealsByCourse(course);
+			appeals = appealDAO.getAppealsByCourse(course.getCourseId(),user.getPersonId(),user.getAccessRights());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return;

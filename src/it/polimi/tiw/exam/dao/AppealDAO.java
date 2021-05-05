@@ -14,25 +14,29 @@ public class AppealDAO {
 	}
 	
 	
-	public List<Appeal> getAppealsByCourse(Course course) throws SQLException { //needs Course Object
-		
-		String query = "SELECT * FROM Appeal JOIN Course ON Appeal.id_course = Course.id_course WHERE Appeal.id_course = ? ORDER BY date DESC";
+	public List<Appeal> getAppealsByCourse(int courseId, int personId, String accessRights) throws SQLException { //needs Course Object
+		String query=null;
+		if(accessRights.equals("Professor")) query= "SELECT * FROM Appeal WHERE id_course = ? ORDER BY date DESC";
+		else if(accessRights.equals("Student")) query= "SELECT * FROM Appeal JOIN Exam ON Appeal.id_appeal = Exam.id_appeal WHERE Appeal.id_course = ? and Exam.id_student=? ORDER BY date DESC";
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		List<Appeal> resultList = new LinkedList<>();
 		
 		try {
 			statement = connection.prepareStatement(query);
-			statement.setInt(1, course.getCourseId()); 		//update this after seeing which getter for courseId
-												 			//is actually implemented in Course Object
+			statement.setInt(1, courseId); 
+			if(accessRights.equals("Student")) {
+				statement.setInt(2, personId); 
+			}
+			
 			rs = statement.executeQuery();
 			while(rs.next()==true) {
 				Appeal temp = new Appeal();		
 				
 				temp.setAppealId(rs.getInt("Appeal.id_appeal"));
 				temp.setCourseId(rs.getInt("Appeal.id_course"));
-				temp.setCourseTitle(rs.getString("Course.title"));
-				temp.setDate(rs.getDate("Appeal.date")); 	// may want to check if this works later on
+				//temp.setCourseTitle(rs.getString("Course.title"));
+				temp.setDate(rs.getDate("Appeal.date")); 	
 				
 				resultList.add(temp);
 			}
