@@ -436,24 +436,22 @@ public class GradeDAO {
 	
 	/**
 	 * @ensures \result is either '1', in case update query was correct, or '0' in case something went wrong
+	 * //CALL THIS METHOD INSIDE ONE WITH COMMIT CONTROL!!
 	 */
-	public int reportGrade(int appealId) throws SQLException{
-		connection.setAutoCommit(false); //may want to remove this and handle all report commits in ReportDAO
-		String query = "UPDATE exam SET state='recorded' WHERE id_appeal = ? and state = 'published'";
+	public int reportGrade(int appealId, int reportId) throws SQLException{
+		String query = "UPDATE exam SET state='recorded' and id_report = ? WHERE id_appeal = ? and state = 'published'";
 		PreparedStatement pstatement = null;
 		ResultSet rs = null;
 		int exitCode = 1;
 		try {
 			pstatement = connection.prepareStatement(query);
 			pstatement.setInt(1, appealId);
+			pstatement.setInt(2, reportId);
 			pstatement.executeUpdate();
-			connection.commit();
 		} catch (SQLException e){
 			e.printStackTrace();
-			connection.rollback();
 			exitCode = 0;
 		} finally {
-			connection.setAutoCommit(true);
 			try {
 				if (rs != null)
 					rs.close();

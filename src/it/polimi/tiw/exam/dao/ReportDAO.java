@@ -91,24 +91,60 @@ public class ReportDAO {
 	}
 
 	public void createReport(int appealId) throws SQLException {
-		GradeDAO gradeDao = new GradeDAO(connection); //may want to check SQLExceptions
-		int code = gradeDao.reportGrade(appealId);
-		if (code == 1) {
-			String query = "INSERT INTO report(id_appeal, date, hour) VALUES (?, ?, ?)";
+		GradeDAO gradeDao = new GradeDAO(connection); // may want to check SQLExceptions
+		String query = "INSERT INTO report(id_appeal, date, hour) VALUES (?, ?, ?)";
+		PreparedStatement pstatement = null;
+		ResultSet rs = null;
+		connection.setAutoCommit(false);
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1, appealId);
+			pstatement.setDate(2, new Date(Calendar.getInstance().getTime().getTime())); // introduces the current date
+			pstatement.setTime(3, new Time(Calendar.getInstance().getTime().getTime())); // introduces the current time
+			pstatement.executeUpdate();
+
+			int reportId = getLastReport(appealId);
+
+			gradeDao.reportGrade(appealId, reportId);
+
+			connection.commit();
+		} catch (SQLException e) {
+			connection.rollback();
+		} finally {
+			connection.setAutoCommit(true);
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close ResultSet");
+			}
+			;
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close Statement");
+			}
+			;
+		}
+		;
+	}
+	
+	public int getLastReport(int appealId) throws SQLException {
+			String query = "SELECT * FROM report WHERE id_appeal = ? ORDER BY date DESC";
 			PreparedStatement pstatement = null;
 			ResultSet rs = null;
-			connection.setAutoCommit(false);
+			int result = 0;
 			try {
 				pstatement = connection.prepareStatement(query);
 				pstatement.setInt(1, appealId);
-				pstatement.setDate(2, new Date(Calendar.getInstance().getTime().getTime())); //introduces the current date
-				pstatement.setTime(3, new Time(Calendar.getInstance().getTime().getTime())); //introduces the current time
-				pstatement.executeUpdate();
-				connection.commit();
+				rs = pstatement.executeQuery();
+				if (rs.next()) {
+					result = rs.getInt("id_report");
+				}
 			} catch (SQLException e) {
-				connection.rollback();
+				e.printStackTrace();
 			} finally {
-				connection.setAutoCommit(true);
 				try {
 					if (rs != null)
 						rs.close();
@@ -125,7 +161,7 @@ public class ReportDAO {
 				;
 			}
 			;
+			return result;
 		}
-	}
 
 }
