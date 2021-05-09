@@ -4,6 +4,8 @@ import java.sql.*;
 import it.polimi.tiw.exam.objects.*;
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReportDAO {
 
@@ -29,8 +31,9 @@ public class ReportDAO {
 				AppealDAO auxAppDAO = new AppealDAO(connection);
 				result.setAppeal(auxAppDAO.getAppealById(rs.getInt("id_appeal")));
 				result.setCreationDate(rs.getDate("date"));
-				result.setCreationTime(rs.getTime("time"));
-				// result.setGrades complete this statement after finalizing GradeDAO
+				result.setCreationTime(rs.getTime("hour"));
+				GradeDAO gdao = new GradeDAO(connection);
+				result.setGrades(gdao.getRecordedGrades(result));
 			}
 		} finally {
 			try {
@@ -52,23 +55,24 @@ public class ReportDAO {
 		return result;
 	}
 
-	public Report getReportByAppeal(Appeal appeal) throws SQLException {
+	public List<Report> getReportByAppeal(Appeal appeal) throws SQLException {
 		String query = "SELECT * FROM report WHERE id_appeal = ?";
 		PreparedStatement statement = null;
 		ResultSet rs = null;
-		Report result = null;
+		List<Report> result = new LinkedList<>();
 		try {
 			statement = connection.prepareStatement(query);
 			statement.setInt(1, appeal.getAppealId());
 			rs = statement.executeQuery();
 			if (rs.next() == true) {
-				result = new Report();
-				result.setReportId(rs.getInt("id_report"));
-				result.setAppeal(appeal);
-				result.setCreationDate(rs.getDate("date"));
-				result.setCreationTime(rs.getTime("hour"));
+				Report temp = new Report();
+				temp.setReportId(rs.getInt("id_report"));
+				temp.setAppeal(appeal);
+				temp.setCreationDate(rs.getDate("date"));
+				temp.setCreationTime(rs.getTime("hour"));
 				GradeDAO gradeDao = new GradeDAO(connection);
-				result.setGrades(gradeDao.getRecordedGrades(result)); //check after finalizing db for reports
+				temp.setGrades(gradeDao.getRecordedGrades(temp));
+				result.add(temp);
 			}
 		} finally {
 			try {
@@ -104,7 +108,7 @@ public class ReportDAO {
 			pstatement.executeUpdate();
 
 			int reportId = getLastReport(appealId);
-
+			
 			gradeDao.reportGrade(appealId, reportId);
 
 			connection.commit();
@@ -131,7 +135,7 @@ public class ReportDAO {
 	}
 	
 	public int getLastReport(int appealId) throws SQLException {
-			String query = "SELECT * FROM report WHERE id_appeal = ? ORDER BY date DESC";
+			String query = "SELECT * FROM report WHERE id_appeal = ? ORDER BY date DESC, hour DESC";
 			PreparedStatement pstatement = null;
 			ResultSet rs = null;
 			int result = 0;

@@ -53,9 +53,7 @@ public class CreateReport extends HttpServlet {
 		}
 		
 		try {
-			AppealDAO appealDao = new AppealDAO(connection); //may want to improve behavior by modifying the getReport method to get only appId parameter
-			Appeal appeal = appealDao.getAppealById(appId);
-			report = reportDao.getReportByAppeal(appeal);
+			report = reportDao.getReportById(reportDao.getLastReport(appId));
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An accidental error occurred, couldn't retrieve report");
 			return;

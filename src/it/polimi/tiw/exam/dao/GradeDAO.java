@@ -439,15 +439,16 @@ public class GradeDAO {
 	 * //CALL THIS METHOD INSIDE ONE WITH COMMIT CONTROL!!
 	 */
 	public int reportGrade(int appealId, int reportId) throws SQLException{
-		String query = "UPDATE exam SET state='recorded' and id_report = ? WHERE id_appeal = ? and state = 'published'";
+		String query = "UPDATE exam SET state='recorded', id_report = ? WHERE id_appeal = ? and state = 'published'";
 		PreparedStatement pstatement = null;
 		ResultSet rs = null;
 		int exitCode = 1;
 		try {
 			pstatement = connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			pstatement.setInt(2, reportId);
+			pstatement.setInt(1, reportId);
+			pstatement.setInt(2, appealId);
 			pstatement.executeUpdate();
+			
 		} catch (SQLException e){
 			e.printStackTrace();
 			exitCode = 0;
@@ -483,7 +484,6 @@ public class GradeDAO {
 			try {
 				pstatement.close();
 			} catch (Exception e1) {
-
 			}
 		}
 	}
@@ -550,15 +550,16 @@ public class GradeDAO {
 	
 	public List<Grade> getRecordedGrades (Report report) throws SQLException{
 		Grade grade=null;
-		String query="SELECT * FROM exam JOIN report ON exam.id_appeal = report.id_appeal "
+		String query="SELECT * FROM exam JOIN report ON (exam.id_appeal = report.id_appeal and exam.id_report = report.id_report) "
 									  + "JOIN student ON exam.id_student = student.id_student "
-									  + "WHERE exam.state='recorded' and exam.id_appeal=?";
+									  + "WHERE exam.state='recorded' and exam.id_appeal=? and report.id_report = ?";
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
 		List<Grade> resultList = new LinkedList<>();
 		try {
 			pstatement=connection.prepareStatement(query);
 			pstatement.setInt(1, report.getAppeal().getAppealId());
+			pstatement.setInt(2, report.getReportId());
 			result=pstatement.executeQuery();
 			while (result.next()) {
 				grade = new Grade();
