@@ -7,7 +7,7 @@ public class UserForm {
 	private String idError;
 	private String pwdError;
 	
-	
+
 	public UserForm(int id, String pwd){
 		super();
 		setPersonId(id);
@@ -23,6 +23,14 @@ public class UserForm {
 	
 	public String getPassword(){
 		return this.password;
+	}
+	
+	public String getIdError() {
+		return idError;
+	}
+
+	public String getPwdError() {
+		return pwdError;
 	}
 	
 	
