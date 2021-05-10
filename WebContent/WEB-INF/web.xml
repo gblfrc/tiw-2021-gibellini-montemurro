@@ -6,7 +6,7 @@
 	<display-name>TIW-Exam-Project</display-name>
 	<context-param>
 		<param-name>dbUrl</param-name>
-		<param-value>jdbc:mysql://localhost:3306/tiw_project</param-value>
+		<param-value>jdbc:mysql://localhost:3306/exam_tiw</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbUser</param-name>
@@ -14,7 +14,7 @@
 	</context-param>
 	<context-param>
 		<param-name>dbPassword</param-name>
-		<param-value>ComeOnYouIrons1571@</param-value>
+		<param-value>EleSQLace1309162020ita?</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbDriver</param-name>
@@ -32,6 +32,19 @@
 		<url-pattern>/GetCourses</url-pattern>
 		<url-pattern>/GetAppeal</url-pattern>
 		<url-pattern>/GetResult</url-pattern>
+		<url-pattern>/GetSubscribers</url-pattern>
+		<url-pattern>/PublishGrade</url-pattern>
+		<url-pattern>/RefuseGrade</url-pattern>
+		<url-pattern>/GetModify</url-pattern>
+		<url-pattern>/Edit</url-pattern>
+		<url-pattern>/CreateReport</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>ProfessorFilter</filter-name>
+		<filter-class>it.polimi.tiw.exam.filters.ProfessorFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>ProfessorFilter</filter-name>
 		<url-pattern>/GetSubscribers</url-pattern>
 		<url-pattern>/PublishGrade</url-pattern>
 		<url-pattern>/RefuseGrade</url-pattern>

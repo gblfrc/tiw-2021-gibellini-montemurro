@@ -61,12 +61,12 @@ public class GetAccess extends HttpServlet {
 		UserForm uf = new UserForm(personId, password);
 		UserDAO userDAO = new UserDAO(connection);
 		User user = null;
-
+		
 		if (!uf.isValid()) {
 			String path = "/Login.html";
 			ServletContext servletContext = getServletContext();
 			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-			ctx.setVariable("form", uf);
+			ctx.setVariable("uf", uf);
 			templateEngine.process(path, ctx, response.getWriter());
 			return;
 		} 

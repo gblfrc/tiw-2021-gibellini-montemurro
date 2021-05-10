@@ -7,6 +7,7 @@ public class UserForm {
 	private String idError;
 	private String pwdError;
 	
+	
 	public UserForm(int id, String pwd){
 		super();
 		setPersonId(id);

@@ -88,5 +88,43 @@ public class AppealDAO {
 	}
 	
 	
-	
+	public boolean hasAppeal(int appealId, int personId, int courseId, String accessRights) throws SQLException {
+    	boolean hasAppeal=false;
+    	String query=null;
+    	if(accessRights.equalsIgnoreCase("Professor"))query= "SELECT * FROM appeal AS a JOIN course AS c "
+    			+ "on a.id_course=c.id_course WHERE a.id_appeal=? and c.id_professor=? and a.id_course=?";
+    	else if(accessRights.equalsIgnoreCase("Student"))query= "SELECT * FROM followings WHERE id_course=? and id_student=? ";
+    	ResultSet result = null;
+		PreparedStatement pstatement = null;
+		
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1,appealId);
+			pstatement.setInt(2,personId);
+			pstatement.setInt(3,courseId);
+			result = pstatement.executeQuery();
+			
+			if(result.next()) {
+				hasAppeal=true;
+			}
+			
+		} catch (SQLException e) {
+			throw new SQLException(e);
+
+		} finally {
+			try {
+				if (result != null)
+					result.close();
+			} catch (Exception e1) {
+				throw new SQLException(e1);
+			}
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (Exception e2) {
+				throw new SQLException(e2);
+			}
+		}
+		return hasAppeal;
+    }
 }

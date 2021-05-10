@@ -11,7 +11,9 @@
 		Username: <input type="text" name="personId" required> <br>
 		Password: <input type="password" name="password" required><br>
 		<input type="submit" value="login">
-		<p th:text=" ${errorMsg}"></p>
+		<p th:text="${uf.idError}"></p>
+		<p th:text="${uf.pwdError}"></p>
+		
 	</form>
 
 </body>

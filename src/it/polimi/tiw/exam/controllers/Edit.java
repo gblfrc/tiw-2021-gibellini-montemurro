@@ -37,7 +37,7 @@ public class Edit extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 			return;
 		}
-		response.sendRedirect("GetSubscribers?appealId=" + appealId );
+		response.sendRedirect("GetSubscribers?appeal=" + appealId);
 	}
 	
 }

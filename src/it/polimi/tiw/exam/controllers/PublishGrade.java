@@ -60,7 +60,7 @@ public class PublishGrade extends HttpServlet {
 			return;
 		}
 		
-		response.sendRedirect("GetSubscribers?appealId=" + appId );
+		response.sendRedirect("GetSubscribers?appeal=" + appId );
 		
 	}
 	

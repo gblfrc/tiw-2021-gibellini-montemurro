@@ -1,9 +1,11 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 
+import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.CourseDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Course;
@@ -28,22 +31,43 @@ import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 @WebServlet("/GetSubscribers")
 public class GetSubscribers extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Connection connection=null;
+	private Connection connection = null;
 	private TemplateEngine templateEngine;
-       
+
 	public void init() throws ServletException {
-    	ServletContext servletContext = getServletContext();
-    	connection = ConnectionHandler.getConnection(servletContext);
-    	templateEngine = TemplateEngineHandler.getEngine(servletContext);
+		ServletContext servletContext = getServletContext();
+		connection = ConnectionHandler.getConnection(servletContext);
+		templateEngine = TemplateEngineHandler.getEngine(servletContext);
 	}
-	
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		Boolean changeOrder=false;
 		String field=null;
 		try {
+			List<String> params= Collections.list(request.getParameterNames());
+			if(params.contains("changeOrder")&&
+			   !request.getParameter("changeOrder").equalsIgnoreCase("true")&&
+			   !request.getParameter("changeOrder").equalsIgnoreCase("false")) {
+					throw new InvalidParameterException("Unacceptable request");
+				}
+			params.remove("changeOrder");
+			
+			if(params.contains("field")) {
+				field=request.getParameter("field");
+				if(!field.equalsIgnoreCase("studentId")&&!field.equalsIgnoreCase("surname")&&!field.equalsIgnoreCase("name")&&
+			      !field.equalsIgnoreCase("email")&&!field.equalsIgnoreCase("degree_course")&&!field.equalsIgnoreCase("grade")&&
+			      !field.equalsIgnoreCase("state")) {
+					throw new InvalidParameterException("Unacceptable request");
+				}
+			}
+			params.remove("field");
+			
+			params.remove("appeal");
+			
+			if(params.size()>0) throw new InvalidParameterException("Couldn't handle request");
+			
 			changeOrder=Boolean.parseBoolean(request.getParameter("changeOrder"));
-			field=request.getParameter("field");
 			
 			if((session.getAttribute(field+ "Order")==null||session.getAttribute(field+ "Order")=="DESC") && changeOrder) {
 				session.setAttribute(field+ "Order", "ASC");
@@ -51,22 +75,26 @@ public class GetSubscribers extends HttpServlet {
 			else if(session.getAttribute(field+ "Order")=="ASC" && changeOrder) {
 				session.setAttribute(field+ "Order", "DESC");
 			}
-			
 		} catch (Exception e) {
-			changeOrder=false;
-			field=null;
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			return;
 		}
 		
 		
 		Integer appId = null;
+		User user = (User) session.getAttribute("user");
 		try {
+			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
-		} catch (NumberFormatException| NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), /*courseId*/1, "Professor")) {
+				throw new InvalidParameterException();
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
 			return;
 		}
+	
 		
-		User user = (User) session.getAttribute("user");
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		List<Grade> grades= new ArrayList<Grade>();
 		
@@ -88,10 +116,12 @@ public class GetSubscribers extends HttpServlet {
 		templateEngine.process(path, ctx, response.getWriter());
 		
 	}
-	
+
 	public void destroy() {
 		try {
-		ConnectionHandler.closeConnection(connection);
-		} catch (SQLException e) {};
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+		}
+		;
 	}
 }
