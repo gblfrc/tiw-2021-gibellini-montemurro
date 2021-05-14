@@ -1,6 +1,7 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -40,56 +41,41 @@ public class GetResult extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
-		//gets user
-		User user = null;
+		User user = (User)session.getAttribute("user");
+
+		//control on student's rights to access the appeal
+		Integer appId = null;
 		try {
-			user = (User)session.getAttribute("user");
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error of our servers");
-			//log again?
-			return;
-		}
-		//gets student id
-		int studId;
-		try {
-			studId = user.getPersonId();
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error of our servers");
-			return;
-		}
-		//gets appeal id
-		int appId;
-		try {
+			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
-		} catch (NumberFormatException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unable to find appeal");
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), /*courseId*/1, "Student")) {
+				throw new InvalidParameterException();
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
 			return;
 		}
 		
+		//main section: obtaining the student's grade (and information about the appeal)
 		GradeDAO gradeDao = new GradeDAO(connection);
 		Grade grade = null;
-		
-		//controllare che appId e studId non siano 0
-		
 		try {
-			grade = gradeDao.getResultByAppealAndStudent(appId, studId);
+			grade = gradeDao.getResultByAppealAndStudent(appId, user.getPersonId());
 		} catch (SQLException e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "It seems this student never subscribed to that exam");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "It seems this student never subscribed to the requested exam");
 			return;
 		}
-		
 		AppealDAO appealDao = new AppealDAO(connection);
 		Appeal appeal = new Appeal();
 		try {
 			appeal = appealDao.getAppealById(appId);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "It seems the searched-for appeal doesn't exist");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Impossible to find the requested appeal");
 			return;
 		}
 
-	
 		String path = "/WEB-INF/Result.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
