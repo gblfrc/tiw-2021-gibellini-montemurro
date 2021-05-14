@@ -1,6 +1,7 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -16,9 +17,11 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
+import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.dao.ReportDAO;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.Report;
+import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 
@@ -34,6 +37,8 @@ public class CreateReport extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		//control on "appeal" request parameter legitimacy
 		int appId;
 		try {
 			appId = Integer.parseInt(request.getParameter("appeal"));
@@ -42,6 +47,33 @@ public class CreateReport extends HttpServlet {
 			return;
 		}
 		
+		//control on professor's rights to access the appeal
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		try {
+			AppealDAO appealDAO= new AppealDAO(connection);
+			appId = Integer.parseInt(request.getParameter("appeal"));
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), /*courseId*/1, "Professor")) {
+				throw new InvalidParameterException();
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			return;
+		}
+
+		//control on number of reportable grades: if none is reportable, won't create an empty report
+		GradeDAO gdao = new GradeDAO(connection);
+		try {
+			int reportableGrades = gdao.countReportableGrades(appId);
+			if (reportableGrades == 0) throw new InvalidParameterException("No grades reportable for specified appeal");
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			return;
+		}
+		
+		//may want to check that no additional parameters have been given
+		
+		//main section: report grades and fetch latest report
 		ReportDAO reportDao = new ReportDAO(connection);
 		Report report = null;
 		

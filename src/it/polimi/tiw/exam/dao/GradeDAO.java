@@ -455,7 +455,6 @@ public class GradeDAO {
 			pstatement.setInt(1, reportId);
 			pstatement.setInt(2, appealId);
 			pstatement.executeUpdate();
-			
 		} catch (SQLException e){
 			e.printStackTrace();
 			exitCode = 0;
@@ -476,6 +475,37 @@ public class GradeDAO {
 		return exitCode;
 	}
 
+	
+	public int countReportableGrades (int appealId) throws SQLException{
+		String query = "SELECT count(*) FROM exam WHERE state='published' and id_appeal = ?";
+		PreparedStatement pstatement = null;
+		ResultSet rs = null;
+		int result = 0;
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1, appealId);
+			rs = pstatement.executeQuery();
+			if(rs.next()) result = rs.getInt(1);
+		} catch (SQLException e){
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close ResultSet");
+			};
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close Statement");
+			};
+		};
+		return result;
+	}
+	
+	
 	public void publishGrade(int appealId) throws SQLException{
 		String query = "UPDATE exam SET state='published' WHERE id_appeal = ?";
 		PreparedStatement pstatement = null;
