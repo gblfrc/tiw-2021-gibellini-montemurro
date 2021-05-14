@@ -20,7 +20,7 @@ public class ProfessorFilter implements Filter{
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
 		String loginpath = req.getServletContext().getContextPath() + "/Login.html";
-		// check if the client is logged
+		// check if the logged user is a professor
 		HttpSession s = req.getSession();
 		User user=(User)s.getAttribute("user");
 		if(!user.getAccessRights().equalsIgnoreCase("Professor")) {
