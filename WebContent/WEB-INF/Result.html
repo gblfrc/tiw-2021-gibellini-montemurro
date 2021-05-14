@@ -46,7 +46,6 @@
 	<div th:if="${#strings.equalsIgnoreCase(grade.state, 'published')}">
 		<form action="RefuseGrade" method="POST">
 			<input type="hidden" name="appeal" th:value=${grade.appealId}>
-			<input type="hidden" name="student" th:value=${grade.studentId}>
 			<input type="submit" value="refuse">
 		</form>
 	</div>
