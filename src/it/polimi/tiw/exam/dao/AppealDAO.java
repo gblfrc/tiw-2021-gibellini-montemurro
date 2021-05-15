@@ -93,7 +93,8 @@ public class AppealDAO {
     	String query=null;
     	if(accessRights.equalsIgnoreCase("Professor"))query= "SELECT * FROM appeal AS a JOIN course AS c "
     			+ "on a.id_course=c.id_course WHERE a.id_appeal=? and c.id_professor=? and a.id_course=?";
-    	else if(accessRights.equalsIgnoreCase("Student"))query= "SELECT * FROM followings WHERE id_course=? and id_student=? ";
+    	else if(accessRights.equalsIgnoreCase("Student")) {query= "SELECT * FROM appeal AS a JOIN exam AS e "
+    			+ "on a.id_appeal=e.id_appeal WHERE a.id_appeal=? and e.id_student=? and a.id_course=?";}
     	ResultSet result = null;
 		PreparedStatement pstatement = null;
 		
