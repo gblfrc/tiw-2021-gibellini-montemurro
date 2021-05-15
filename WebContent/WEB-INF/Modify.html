@@ -7,9 +7,10 @@
 <body>
 	<h1>Modify grade</h1>
 	<form action="Edit" method="POST">
-		<strong>Student ID: </strong> <input type="hidden" name="studentId" th:value="${grade.studentId}"
-			th:text="${grade.studentId}"> 1492
-		<input type="hidden" name="appealId" th:value="${grade.appealId}">
+		<strong>Student ID: </strong> <input type="hidden" name="studentId"
+			th:value="${grade.studentId}">
+		<nobr th:text="${grade.studentId}"> 1492 </nobr>
+		<input type="hidden" name="appealId" th:value="${grade.appealId} ">
 		<br> <strong>Name: </strong>
 		<nobr th:text="${grade.studentName}"> John </nobr>
 		<br> <strong>Surname: </strong>
@@ -36,8 +37,7 @@
 			<option value="29">29</option>
 			<option value="30">30</option>
 			<option value="30 with merit">30 WITH MERIT</option>
-		</select> <br> <br>
-		<input type="submit" value="Enter">
+		</select> <br> <br> <input type="submit" value="Enter">
 	</form>
 </body>
 </html>

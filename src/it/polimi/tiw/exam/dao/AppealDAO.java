@@ -88,13 +88,13 @@ public class AppealDAO {
 	}
 	
 	
-	public boolean hasAppeal(int appealId, int personId, int courseId, String accessRights) throws SQLException {
+	public boolean hasAppeal(int appealId, int personId, String accessRights) throws SQLException {
     	boolean hasAppeal=false;
     	String query=null;
-    	if(accessRights.equalsIgnoreCase("Professor"))query= "SELECT * FROM appeal AS a JOIN course AS c "
-    			+ "on a.id_course=c.id_course WHERE a.id_appeal=? and c.id_professor=? and a.id_course=?";
-    	else if(accessRights.equalsIgnoreCase("Student")) {query= "SELECT * FROM appeal AS a JOIN exam AS e "
-    			+ "on a.id_appeal=e.id_appeal WHERE a.id_appeal=? and e.id_student=? and a.id_course=?";}
+    	if(accessRights.equalsIgnoreCase("Professor")) query= "SELECT * FROM appeal AS a JOIN course AS c "
+    			+ "on a.id_course=c.id_course WHERE a.id_appeal=? and c.id_professor=? ";
+    	else if(accessRights.equalsIgnoreCase("Student")) {query= "SELECT * FROM exam  "
+    			+ " WHERE id_appeal=? and id_student=? ";}
     	ResultSet result = null;
 		PreparedStatement pstatement = null;
 		
@@ -102,7 +102,7 @@ public class AppealDAO {
 			pstatement = connection.prepareStatement(query);
 			pstatement.setInt(1,appealId);
 			pstatement.setInt(2,personId);
-			pstatement.setInt(3,courseId);
+			
 			result = pstatement.executeQuery();
 			
 			if(result.next()) {

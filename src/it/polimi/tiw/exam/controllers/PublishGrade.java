@@ -42,7 +42,7 @@ public class PublishGrade extends HttpServlet {
 		templateEngine = TemplateEngineHandler.getEngine(servletContext);
 	}
 	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		Integer appId = null;
 		User user = (User) session.getAttribute("user");
@@ -50,7 +50,7 @@ public class PublishGrade extends HttpServlet {
 		try {
 			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), /*courseId*/3, "Professor")) {
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new Exception();
 			}
 		} catch (Exception e) {

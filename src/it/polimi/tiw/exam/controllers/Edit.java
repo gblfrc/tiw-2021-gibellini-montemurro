@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.objects.Grade;
+import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
 /**
@@ -27,6 +30,8 @@ public class Edit extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
 		int appealId;
 		int studentId;
 		String gradeValue;
@@ -39,8 +44,28 @@ public class Edit extends HttpServlet {
 			return;
 		}
 		
+		AppealDAO appealDAO = new AppealDAO(connection);
 		try {
-			GradeDAO gradeDAO= new GradeDAO(connection);
+			appealId = Integer.parseInt(request.getParameter("appealId"));
+			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			return;
+		}
+		
+		GradeDAO gradeDAO= new GradeDAO(connection);
+		try {
+			Grade grade=gradeDAO.getResultByAppealAndStudent(appealId,studentId);
+			if(grade==null) throw new Exception("Nonexistent student");
+			if(!grade.getState().equalsIgnoreCase("entered")) throw new Exception("Uneditable grade");
+		}catch(Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			return;
+		}
+		
+		try {
 			gradeDAO.enterGrade(appealId,studentId,gradeValue);
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Impossible to enter grade");

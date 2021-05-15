@@ -48,7 +48,7 @@ public class GetResult extends HttpServlet {
 		try {
 			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), /*courseId*/1, "Student")) {
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Student")) {
 				throw new InvalidParameterException();
 			}
 		} catch (Exception e) {

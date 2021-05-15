@@ -49,7 +49,7 @@ public class GetModify extends HttpServlet {
 		int appealId;
 		try {
 			appealId = Integer.parseInt(request.getParameter("appealId"));
-			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), /* courseId */1, "Professor")) {
+			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
 				throw new Exception();
 			}
 		} catch (Exception e) {
@@ -60,11 +60,11 @@ public class GetModify extends HttpServlet {
 		int studentId;
 		try {
 			studentId = Integer.parseInt(request.getParameter("studentId"));
-			System.out.println(studentId);
-			System.out.println(appealId);
-			if (!appealDAO.hasAppeal(appealId, studentId, /* courseId */ 1, "Student")) {
+			
+			if (!appealDAO.hasAppeal(appealId, studentId, "Student")) {
 				throw new Exception();
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable student ");
