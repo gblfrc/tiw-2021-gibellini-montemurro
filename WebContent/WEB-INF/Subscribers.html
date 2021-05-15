@@ -45,8 +45,10 @@
 					class="passed">30</td>
 				<td th:text=${#strings.toUpperCase(gr.state)}>ENTERED</td>
 				<td><a
-					th:text="${#strings.equalsIgnoreCase(gr.state, 'recorded')} ? '' : 'Edit' "
-					th:href="${#strings.equalsIgnoreCase(gr.state, 'recorded')} ? '' : 
+					th:text="${#strings.equalsIgnoreCase(gr.state, 'recorded') or
+								#strings.equalsIgnoreCase(gr.state, 'published')} ? '' : 'Edit' "
+					th:href="${#strings.equalsIgnoreCase(gr.state, 'recorded') or
+								#strings.equalsIgnoreCase(gr.state, 'published')}  ? '' : 
 							@{/GetModify(appealId=${gr.appealId},studentId=${gr.studentId})}">Edit</a></td>
 			</tr>
 		</tbody>
