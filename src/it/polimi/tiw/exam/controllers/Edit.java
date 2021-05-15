@@ -27,14 +27,23 @@ public class Edit extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		int appealId=Integer.parseInt(request.getParameter("appealId"));
-		int studentId=Integer.parseInt(request.getParameter("studentId"));
-		String gradeValue=request.getParameter("gradeValue");
+		int appealId;
+		int studentId;
+		String gradeValue;
+		try {
+			appealId=Integer.parseInt(request.getParameter("appealId"));
+			studentId=Integer.parseInt(request.getParameter("studentId"));
+			gradeValue=request.getParameter("gradeValue");
+		}catch(NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			return;
+		}
+		
 		try {
 			GradeDAO gradeDAO= new GradeDAO(connection);
 			gradeDAO.enterGrade(appealId,studentId,gradeValue);
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Impossible to enter grade");
 			return;
 		}
 		response.sendRedirect("GetSubscribers?appeal=" + appealId);

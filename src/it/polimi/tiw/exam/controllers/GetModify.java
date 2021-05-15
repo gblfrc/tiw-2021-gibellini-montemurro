@@ -29,39 +29,66 @@ import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 @WebServlet("/GetModify")
 public class GetModify extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Connection connection=null;
+	private Connection connection = null;
 	private TemplateEngine templateEngine;
-	
+
 	public void init() throws ServletException {
 		connection = ConnectionHandler.getConnection(getServletContext());
 		ServletContext servletContext = getServletContext();
 		templateEngine = TemplateEngineHandler.getEngine(servletContext);
-	} 
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
-		GradeDAO gradeDAO= new GradeDAO(connection);
-		Grade grade=null;
+		GradeDAO gradeDAO = new GradeDAO(connection);
+		Grade grade = null;
+
+		AppealDAO appealDAO = new AppealDAO(connection);
+		int appealId;
 		try {
-			int appealId=Integer.parseInt(request.getParameter("appealId"));
-			int studentId=Integer.parseInt(request.getParameter("studentId"));
-			grade = gradeDAO.getResultByAppealAndStudent(appealId,studentId);
-			
-		} catch (NumberFormatException| NullPointerException |SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			appealId = Integer.parseInt(request.getParameter("appealId"));
+			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), /* courseId */1, "Professor")) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
 			return;
-		} 
-		
-		AppealDAO appealDAO= new AppealDAO(connection);
-		Appeal appeal=null;
+		}
+
+		int studentId;
 		try {
-			int appealId=Integer.parseInt(request.getParameter("appealId"));
-			appeal=appealDAO.getAppealById(appealId);
-		}catch (SQLException e) {
+			studentId = Integer.parseInt(request.getParameter("studentId"));
+			System.out.println(studentId);
+			System.out.println(appealId);
+			if (!appealDAO.hasAppeal(appealId, studentId, /* courseId */ 1, "Student")) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable student ");
+			return;
+		}
+
+		try {
+			grade = gradeDAO.getResultByAppealAndStudent(appealId, studentId);
+			if (!grade.getState().equalsIgnoreCase("entered")) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Grade has been already published");
+			return;
+		}
+
+		Appeal appeal = null;
+		try {
+			appeal = appealDAO.getAppealById(appealId);
+		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find courses");
 			return;
 		}
+
 		String path = "/WEB-INF/Modify.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
@@ -69,5 +96,4 @@ public class GetModify extends HttpServlet {
 		ctx.setVariable("appeal", appeal);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
-
 }

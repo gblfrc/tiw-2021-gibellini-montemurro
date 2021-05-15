@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 
+import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
@@ -44,17 +45,23 @@ public class PublishGrade extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		Integer appId = null;
+		User user = (User) session.getAttribute("user");
+		
 		try {
+			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
-		} catch (NumberFormatException| NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), /*courseId*/3, "Professor")) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
 			return;
 		}
-		User user = (User) session.getAttribute("user");
+		
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		
 		try {
-			if(user.getAccessRights().equals("Professor"))gradeDAO.publishGrade(appId);
+			gradeDAO.publishGrade(appId);
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find grades");
 			return;
