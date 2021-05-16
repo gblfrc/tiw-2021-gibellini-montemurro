@@ -42,6 +42,7 @@ public class RefuseGrade extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User)session.getAttribute("user");
 		Integer appId = null;
+		
 		try {
 			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
@@ -61,7 +62,7 @@ public class RefuseGrade extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			return;
 		}
-		
+
 		try {
 			gradeDao.refuseGrade(appId, user.getPersonId());
 		} catch (SQLException e) {

@@ -43,7 +43,7 @@ public class CreateReport extends HttpServlet {
 		try {
 			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't evade the request");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't handle the request");
 			return;
 		}
 		

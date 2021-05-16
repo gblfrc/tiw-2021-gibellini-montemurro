@@ -77,7 +77,7 @@ public class GetModify extends HttpServlet {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Grade has been already published");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Grade has already been published");
 			return;
 		}
 

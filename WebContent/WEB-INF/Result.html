@@ -5,9 +5,11 @@
 <title>Result display page</title>
 </head>
 <body>
-	<div th:if="${#strings.equalsIgnoreCase(grade.state, 'not entered')}">Grade not entered yet</div>
-	
-	<div th:if="${not #strings.equalsIgnoreCase(grade.state, 'not entered')}">
+	<div th:if="${#strings.equalsIgnoreCase(grade.state, 'not entered')}">Grade
+		not entered yet</div>
+
+	<div
+		th:if="${not #strings.equalsIgnoreCase(grade.state, 'not entered')}">
 		<h1>Result:</h1>
 		<h2>Student information:</h2>
 		<p>
@@ -25,9 +27,8 @@
 		<p>
 			<strong>Degree course:</strong>
 			<nobr th:text=${grade.degreeCourse}>Literature</nobr>
-			
-		<!-- may want to give a more consistent form to appeal and grade objects -->	
-			
+
+			<!-- may want to give a more consistent form to appeal and grade objects -->
 		<h2>Appeal information:</h2>
 		<p>
 			<strong>Course Id:</strong>
@@ -40,13 +41,17 @@
 			<nobr th:text=${{appeal.date}}>29.5.1453</nobr>
 		<p>
 			<strong>Grade:</strong>
-			<nobr th:text=${grade.grade}>25</nobr>
+			<nobr th:text=${#strings.toUpperCase(grade.grade)}>25</nobr>
 	</div>
-	
-	<div th:if="${#strings.equalsIgnoreCase(grade.state, 'published')}">
+
+	<div
+		th:if="${#strings.equalsIgnoreCase(grade.state, 'published') and 
+				  not #strings.equalsIgnoreCase(grade.grade, 'failed') and 
+				  not #strings.equalsIgnoreCase(grade.grade, 'recalled') and 
+				  not #strings.equalsIgnoreCase(grade.grade, 'absent')}">
 		<form action="RefuseGrade" method="POST">
 			<input type="hidden" name="appeal" th:value=${grade.appealId}>
-			<input type="submit" value="refuse">
+			<input type="submit" value="Refuse">
 		</form>
 	</div>
 </body>

@@ -453,7 +453,7 @@ public class GradeDAO {
 	 * //CALL THIS METHOD INSIDE ONE WITH COMMIT CONTROL!!
 	 */
 	public int reportGrade(int appealId, int reportId) throws SQLException{
-		String query = "UPDATE exam SET state='recorded', id_report = ? WHERE id_appeal = ? and state = 'published'";
+		String query = "UPDATE exam SET state='recorded', id_report = ? WHERE id_appeal = ? and (state = 'published' or state = 'refused')";
 		PreparedStatement pstatement = null;
 		ResultSet rs = null;
 		int exitCode = 1;
@@ -484,7 +484,7 @@ public class GradeDAO {
 
 	
 	public int countReportableGrades (int appealId) throws SQLException{
-		String query = "SELECT count(*) FROM exam WHERE state='published' and id_appeal = ?";
+		String query = "SELECT count(*) FROM exam WHERE (state='published' or state='refused') and id_appeal = ?";
 		PreparedStatement pstatement = null;
 		ResultSet rs = null;
 		int result = 0;

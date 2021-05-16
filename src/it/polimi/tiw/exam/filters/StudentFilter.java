@@ -16,7 +16,7 @@ import it.polimi.tiw.exam.objects.User;
 public class StudentFilter implements Filter{
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		System.out.print("Checking professor's access rights ...\n");
+		System.out.print("Checking student's access rights ...\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
 		String loginpath = req.getServletContext().getContextPath() + "/Login.html";

@@ -54,7 +54,7 @@ public class PublishGrade extends HttpServlet {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't find appeal");
 			return;
 		}
 		

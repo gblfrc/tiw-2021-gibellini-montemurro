@@ -47,7 +47,6 @@
 		<filter-name>ProfessorFilter</filter-name>
 		<url-pattern>/GetSubscribers</url-pattern>
 		<url-pattern>/PublishGrade</url-pattern>
-		<url-pattern>/RefuseGrade</url-pattern>
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
