@@ -10,13 +10,15 @@
 	<div class="main">
 
 		<h1>Welcome to Exam project</h1>
-
-		<form action="GetAccess" method="POST">
-			Person ID: <input type="text" name="personId" required> <br>
-			<br> Password: <input type="password" name="password" required><br>
-			<br> <input type="submit" value="Login">
-		</form>
-		<p class="error" th:text="${uf.idError}">Arma virumque cano, Troiae qui primus ab oris</p>
+		<div class="login">
+			<form action="GetAccess" method="POST">
+				Person ID: <input type="text" name="personId" required> <br>
+				<br> Password: <input type="password" name="password" required><br>
+				<br> <input type="submit" value="Login">
+			</form>
+		</div>
+		<p class="error" th:text="${uf.idError}">Arma virumque cano,
+			Troiae qui primus ab oris</p>
 		<p class="error" th:text="${uf.pwdError}">Italiam fato profugus...</p>
 	</div>
 </body>

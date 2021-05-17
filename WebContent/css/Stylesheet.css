@@ -10,6 +10,10 @@ div.logout {
 	text-align: right;
 }
 
+form {
+	display: inline-block;
+}
+
 div.main {
 	background-color: Azure;
 	border-style: inset;
@@ -19,6 +23,7 @@ div.main {
 	margin-left: 40px;
 	margin-right: 40px;
 	margin-bottom: 40px;
+	overflow: auto;
 }
 
 div.main h1, h2, table, p, form {
@@ -91,7 +96,7 @@ tr:hover td.passed {
 	background-color: green;
 }
 
-form {
+div.login > form {
 	background-color: PowderBlue;
 	border-style: inset;
 	border-color: PowderBlue;
@@ -106,6 +111,19 @@ form {
 input:not([type="submit"]) {
 	width: 65%;
 	float: right;
+}
+
+input[type="submit"], button {
+	background-color: LightSkyBlue;
+	display: inline-block;
+	border-radius: 4px;
+	border-style: outset;
+	border-color: LightSkyBlue;
+	cursor: pointer;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 8px;
+	padding-right: 8px;
 }
 
 p.error {
