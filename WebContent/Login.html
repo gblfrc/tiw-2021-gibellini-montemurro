@@ -2,19 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="ISO-8859-1">
+<link rel="stylesheet" type="text/css" media="all"
+	href="css/Stylesheet.css" th:href="@{css/Stylesheet.css}" />
 <title>TIW Exam Project</title>
 </head>
 <body>
-	<h1>Welcome to Exam project</h1>
+	<div class="main">
 
-	<form action="GetAccess" method="POST">
-		Person ID: <input type="text" name="personId" required> <br>
-		Password: <input type="password" name="password" required><br>
-		<input type="submit" value="login">
-		<p th:text="${uf.idError}"></p>
-		<p th:text="${uf.pwdError}"></p>
-		
-	</form>
+		<h1>Welcome to Exam project</h1>
 
+		<form action="GetAccess" method="POST">
+			Person ID: <input type="text" name="personId" required> <br>
+			<br> Password: <input type="password" name="password" required><br>
+			<br> <input type="submit" value="Login">
+		</form>
+		<p class="error" th:text="${uf.idError}">Arma virumque cano, Troiae qui primus ab oris</p>
+		<p class="error" th:text="${uf.pwdError}">Italiam fato profugus...</p>
+	</div>
+	<div class="credits">by Gibellini Federico and Montemurro Elena</div>
 </body>
 </html>

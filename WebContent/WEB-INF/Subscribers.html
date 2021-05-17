@@ -2,13 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>List of your courses</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta charset="ISO-8859-1">
 <link rel="stylesheet" type="text/css" media="all"
 	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
+	<div class="logout">
+		<a href="../Login.html">Logout</a>
+	</div>
+	<div class="main">
 	<h1>Welcome to subscribers page</h1>
-	<table border="3">
+	<table>
 		<thead>
 			<tr>
 				<th><a href="Login.html"
@@ -53,16 +57,15 @@
 			</tr>
 		</tbody>
 	</table>
-
 	<form action="PublishGrade" method="POST">
 		<input type="hidden" name="appeal" th:value="${appId}"><input
 			type="submit" value="Publish">
 	</form>
-
 	<form action="CreateReport" method="POST">
 		<input type="hidden" name="appeal" th:value="${appId}"><input
 			type="submit" value="Report">
 	</form>
-
+	</div>
+	<div class="credits">by Gibellini Federico and Montemurro Elena</div>
 </body>
 </html>

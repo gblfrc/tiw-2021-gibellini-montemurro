@@ -2,67 +2,73 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>Report details</title>
-<meta charset="ISO-8859-1" />
+<meta charset="ISO-8859-1">
 <link rel="stylesheet" type="text/css" media="all"
 	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
-	<h1>Report details</h1>
-	<p>
-		<strong>Report ID: </strong>
-		<nobr th:text="${report.reportId}">500</nobr>
-	</P>
-	<p>
-		<strong>Course title: </strong>
-		<nobr th:text="${report.appeal.courseTitle}">Metrics</nobr>
-	</p>
-	<p>
-		<strong>Appeal date: </strong>
-		<nobr th:text="${report.appeal.date}">31/12/2020</nobr>
-	</P>
-	<p>
-		<strong>Report created on: </strong>
-		<nobr th:text="${{report.creationDate}}">01/01/2021</nobr>
-	</P>
-	<p>
-		<strong>Report created at: </strong>
-		<nobr th:text="${{report.creationTime}}">12:00</nobr>
-	</P>
-	<p>
-		<strong>Recorded grades:</strong>
-	</P>
-
-	<table border="3">
-		<tr>
-			<th>Student Id</th>
-			<th>Surname</th>
-			<th>Name</th>
-			<th>Grade</th>
-		</tr>
-		<tbody th:remove="all-but-first">
-			<tr th:each="grade,iterStat : ${report.grades}"
-				th:class="${iterStat.even}? 'even'">
-				<td th:text="${grade.studentId}">1492</td>
-				<td th:text="${grade.studentSurname}">Smith</td>
-				<td th:text="${grade.studentName}">John</td>
-				<td th:text="${#strings.toUpperCase(grade.grade)}"
-					th:class="${#strings.equalsIgnoreCase(grade.grade, 'recalled') or
+	<div class="logout">
+		<a href="../Login.html">Logout</a>
+	</div>
+	<div class="main">
+		<h1>Report details</h1>
+		<p>
+			<strong>Report ID: </strong>
+			<nobr th:text="${report.reportId}">500</nobr>
+		</P>
+		<p>
+			<strong>Course title: </strong>
+			<nobr th:text="${report.appeal.courseTitle}">Metrics</nobr>
+		</p>
+		<p>
+			<strong>Appeal date: </strong>
+			<nobr th:text="${report.appeal.date}">31/12/2020</nobr>
+		</P>
+		<p>
+			<strong>Report created on: </strong>
+			<nobr th:text="${{report.creationDate}}">01/01/2021</nobr>
+		</P>
+		<p>
+			<strong>Report created at: </strong>
+			<nobr th:text="${{report.creationTime}}">12:00</nobr>
+		</P>
+		<p>
+			<strong>Recorded grades:</strong>
+		</P>
+		<table>
+			<thead>
+				<tr>
+					<th>Student Id</th>
+					<th>Surname</th>
+					<th>Name</th>
+					<th>Grade</th>
+				</tr>
+			</thead>
+			<tbody th:remove="all-but-first">
+				<tr th:each="grade : ${report.grades}">
+					<td th:text="${grade.studentId}">1492</td>
+					<td th:text="${grade.studentSurname}">Smith</td>
+					<td th:text="${grade.studentName}">John</td>
+					<td th:text="${#strings.toUpperCase(grade.grade)}"
+						th:class="${#strings.equalsIgnoreCase(grade.grade, 'recalled') or
 							    #strings.equalsIgnoreCase(grade.grade, 'failed') or
 								#strings.equalsIgnoreCase(grade.grade, 'absent') ? 'fail' : 'passed'}"
-					class="passed">25</td>
-			</tr>
-			<tr class="even">
-				<td>1571</td>
-				<td>White</td>
-				<td>Adam</td>
-				<td class="fail">RECALLED</td>
-			</tr>
-			<tr>
-				<td>1453</td>
-				<td>Brown</td>
-				<td>Moses</td>
-				<td class="passed">30</td>
-		</tbody>
-	</table>
+						class="passed">25</td>
+				</tr>
+				<tr>
+					<td>1571</td>
+					<td>White</td>
+					<td>Adam</td>
+					<td class="fail">RECALLED</td>
+				</tr>
+				<tr>
+					<td>1453</td>
+					<td>Brown</td>
+					<td>Moses</td>
+					<td class="passed">30</td>
+			</tbody>
+		</table>
+	</div>
+	<div class="credits">by Gibellini Federico and Montemurro Elena</div>
 </body>
 </html>

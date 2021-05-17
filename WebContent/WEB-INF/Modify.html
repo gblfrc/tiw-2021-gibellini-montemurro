@@ -2,42 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="ISO-8859-1">
+<link rel="stylesheet" type="text/css" media="all"
+	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 <title>Modify grade</title>
 </head>
 <body>
-	<h1>Modify grade</h1>
-	<form action="Edit" method="POST">
-		<strong>Student ID: </strong> <input type="hidden" name="studentId"
-			th:value="${grade.studentId}">
-		<nobr th:text="${grade.studentId}"> 1492 </nobr>
-		<input type="hidden" name="appealId" th:value="${grade.appealId} ">
-		<br> <strong>Name: </strong>
-		<nobr th:text="${grade.studentName}"> John </nobr>
-		<br> <strong>Surname: </strong>
-		<nobr th:text="${grade.studentSurname}"> Smith </nobr>
-		<br> <strong>Course title: </strong>
-		<nobr th:text="${appeal.courseTitle}"> Metrics </nobr>
-		<br> <strong>Appeal date: </strong>
-		<nobr th:text="${appeal.date}"> 31/12/2020 </nobr>
-		<br> Grade: <select name="gradeValue">
-			<option value="absent">ABSENT</option>
-			<option value="recalled">RECALLED</option>
-			<option value="failed">FAILED</option>
-			<option value="18">18</option>
-			<option value="19">19</option>
-			<option value="20">20</option>
-			<option value="21">21</option>
-			<option value="22">22</option>
-			<option value="23">23</option>
-			<option value="24">24</option>
-			<option value="25">25</option>
-			<option value="26">26</option>
-			<option value="27">27</option>
-			<option value="28">28</option>
-			<option value="29">29</option>
-			<option value="30">30</option>
-			<option value="30 with merit">30 WITH MERIT</option>
-		</select> <br> <br> <input type="submit" value="Enter">
-	</form>
+	<div class="logout">
+		<a href="../Login.html">Logout</a>
+	</div>
+	<div class="main">
+		<h1>Modify grade</h1>
+		<form action="Edit" method="POST">
+			<strong>Student ID: </strong> <input type="hidden" name="studentId"
+				th:value="${grade.studentId}">
+			<nobr th:text="${grade.studentId}"> 1492 </nobr>
+			<input type="hidden" name="appealId" th:value="${grade.appealId} ">
+			<br> <strong>Name: </strong>
+			<nobr th:text="${grade.studentName}"> John </nobr>
+			<br> <strong>Surname: </strong>
+			<nobr th:text="${grade.studentSurname}"> Smith </nobr>
+			<br> <strong>Course title: </strong>
+			<nobr th:text="${appeal.courseTitle}"> Metrics </nobr>
+			<br> <strong>Appeal date: </strong>
+			<nobr th:text="${appeal.date}"> 31/12/2020 </nobr>
+			<br> <strong>Grade: </strong><select name="gradeValue">
+				<option value="absent">ABSENT</option>
+				<option value="recalled">RECALLED</option>
+				<option value="failed">FAILED</option>
+				<option value="18">18</option>
+				<option value="19">19</option>
+				<option value="20">20</option>
+				<option value="21">21</option>
+				<option value="22">22</option>
+				<option value="23">23</option>
+				<option value="24">24</option>
+				<option value="25">25</option>
+				<option value="26">26</option>
+				<option value="27">27</option>
+				<option value="28">28</option>
+				<option value="29">29</option>
+				<option value="30">30</option>
+				<option value="30 with merit">30 WITH MERIT</option>
+			</select> <br> <br> <input type="submit" value="Enter">
+		</form>
+	</div>
+	<div class="credits">by Gibellini Federico and Montemurro Elena</div>
 </body>
 </html>

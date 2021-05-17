@@ -2,24 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>List of your courses</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
+<meta charset="ISO-8859-1">
+<link rel="stylesheet" type="text/css" media="all"
+	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
-	<h1>Welcome to your list of courses</h1>
-	<h2>Select a course to see its appeals</h2>
-	<table border="1">
-		<thead>
-			<th>Course Name</th>
-			<th>Appeals Link</th>
-		</thead>
-		<tbody th:remove="all-but-first">
-			<tr th:each="course : ${courses}">
-				<td th:text="${course.title}">TIW</td>
-				<td><a href="Home.html"
-					th:href="@{/GetAppeal(courseId=${course.courseId})}">Appeals</a></td>
-			</tr>
-		</tbody>
-	</table>
+	<div class="logout">
+		<a href="../Login.html">Logout</a>
+	</div>
+	<div class="main">
+		<h1>Welcome to your list of courses</h1>
+		<h2>Select a course to see its appeals</h2>
+		<table>
+			<thead>
+				<th>Course Name</th>
+				<th>Appeals Link</th>
+			</thead>
+			<tbody th:remove="all-but-first">
+				<tr th:each="course : ${courses}">
+					<td th:text="${course.title}">TIW</td>
+					<td><a href="Home.html"
+						th:href="@{/GetAppeal(courseId=${course.courseId})}">Appeals</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="credits">by Gibellini Federico and Montemurro Elena</div>
 </body>
 </html>

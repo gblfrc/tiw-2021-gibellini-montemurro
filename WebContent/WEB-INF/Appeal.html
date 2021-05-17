@@ -2,29 +2,34 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>List of your courses</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
+<meta charset="ISO-8859-1">
+<link rel="stylesheet" type="text/css" media="all"
+	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
-	<h1>Welcome to appeals page</h1>
-	<h2>Select an appeal to see its subscribers</h2>
-	<table border="1">
-		<thead>
-			<tr>
-				<th>Appeal date</th>
-			</tr>
-		</thead>
-		<tbody th:remove="all-but-first">
-			<tr th:each="app : ${appeals}">
-
-				<td><a href="Home.html"
-					th:href="${#strings.equalsIgnoreCase(session.user.accessRights,'Professor')}? 
+	<div class="logout">
+		<a href="../Login.html">Logout</a>
+	</div>
+	<div class="main">
+		<h1>Welcome to appeals page</h1>
+		<h2>Select an appeal to see its subscribers</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Appeal date</th>
+				</tr>
+			</thead>
+			<tbody th:remove="all-but-first">
+				<tr th:each="app : ${appeals}">
+					<td><a href="Home.html"
+						th:href="${#strings.equalsIgnoreCase(session.user.accessRights,'Professor')}? 
 					@{/GetSubscribers(appeal=${app.appealId})} : 
 					@{/GetResult(appeal=${app.appealId})} "
-					th:text="${app.date}"> 1999-04-03</a></td>
-
-			</tr>
-		</tbody>
-	</table>
+						th:text="${app.date}"> 1999-04-03</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="credits">by Gibellini Federico and Montemurro Elena</div>
 </body>
 </html>
