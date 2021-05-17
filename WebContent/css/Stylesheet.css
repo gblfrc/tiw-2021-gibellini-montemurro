@@ -3,6 +3,7 @@
 body {
 	background-color: LightGoldenRodYellow;
 	font-family: Georgia;
+	position: relative;
 }
 
 div.logout {
@@ -119,11 +120,4 @@ p.error {
 	padding-bottom: 5px;
 	display: inline-block;
 	display: table;
-}
-
-div.credits {
-	position: absolute;
-	bottom: 0px;
-	right: 4px;
-	font-size: 15px;
 }
