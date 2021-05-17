@@ -38,6 +38,7 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
+		<url-pattern>/GetAllReports</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>ProfessorFilter</filter-name>
@@ -50,6 +51,7 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
+		<url-pattern>/GetAllReports</url-pattern>
 	</filter-mapping>
 		<filter>
 		<filter-name>StudentFilter</filter-name>

@@ -2,7 +2,7 @@ package it.polimi.tiw.exam.dao;
 
 import java.sql.*;
 import it.polimi.tiw.exam.objects.*;
-import java.sql.Date;
+
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -167,5 +167,40 @@ public class ReportDAO {
 			;
 			return result;
 		}
+	
+	public List<Report> getAllReports (int appealId) throws SQLException{
+		String query = "SELECT id_report FROM report WHERE id_appeal = ? ORDER BY date DESC, hour DESC";
+		PreparedStatement pstatement = null;
+		ResultSet rs = null;
+		List<Report> result = new LinkedList<>();
+		try {
+			pstatement = connection.prepareStatement(query);
+			pstatement.setInt(1, appealId);
+			rs = pstatement.executeQuery();
+			while (rs.next()) {
+				int reportId = rs.getInt("id_report");
+				result.add(getReportById(reportId));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close ResultSet");
+			}
+			;
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (Exception e) {
+				throw new SQLException("Couldn't close Statement");
+			}
+			;
+		}
+		;
+		return result;
+	}
 
 }
