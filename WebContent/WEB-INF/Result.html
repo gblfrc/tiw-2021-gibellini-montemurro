@@ -7,8 +7,8 @@
 <title>Result display page</title>
 </head>
 <body>
-	<div class="logout">
-		<a href="../Login.html">Logout</a>
+	<div class="logout" align="right">
+		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">
 		<p th:if="${#strings.equalsIgnoreCase(grade.state, 'not entered')}">Grade
