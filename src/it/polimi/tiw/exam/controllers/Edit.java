@@ -59,7 +59,7 @@ public class Edit extends HttpServlet {
 		try {
 			Grade grade=gradeDAO.getResultByAppealAndStudent(appealId,studentId);
 			if(grade==null) throw new Exception("Nonexistent student");
-			if(!grade.getState().equalsIgnoreCase("entered")) throw new Exception("Uneditable grade");
+			if(!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) throw new Exception("Uneditable grade");
 		}catch(Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			return;

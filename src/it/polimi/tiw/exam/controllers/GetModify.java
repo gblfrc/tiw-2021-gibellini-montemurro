@@ -73,7 +73,7 @@ public class GetModify extends HttpServlet {
 
 		try {
 			grade = gradeDAO.getResultByAppealAndStudent(appealId, studentId);
-			if (!grade.getState().equalsIgnoreCase("entered")) {
+			if (!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) {
 				throw new Exception();
 			}
 		} catch (Exception e) {
