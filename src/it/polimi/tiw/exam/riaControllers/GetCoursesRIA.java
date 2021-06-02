@@ -1,4 +1,4 @@
-package it.polimi.tiw.riaControllers;
+package it.polimi.tiw.exam.riaControllers;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -32,8 +32,9 @@ public class GetCoursesRIA extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+		/*HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");*/
+		User user= new User(3, "Professor"); //correct this after getting login page
 		CourseDAO courseDAO= new CourseDAO(connection);
 		List<Course> courses= new ArrayList<Course>();
 
