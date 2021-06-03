@@ -89,7 +89,12 @@
           dateCell.appendChild(anchor);
           newRow.appendChild(dateCell);
           appealList.appeals.appendChild(newRow);
-          //anchor.addEventListener();
+          anchor.addEventListener("click", (e) => {
+            e.preventDefault();
+            subscribers.hide();
+            subscribers.clear();
+            subscribers.show(e.target.getAttribute('appealId'));
+          });
         }
       }
     }
@@ -102,7 +107,8 @@
     this.hide = function hide(){
       this.element.style.display = "none";
     }
-    this.show = function show(){
+    this.show = function show(appealId){
+      makeCall("GET", "GetSubscribersRIA?appeal=" + appealId, this.update);
       this.element.removeAttribute("style");
     }
     this.clear = function clear() {
@@ -113,28 +119,67 @@
     this.hide();
     this.clear();
     this.update = function update(req) {
-      /*
       if (req.readyState === 4 && req.status === 200){
         let i = 0;
         let array = JSON.parse(req.responseText);
         for (i = 0; i<array.length; i++){
           let newRow = document.createElement("tr");
-          let titleCell = document.createElement("td");
-          let text = document.createTextNode(array[i].title);
-          titleCell.appendChild(text);
-          newRow.appendChild(titleCell);
-          let appealLinkCell = document.createElement("td");
+          //studentId
+          let studentIdCell = document.createElement("td");
+          let text = document.createTextNode(array[i].studentId);
+          studentIdCell.appendChild(text);
+          newRow.appendChild(studentIdCell);
+          //studentSurname
+          let surnameCell = document.createElement("td");
+          text = document.createTextNode(array[i].studentSurname);
+          surnameCell.appendChild(text);
+          newRow.appendChild(surnameCell);
+          //studentName
+          let nameCell = document.createElement("td");
+          text = document.createTextNode(array[i].studentName);
+          nameCell.appendChild(text);
+          newRow.appendChild(nameCell);
+          //email
+          let emailCell = document.createElement("td");
+          text = document.createTextNode(array[i].email);
+          emailCell.appendChild(text);
+          newRow.appendChild(emailCell);
+          //degreeCourse
+          let degreeCourseCell = document.createElement("td");
+          text = document.createTextNode(array[i].degreeCourse);
+          degreeCourseCell.appendChild(text);
+          newRow.appendChild(degreeCourseCell);
+          //grade
+          let gradeCell = document.createElement("td");
+          text = document.createTextNode(array[i].grade.toUpperCase());
+          gradeCell.appendChild(text);
+          if (array[i].grade == "failed" || array[i].grade == "recalled" ||
+              array[i].grade == "absent"){
+                //may want to use a more formal method to compare strings
+                gradeCell.setAttribute("class", "fail");
+              }
+          else gradeCell.setAttribute("class", "passed");
+          newRow.appendChild(gradeCell);
+          //state
+          let stateCell = document.createElement("td");
+          text = document.createTextNode(array[i].state.toUpperCase());
+          stateCell.appendChild(text);
+          newRow.appendChild(stateCell);
+          //edit button
+          let editCell = document.createElement("td");
+          let button = document.createElement("button");
+          button.innerText = "Edit";
+          //button.appendChild(text);  //it seems appendChild doesn't to work with button
           let anchor = document.createElement("a");
-          text = document.createTextNode("Show Appeals");
-          anchor.appendChild(text);
-          anchor.setAttribute("href", "GetAppealsRIA?courseId=" + array[i].courseId); //certainly needs updating
-          appealLinkCell.appendChild(anchor);
-          newRow.appendChild(appealLinkCell);
-          //may want to check why in this exact moment this.courses is undefined
-          this.courses = document.querySelector("div[class='courses']>table>tbody");
-          this.courses.appendChild(newRow);
-          anchor.addEventListener();//implement*/
+          anchor.appendChild(button);
+          anchor.setAttribute("href", "#");
+          editCell.appendChild(anchor);
+          newRow.appendChild(editCell);
+          subscribers.subs.appendChild(newRow);
+          //anchor.addEventListener();//implement*/
         }
+      }
+    }
   }
 
   function PageOrchestrator(){
