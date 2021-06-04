@@ -46,12 +46,13 @@
             appealList.clear();
             subscribers.hide();
             subscribers.clear();
-            appealList.show(e.target.getAttribute('courseId'));
+            let title = e.target.parentElement.previousSibling.innerText;
+            appealList.show(e.target.getAttribute('courseId'), title);
           });
         }
       }
     }
-    makeCall("GET", "GetCoursesRIA", this.update);
+    makeCall("GET", "GetCoursesRIA", this.update, null);
   }
 
   function AppealList(){
@@ -63,8 +64,10 @@
     this.hide = function hide(){
       this.element.style.display = "none";
     }
-    this.show = function show(courseId){
-      makeCall("GET", "GetAppealsRIA?courseId=" + courseId, this.update);
+    this.show = function show(courseId, title){
+      makeCall("GET", "GetAppealsRIA?courseId=" + courseId, this.update, null);
+      this.message.innerText = "Here are the appeals for the course: " + title.toUpperCase();
+      this.element.setAttribute("courseId", courseId);
       this.element.removeAttribute("style");
     }
     this.clear = function clear() {
@@ -93,7 +96,8 @@
             e.preventDefault();
             subscribers.hide();
             subscribers.clear();
-            subscribers.show(e.target.getAttribute('appealId'));
+            let date = e.target.innerText;
+            subscribers.show(e.target.getAttribute('appealId'), date);
           });
         }
       }
@@ -101,14 +105,16 @@
   }
 
   function Subscribers() {
-    this.element = document.querySelector("div[class='subscribers']");
-    this.message = document.querySelector("div[class='subscribers']>span");
-    this.subs = document.querySelector("div[class='subscribers']>table>tbody");
+    this.element = document.querySelector("div.subscribers");
+    this.message = document.querySelector("div.subscribers>span");
+    this.subs = document.querySelector("div.subscribers>table>tbody");
     this.hide = function hide(){
       this.element.style.display = "none";
     }
-    this.show = function show(appealId){
-      makeCall("GET", "GetSubscribersRIA?appeal=" + appealId, this.update);
+    this.show = function show(appealId, date){
+      makeCall("GET", "GetSubscribersRIA?appeal=" + appealId, this.update, null);
+      this.message.innerText = "Here is the list of students who took part the appeal on " + date.toUpperCase();
+      this.element.setAttribute("appealId", appealId); //may want to save appealId in a different var
       this.element.removeAttribute("style");
     }
     this.clear = function clear() {
@@ -166,27 +172,80 @@
           stateCell.appendChild(text);
           newRow.appendChild(stateCell);
           //edit button
-          let editCell = document.createElement("td");
-          let button = document.createElement("button");
-          button.innerText = "Edit";
-          //button.appendChild(text);  //it seems appendChild doesn't to work with button
-          let anchor = document.createElement("a");
-          anchor.appendChild(button);
-          anchor.setAttribute("href", "#");
-          editCell.appendChild(anchor);
-          newRow.appendChild(editCell);
+          if (stateCell.innerText == "ENTERED" || stateCell.innerText == "NOT ENTERED"){
+            let editCell = document.createElement("td");
+            let button = document.createElement("button");
+            button.innerText = "Edit";
+            //button.appendChild(text);  //it seems appendChild doesn't to work with button
+            let anchor = document.createElement("a");
+            anchor.appendChild(button);
+            anchor.setAttribute("href", "#");
+            editCell.appendChild(anchor);
+            newRow.appendChild(editCell);
+            anchor.addEventListener("click", (e) => {
+              let appealId = subscribers.element.getAttribute("appealId");
+              let studentId = e.target.closest("tr").children[0].innerText;
+              editForm.show(appealId, studentId);
+            });
+          }
           subscribers.subs.appendChild(newRow);
-          //anchor.addEventListener();//implement*/
         }
       }
     }
   }
+
+  function EditForm(){
+    this.studentId = document.querySelector("div.Edit div.studentId");
+    this.appealId = document.querySelector("div.Edit input[name='appealId']");
+    this.name = document.querySelector("div.Edit div.name");
+    this.surname = document.querySelector("div.Edit div.surname");
+    this.courseTitle = document.querySelector("div.Edit div.courseTitle");
+    this.appealDate = document.querySelector("div.Edit div.appealDate");
+    this.grade = document.querySelector("div.Edit div.grade");
+    this.element = document.querySelector("div.Edit");
+    this.button = document.querySelector("div.Edit input[type='submit']")
+    this.hide = function hide(){
+      this.element.style.display = "none";
+    }
+    this.show = function show(appealId, studentId){
+      makeCall("GET", "GetModifyRIA?appealId=" + appealId + "&studentId=" + studentId, this.update, null);
+      //may want to find a better way to express the url
+      this.studentId.setAttribute("value", studentId);
+      this.appealId.setAttribute("value", appealId);
+      this.element.removeAttribute("style");
+    }
+    this.clear = function clear() {
+      this.studentId.children[2].innerText = "";
+      this.name.children[1].innerText = "";
+      this.surname.children[1].innerText = "";
+      this.courseTitle.children[1].innerText = "";
+      this.appealDate.children[1].innerText = "";
+    }
+    this.hide();
+    this.clear();
+    this.update = function update(req){
+      if (req.readyState === 4 && req.status === 200){
+        let objectStrings = req.responseText.split("}"); //needed to parse two different objects
+        let grade = JSON.parse(objectStrings[0]+"}");
+        let appeal = JSON.parse(objectStrings[1]+"}");
+        //introducing content in <nobr> tags
+        editForm.studentId.children[2].innerText = grade.studentId;
+        editForm.name.children[1].innerText = grade.studentName;
+        editForm.surname.children[1].innerText = grade.studentSurname;
+        editForm.courseTitle.children[1].innerText = appeal.courseTitle;
+        editForm.appealDate.children[1].innerText = appeal.date;
+        editForm.studentId.children[1].setAttribute("value", grade.studentId);
+      }
+    }
+  }
+
 
   function PageOrchestrator(){
     this.start = function (){
       courseList = new CourseList();
       appealList = new AppealList();
       subscribers = new Subscribers();
+      editForm = new EditForm();
       //this.clearAll();
     }
     this.clearAll = function clearAll() {
@@ -197,13 +256,13 @@
     }
   }
 
-  function makeCall(method, url, callback) {
+  function makeCall(method, url, callback, form) {
 	    var req = new XMLHttpRequest();
 	    req.onreadystatechange = function() {
 	      callback(req)
 	    };
 	    req.open(method, url);
-      req.send();
+		if (form !== null) req.send(new FormData(form));
+		else req.send();
 	  }
-
 }())
