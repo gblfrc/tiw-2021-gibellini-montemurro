@@ -1,6 +1,6 @@
 (function() {
 
-  var courseList, appealList, subscribers, pageOrchestrator;
+  var courseList, appealList, subscribers, editForm, pageOrchestrator;
 
   window.addEventListener("load", () => {
     pageOrchestrator = new PageOrchestrator();
@@ -21,6 +21,7 @@
     this.clear();
     this.update = function update(req) {
       if (req.readyState === 4 && req.status === 200){
+		courseList.clear(); //should be useless; line written to create analogy with other update methods
         let i = 0;
         let array = JSON.parse(req.responseText);
         for (i = 0; i<array.length; i++){
@@ -52,7 +53,7 @@
         }
       }
     }
-    makeCall("GET", "GetCoursesRIA", this.update, null);
+    makeCall("GET", "GetCoursesRIA", null, this.update);
   }
 
   function AppealList(){
@@ -65,7 +66,7 @@
       this.element.style.display = "none";
     }
     this.show = function show(courseId, title){
-      makeCall("GET", "GetAppealsRIA?courseId=" + courseId, this.update, null);
+      makeCall("GET", "GetAppealsRIA?courseId=" + courseId, null, this.update);
       this.message.innerText = "Here are the appeals for the course: " + title.toUpperCase();
       this.element.setAttribute("courseId", courseId);
       this.element.removeAttribute("style");
@@ -79,6 +80,7 @@
     this.clear();
     this.update = function update(req) {
       if (req.readyState === 4 && req.status === 200){
+		appealList.clear();
         let i = 0;
         let array = JSON.parse(req.responseText);
         for (i = 0; i<array.length; i++){
@@ -112,7 +114,7 @@
       this.element.style.display = "none";
     }
     this.show = function show(appealId, date){
-      makeCall("GET", "GetSubscribersRIA?appeal=" + appealId, this.update, null);
+      makeCall("GET", "GetSubscribersRIA?appealId=" + appealId, null, this.update);
       this.message.innerText = "Here is the list of students who took part the appeal on " + date.toUpperCase();
       this.element.setAttribute("appealId", appealId); //may want to save appealId in a different var
       this.element.removeAttribute("style");
@@ -126,6 +128,8 @@
     this.clear();
     this.update = function update(req) {
       if (req.readyState === 4 && req.status === 200){
+		subscribers.clear();
+        editForm.hide();
         let i = 0;
         let array = JSON.parse(req.responseText);
         for (i = 0; i<array.length; i++){
@@ -183,6 +187,7 @@
             editCell.appendChild(anchor);
             newRow.appendChild(editCell);
             anchor.addEventListener("click", (e) => {
+              e.preventDefault();
               let appealId = subscribers.element.getAttribute("appealId");
               let studentId = e.target.closest("tr").children[0].innerText;
               editForm.show(appealId, studentId);
@@ -208,7 +213,7 @@
       this.element.style.display = "none";
     }
     this.show = function show(appealId, studentId){
-      makeCall("GET", "GetModifyRIA?appealId=" + appealId + "&studentId=" + studentId, this.update, null);
+      makeCall("GET", "GetModifyRIA?appealId=" + appealId + "&studentId=" + studentId, null, this.update);
       //may want to find a better way to express the url
       this.studentId.setAttribute("value", studentId);
       this.appealId.setAttribute("value", appealId);
@@ -235,9 +240,21 @@
         editForm.courseTitle.children[1].innerText = appeal.courseTitle;
         editForm.appealDate.children[1].innerText = appeal.date;
         editForm.studentId.children[1].setAttribute("value", grade.studentId);
+        editForm.button.addEventListener("click", (e) => {
+          e.preventDefault();
+          let form = e.target.closest("form");
+          makeCall("POST", "EditRIA", form, function(req){
+            if (req.readyState === 4 && req.status === 200){
+              let appeal = JSON.parse(req.responseText);
+              subscribers.show(appeal.appealId, appeal.date);
+            }
+          });
+        })
       }
     }
   }
+
+/**/
 
 
   function PageOrchestrator(){
@@ -256,13 +273,17 @@
     }
   }
 
-  function makeCall(method, url, callback, form) {
+
+
+  function makeCall(method, url, form, callback) {
 	    var req = new XMLHttpRequest();
-	    req.onreadystatechange = function() {
+	    req.onreadystatechange = function(e) {
+		  e.preventDefault();
 	      callback(req)
 	    };
 	    req.open(method, url);
 		if (form !== null) req.send(new FormData(form));
 		else req.send();
-	  }
+  }
+
 }())

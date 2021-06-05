@@ -51,6 +51,7 @@ public class GetSubscribers extends HttpServlet {
 		try {
 			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
+			//may want to change appeal parameter name to appealId to make this servlet equal to the RIA one
 			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new InvalidParameterException();
 			}

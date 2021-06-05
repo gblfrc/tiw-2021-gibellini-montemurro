@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
-@WebServlet("/GetSubscribersRIA")
+@WebServlet("/GetSubscribersRIA") @MultipartConfig
 public class GetSubscribersRIA extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -33,6 +34,7 @@ public class GetSubscribersRIA extends HttpServlet {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
 		HttpSession session = request.getSession();
 		Boolean changeOrder=false;
 		String field=null;
@@ -43,7 +45,7 @@ public class GetSubscribersRIA extends HttpServlet {
 		user = new User (3, "Professor");
 		try {
 			AppealDAO appealDAO= new AppealDAO(connection);
-			appId = Integer.parseInt(request.getParameter("appeal"));
+			appId = Integer.parseInt(request.getParameter("appealId"));
 			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new InvalidParameterException();
 			}
@@ -73,9 +75,9 @@ public class GetSubscribersRIA extends HttpServlet {
 			}
 			params.remove("field");
 			
-			params.remove("appeal");
+			params.remove("appealId");
 			//checks there aren't too many parameters in the request
-			if(params.size()>0) throw new InvalidParameterException("Couldn't handle request"); 
+			//if(params.size()>0) throw new InvalidParameterException("Couldn't handle request"); 
 			
 			changeOrder=Boolean.parseBoolean(request.getParameter("changeOrder")); //if there is no "changeOrder" parameter, parseBoolean returns false
 			//checks existence of the attribute related to "field" request parameter (and handles it)
@@ -109,9 +111,8 @@ public class GetSubscribersRIA extends HttpServlet {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
-		
 	}
-
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);
