@@ -1,6 +1,6 @@
 (function() {
 
-  var courseList, appealList, subscribers, editForm, pageOrchestrator;
+  var courseList, appealList, subscribers, editForm, buttons, pageOrchestrator;
 
   window.addEventListener("load", () => {
     pageOrchestrator = new PageOrchestrator();
@@ -112,9 +112,11 @@
     this.subs = document.querySelector("div.subscribers>table>tbody");
     this.hide = function hide(){
       this.element.style.display = "none";
+      if (buttons !== undefined) buttons.hide();
     }
     this.show = function show(appealId, date){
       makeCall("GET", "GetSubscribersRIA?appealId=" + appealId, null, this.update);
+      buttons.show(appealId);
       this.message.innerText = "Here is the list of students who took part the appeal on " + date.toUpperCase();
       this.element.setAttribute("appealId", appealId); //may want to save appealId in a different var
       this.element.removeAttribute("style");
@@ -128,7 +130,7 @@
     this.clear();
     this.update = function update(req) {
       if (req.readyState === 4 && req.status === 200){
-		subscribers.clear();
+        subscribers.clear();
         editForm.hide();
         let i = 0;
         let array = JSON.parse(req.responseText);
@@ -188,6 +190,7 @@
             newRow.appendChild(editCell);
             anchor.addEventListener("click", (e) => {
               e.preventDefault();
+              //buttons.hide();
               let appealId = subscribers.element.getAttribute("appealId");
               let studentId = e.target.closest("tr").children[0].innerText;
               editForm.show(appealId, studentId);
@@ -195,6 +198,7 @@
           }
           subscribers.subs.appendChild(newRow);
         }
+
       }
     }
   }
@@ -254,7 +258,52 @@
     }
   }
 
-/**/
+  function Buttons(){
+    this.element = document.querySelector("div.Buttons");
+    this.publish = document.querySelector("div.Buttons form.publish input[type='hidden']");
+    this.report = document.querySelector("div.Buttons form.report input[type='hidden']");
+    this.hide = function hide(){
+      this.element.style.display = "none";
+    }
+    this.show = function show(appealId){
+      this.publish.setAttribute("value", appealId);
+      this.report.setAttribute("value", appealId);
+      this.element.removeAttribute("style");
+      this.update();
+    }
+    this.hide();
+    this.update = function update(){
+      let publishSubmit = buttons.publish.nextSibling.nextSibling; //line to get the buttons
+      //may want to find a better way to get the button
+      publishSubmit.addEventListener("click", (e) => {
+      e.preventDefault();
+      editForm.hide();
+      let form = e.target.closest("form");
+      makeCall("POST", "PublishRIA", form, function(req){
+        if (req.readyState === 4 && req.status === 200){
+          let appeal = JSON.parse(req.responseText);
+          subscribers.show(appeal.appealId, appeal.date);
+          }
+        });
+      });
+      let reportSubmit = buttons.publish.nextSibling.nextSibling; //line to get the buttons
+      //may want to find a better way to get the button
+      reportSubmit.addEventListener("click", (e) => {
+      e.preventDefault();
+      editForm.hide();
+      let form = e.target.closest("form");
+      makeCall("POST", "ReportRIA", form, function(req){
+        if (req.readyState === 4 && req.status === 200){
+          let appeal = JSON.parse(req.responseText);
+          subscribers.show(appeal.appealId, appeal.date);
+          //show report
+          }
+        });
+      });
+    }
+  }
+
+
 
 
   function PageOrchestrator(){
@@ -263,7 +312,8 @@
       appealList = new AppealList();
       subscribers = new Subscribers();
       editForm = new EditForm();
-      //this.clearAll();
+      buttons = new Buttons();
+      buttons.update();
     }
     this.clearAll = function clearAll() {
       let temp = document.querySelector("div[class='appeals']");
