@@ -1,6 +1,7 @@
 (function() {
 
-  var courseList, appealList, subscribers, editForm, buttons, pageOrchestrator;
+  var courseList, appealList, subscribers, editForm,
+      buttons, reports, pageOrchestrator;
 
   window.addEventListener("load", () => {
     pageOrchestrator = new PageOrchestrator();
@@ -98,6 +99,7 @@
             e.preventDefault();
             subscribers.hide();
             subscribers.clear();
+            reports.hide();
             let date = e.target.innerText;
             subscribers.show(e.target.getAttribute('appealId'), date);
           });
@@ -262,18 +264,22 @@
     this.element = document.querySelector("div.Buttons");
     this.publish = document.querySelector("div.Buttons form.publish input[type='hidden']");
     this.report = document.querySelector("div.Buttons form.report input[type='hidden']");
+    this.allReports = document.querySelector("div.Buttons form.allReports input[type='hidden']");
     this.hide = function hide(){
       this.element.style.display = "none";
+      this.publish.removeAttribute("value");
+      this.report.removeAttribute("value");
+      this.allReports.removeAttribute("value");
     }
     this.show = function show(appealId){
       this.publish.setAttribute("value", appealId);
       this.report.setAttribute("value", appealId);
+      this.allReports.setAttribute("value", appealId);
       this.element.removeAttribute("style");
-      this.update();
     }
     this.hide();
-    this.update = function update(){
-      let publishSubmit = buttons.publish.nextSibling.nextSibling; //line to get the buttons
+    this.registerEvents = function registerEvents(){
+      let publishSubmit = this.publish.nextSibling.nextSibling; //line to get the buttons
       //may want to find a better way to get the button
       publishSubmit.addEventListener("click", (e) => {
       e.preventDefault();
@@ -286,7 +292,7 @@
           }
         });
       });
-      let reportSubmit = buttons.publish.nextSibling.nextSibling; //line to get the buttons
+      let reportSubmit = this.report.nextSibling.nextSibling; //line to get the buttons
       //may want to find a better way to get the button
       reportSubmit.addEventListener("click", (e) => {
       e.preventDefault();
@@ -296,14 +302,126 @@
         if (req.readyState === 4 && req.status === 200){
           let appeal = JSON.parse(req.responseText);
           subscribers.show(appeal.appealId, appeal.date);
-          //show report
+          reports.show("last", appeal.appealId);
           }
         });
       });
+      //add event listener to allReports button
+      let allReportsSubmit = this.allReports.nextSibling.nextSibling; //line to get the buttons
+      //may want to find a better way to get the button
+      allReportsSubmit.addEventListener("click", (e) => {
+      e.preventDefault();
+      editForm.hide();
+      appealId = this.allReports.getAttribute("value");
+      reports.show("all", appealId);
+      });
     }
+    this.registerEvents();
   }
 
-
+  function Reports(){
+    this.element = document.querySelector("div.Reports");
+    this.summary = document.querySelector("div.Reports div.summary");
+    this.courseTitle = document.querySelector("div.Reports div.summary div.courseTitle");
+    this.appealDate = document.querySelector("div.Reports div.summary div.appealDate");
+    this.message = document.querySelector("div.Reports div.summary p.message");
+    this.details = document.querySelector("div.Reports div.details");
+    this.reportId = document.querySelector("div.Reports div.details div.reportId");
+    this.reportDate = document.querySelector("div.Reports div.details div.reportDate");
+    this.reportHour = document.querySelector("div.Reports div.details div.reportHour");
+    this.reportGrades = document.querySelector("div.Reports div.details div.reportGrades tbody");
+    //methods
+    this.hide = function hide(){
+      this.element.style.display = "none";
+    }
+    this.showMessage = function showMessage(msgType){
+      if (msgType === "last") this.message.innerText="Created report for the appeal:";
+      if (msgType === "all") this.message.innerText="Here is shown all information about reports for the appeal:";
+    }
+    this.show = function show(msgType, appealId){
+      reports.clear();
+      makeCall("GET", "GetReportsRIA?type=" + msgType + "&appealId=" + appealId, null, this.update);
+      //may want to find a better way to express the url
+      this.showMessage(msgType);
+      this.element.removeAttribute("style");
+    }
+    this.clear = function clear() {
+      //get all report details
+      let allDetails = document.querySelector("div.Reports div.details");
+      //delete all but first report details
+      if (allDetails.length > 1){
+        for (let i=1; i<allDetails.length; i++){
+          allDetails[i].remove();
+        }
+      }
+      //clear all static (or previously-shown) report content
+      this.courseTitle.children[1].innerText = "";
+      this.appealDate.children[1].innerText = "";
+      this.reportId.children[1].innerText = "";
+      this.reportDate.children[1].innerText = "";
+      this.reportHour.children[1].innerText = "";
+      //remove all static (or previously-shown) rows in the table
+      while(this.reportGrades.children.length>0){
+        this.reportGrades.removeChild(this.reportGrades.children[0]);
+      }
+    }
+    this.hide();
+    this.clear();
+    this.update = function update(req){
+      if (req.readyState === 4 && req.status === 200){
+        let reportsArr = JSON.parse(req.responseText);
+        let course = reportsArr[0].appeal.courseTitle;
+        reports.courseTitle.children[1].innerText = reportsArr[0].appeal.courseTitle;
+        reports.appealDate.children[1].innerText = reportsArr[0].appeal.date;
+        for (let i=0; i<reportsArr.length; i++){
+          let currentReport = reportsArr[i];
+          //select report details section or duplicate an existent one
+          let detailsElement;
+          if (i===0) detailsElement = reports.details;
+          if (i>0) {
+            detailsElement = reports.details.cloneNode();
+            this.element.appendChild(detailsElement);
+          }
+          //get details elements (get nobr tags)
+          let reportId = detailsElement.children[1].children[1];
+          let reportDate = detailsElement.children[2].children[1];
+          let reportHour = detailsElement.children[3].children[1];
+          let reportGrades = detailsElement.children[4].children[1].children[1];
+          reportId.innerText = currentReport.reportId;
+          reportDate.innerText = currentReport.creationDate;
+          reportHour.innerText = currentReport.creationTime;
+          //add grades as rows of the table
+          let grades = currentReport.grades;
+          for (let j=0; j<grades.length; j++){
+            let newRow = document.createElement("tr");
+            //studentId
+            let studentIdCell = document.createElement("td");
+            studentIdCell.innerText = grades[j].studentId;
+            newRow.appendChild(studentIdCell);
+            //studentSurname
+            let surnameCell = document.createElement("td");
+            surnameCell.innerText = grades[j].studentSurname;
+            newRow.appendChild(surnameCell);
+            //studentName
+            let nameCell = document.createElement("td");
+            nameCell.innerText = grades[j].studentName;
+            newRow.appendChild(nameCell);
+            //grade
+            let gradeCell = document.createElement("td");
+            gradeCell.innerText = grades[j].grade.toUpperCase();
+            if (gradeCell.innerText == "FAILED" || gradeCell.innerText == "RECALLED" ||
+                gradeCell.innerText == "ABSENT"){
+                  //may want to use a more formal method to compare strings
+                  gradeCell.setAttribute("class", "fail");
+                }
+            else gradeCell.setAttribute("class", "passed");
+            newRow.appendChild(gradeCell);
+            reportGrades.appendChild(newRow);
+          }
+        }
+      }
+    }
+  }
 
 
   function PageOrchestrator(){
@@ -313,7 +431,7 @@
       subscribers = new Subscribers();
       editForm = new EditForm();
       buttons = new Buttons();
-      buttons.update();
+      reports = new Reports();
     }
     this.clearAll = function clearAll() {
       let temp = document.querySelector("div[class='appeals']");

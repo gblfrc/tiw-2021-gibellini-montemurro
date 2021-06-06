@@ -79,14 +79,17 @@
 		</div>
 		<div class="Buttons">
 			<form class="publish" action="#">
-				<input type="hidden" name="appeal">
-				<input type="submit" value="Publish">
+				<input type="hidden" name="appeal"> <input type="submit"
+					value="Publish">
 			</form>
 			<form class="report" action="#">
-				<input type="hidden" name="appeal">
-				<input type="submit" value="Report">
+				<input type="hidden" name="appeal"> <input type="submit"
+					value="Report">
 			</form>
-			<!-- <button id="allReports">All Reports</button> -->
+			<form class="allReports" action="#">
+				<input type="hidden" name="appeal"> <input type="submit"
+					value="All Reports">
+			</form>
 		</div>
 		<div class="Edit">
 			<h1>Edit grade</h1>
@@ -136,6 +139,56 @@
 				</div>
 				<br> <br> <input type="submit" value="Enter">
 			</form>
+		</div>
+		<div class="Reports">
+			<div class="summary">
+				<h1>Reports summary</h1>
+				<p class="message">Created report for the appeal:</p>
+				<div class="courseTitle">
+					<strong>Course title: </strong>
+					<nobr>Metrics</nobr>
+				</div>
+				<div class="appealDate">
+					<strong>Appeal date: </strong>
+					<nobr>31/12/2020</nobr>
+				</div>
+			</div>
+			<div class="details">
+				<h2>Report details</h2>
+				<div class="reportId">
+					<strong>Report ID: </strong>
+					<nobr>500</nobr>
+				</div>
+				<div class="reportDate">
+					<strong>Report created on: </strong>
+					<nobr>01/01/2021</nobr>
+				</div>
+				<div class="reportHour">
+					<strong>Report created at: </strong>
+					<nobr>12:00</nobr>
+				</div>
+				<div class="reportGrades">
+					<strong>Recorded grades:</strong> 
+					<table>
+						<thead>
+							<tr>
+								<th>Student Id</th>
+								<th>Surname</th>
+								<th>Name</th>
+								<th>Grade</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1492</td>
+								<td>Smith</td>
+								<td>John</td>
+								<td>25</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 	</div>
 </body>
