@@ -6,8 +6,7 @@
 <link rel="stylesheet" type="text/css" media="all"
 	href="css/Stylesheet.css" />
 <script src="main.js" defer></script>
-<!-- <script src="utils.js" defer></script> -->
-<!-- <script src="call.js" defer></script> -->
+<script src="sort.js" defer></script>
 </head>
 <body>
 	<div class="main">
@@ -53,13 +52,13 @@
 			<table>
 				<thead>
 					<tr>
-						<th>StudentId</th>
-						<th>Surname</th>
-						<th>Name</th>
-						<th>Email</th>
-						<th>Degree course</th>
-						<th>Grade</th>
-						<th>State</th>
+						<th class="sortable">StudentId</th>
+						<th class="sortable">Surname</th>
+						<th class="sortable">Name</th>
+						<th class="sortable">Email</th>
+						<th class="sortable">Degree course</th>
+						<th class="sortable">Grade</th>
+						<th class="sortable">State</th>
 						<th>Edit</th>
 					</tr>
 				</thead>
@@ -72,7 +71,11 @@
 						<td>Degree course</td>
 						<td>Grade</td>
 						<td>State</td>
-						<td>Edit</td>
+						<td>
+							<form>
+								<input type="submit" value="Edit">
+							</form>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -89,6 +92,10 @@
 			<form class="allReports" action="#">
 				<input type="hidden" name="appeal"> <input type="submit"
 					value="All Reports">
+			</form>
+			<form class="multipleEdit" action="#">
+				<input type="hidden" name="appeal"> <input type="submit"
+					value="Multiple Edit">
 			</form>
 		</div>
 		<div class="Edit">
@@ -168,7 +175,7 @@
 					<nobr>12:00</nobr>
 				</div>
 				<div class="reportGrades">
-					<strong>Recorded grades:</strong> 
+					<strong>Recorded grades:</strong>
 					<table>
 						<thead>
 							<tr>
@@ -189,6 +196,65 @@
 					</table>
 				</div>
 			</div>
+		</div>
+	</div>
+	<div class="mebg">
+		<div class="MultipleEdit">
+		<span class="closer">X
+		<!-- may want to add a better icon --></span>
+			<table>
+				<thead>
+					<tr>
+						<th class="sortable">StudentId</th>
+						<th class="sortable">Surname</th>
+						<th class="sortable">Name</th>
+						<th class="sortable">Email</th>
+						<th class="sortable">Degree course</th>
+						<th class="sortable">Grade</th>
+						<th class="sortable">State</th>
+						<th>Edit</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>StudentId</td>
+						<td>Surname</td>
+						<td>Name</td>
+						<td>Email</td>
+						<td>Degree course</td>
+						<td>Grade</td>
+						<td>State</td>
+						<td>
+							<form>
+								<select name="gradeValue">
+									<option value="" selected></option>
+									<option value="absent">ABSENT</option>
+									<option value="recalled">RECALLED</option>
+									<option value="failed">FAILED</option>
+									<option value="18">18</option>
+									<option value="19">19</option>
+									<option value="20">20</option>
+									<option value="21">21</option>
+									<option value="22">22</option>
+									<option value="23">23</option>
+									<option value="24">24</option>
+									<option value="25">25</option>
+									<option value="26">26</option>
+									<option value="27">27</option>
+									<option value="28">28</option>
+									<option value="29">29</option>
+									<option value="30">30</option>
+									<option value="30 with merit">30 WITH MERIT</option>
+								</select>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<br>
+			<form>
+				<input type="submit" value="Enter">
+			</form>
 		</div>
 	</div>
 </body>

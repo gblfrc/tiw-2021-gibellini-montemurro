@@ -26,7 +26,7 @@ div.main {
 	overflow: auto;
 }
 
-div.main > *{
+div.main>* {
 	margin-top: 15px;
 	margin-left: 15px;
 	margin-right: 15px;
@@ -110,12 +110,13 @@ div.login>form {
 	width: 40%;
 }
 
+/*may want to extend this to input[type="button"]*/
 input:not([type="submit"]) {
 	width: 65%;
 	float: right;
 }
 
-input[type="submit"], button {
+input[type="submit"], input[type="button"], button {
 	background-color: LightSkyBlue;
 	display: inline-block;
 	border-radius: 4px;
@@ -126,6 +127,12 @@ input[type="submit"], button {
 	padding-bottom: 3px;
 	padding-left: 8px;
 	padding-right: 8px;
+}
+
+input[type="checkbox"] {
+	cursor: pointer;
+	height: 1.1em;
+	width: 1.1em;
 }
 
 p.error {
@@ -149,3 +156,50 @@ div.mainTables div {
 }
 
 /* may still want to update: RIA version shows lacks in spacing between spans and tables */
+td.checkbox {
+	/*may want to update (or create a custom checkbox)*/
+	align-items: center;
+	/*text-align: center;*/
+	display: inline-flex;
+	cursor: pointer;
+	position: relative;
+}
+
+.mebg {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	visibility: hidden;
+	opacity: 0;
+	justify-content: center;
+	align-items: center;
+	display: flex;
+}
+
+.MultipleEdit {
+	padding: 30px;
+	background-color: Azure;
+	border-style: inset;
+	border-color: LightSkyBlue;
+	border-radius: 15px;
+	position: relative;
+	max-height: 85%;
+	/*overflow: scroll;*/ /*may want to change display of scroll bars*/
+	/*may want to find a way to prevent scrolling of the main page*/
+}
+
+.active {
+	visibility:visible;
+	opacity: 1;
+}
+
+.closer{
+	/*content: '\f00d';*/ /* use this property to replace the X with an icon */
+	position:absolute;
+	right: 15px;
+	top: 5px;
+	cursor: pointer;
+}

@@ -1,7 +1,7 @@
 (function() {
 
   var courseList, appealList, subscribers, editForm,
-      buttons, reports, pageOrchestrator;
+      buttons, reports, multipleEdit, pageOrchestrator;
 
   window.addEventListener("load", () => {
     pageOrchestrator = new PageOrchestrator();
@@ -182,28 +182,83 @@
           //edit button
           if (stateCell.innerText == "ENTERED" || stateCell.innerText == "NOT ENTERED"){
             let editCell = document.createElement("td");
-            let button = document.createElement("button");
-            button.innerText = "Edit";
+            let form = document.createElement("form");
+            //set student input
+            let studentInput = document.createElement("input");
+            studentInput.setAttribute("type", "hidden");
+            studentInput.setAttribute("name", "studentId");
+            studentInput.setAttribute("value", array[i].studentId)
+            form.appendChild(studentInput);
+            //set appeal input
+            let appealInput = document.createElement("input");
+            appealInput.setAttribute("type", "hidden");
+            appealInput.setAttribute("name", "appealId");
+            appealInput.setAttribute("value", subscribers.element.getAttribute("appealId"));
+            form.appendChild(appealInput);
+            //create button
+            let button = document.createElement("input");
+            button.setAttribute("type", "submit");
+            button.setAttribute("value", "Edit");
+            form.appendChild(button);
+            //button.innerText = "Edit";
             //button.appendChild(text);  //it seems appendChild doesn't to work with button
-            let anchor = document.createElement("a");
+          /*let anchor = document.createElement("a");
             anchor.appendChild(button);
-            anchor.setAttribute("href", "#");
-            editCell.appendChild(anchor);
+            anchor.setAttribute("href", "#");*/
+            editCell.appendChild(form);
             newRow.appendChild(editCell);
-            anchor.addEventListener("click", (e) => {
-              e.preventDefault();
-              //buttons.hide();
-              let appealId = subscribers.element.getAttribute("appealId");
-              let studentId = e.target.closest("tr").children[0].innerText;
-              editForm.show(appealId, studentId);
-            });
+            button.addEventListener("click", editButtonCallback);
           }
           subscribers.subs.appendChild(newRow);
         }
-
+      }
+    }
+    this.toCheckbox = function toCheckbox(){
+      let forms = document.querySelectorAll("div.subscribers tbody tr form");
+      if (forms.length>0){
+        for (let i=0; i<forms.length; i++){
+          forms[i].closest("td").setAttribute("class", "checkbox");
+          //remove both of the event listeners in case this function got called twice in a row
+          forms[i].children[2].removeEventListener("click", editButtonCallback);
+          forms[i].children[2].removeEventListener("click", editCheckboxCallback);
+          forms[i].children[2].removeAttribute("value");
+          forms[i].children[2].setAttribute("type", "checkbox");
+          forms[i].children[2].addEventListener("click", editCheckboxCallback);
+        }
+      }
+    }
+    this.toButton = function toButton(){
+      let forms = document.querySelectorAll("div.subscribers tbody tr form");
+      if (forms.length>0){
+        for (let i=0; i<forms.length; i++){
+          forms[i].closest("td").removeAttribute("class");
+          //remove both of the event listeners in case this function got called twice in a row
+          forms[i].children[2].removeEventListener("click", editCheckboxCallback);
+          forms[i].children[2].removeEventListener("click", editButtonCallback);
+          forms[i].children[2].removeAttribute("value");
+          forms[i].children[2].setAttribute("type", "submit");
+          forms[i].children[2].setAttribute("value", "Edit");
+          forms[i].children[2].addEventListener("click", editButtonCallback);
+        }
       }
     }
   }
+
+  function editButtonCallback(e){
+    e.preventDefault();
+    let appealId = e.target.closest("form").children[1].getAttribute("value");
+    let studentId = e.target.closest("form").children[0].getAttribute("value");
+    editForm.show(appealId, studentId);
+  }
+
+  function editCheckboxCallback(e){
+    //e.preventDefault();
+    //correct implmentation
+    let appealId = e.target.closest("form").children[1].getAttribute("value");
+    let studentId = e.target.closest("form").children[0].getAttribute("value");
+    //editForm.show(appealId, studentId);
+  }
+
 
   function EditForm(){
     this.studentId = document.querySelector("div.Edit div.studentId");
@@ -265,16 +320,19 @@
     this.publish = document.querySelector("div.Buttons form.publish input[type='hidden']");
     this.report = document.querySelector("div.Buttons form.report input[type='hidden']");
     this.allReports = document.querySelector("div.Buttons form.allReports input[type='hidden']");
+    this.multipleEdit = document.querySelector("div.Buttons form.multipleEdit input[type='hidden']");
     this.hide = function hide(){
       this.element.style.display = "none";
       this.publish.removeAttribute("value");
       this.report.removeAttribute("value");
       this.allReports.removeAttribute("value");
+      this.multipleEdit.removeAttribute("value");
     }
     this.show = function show(appealId){
       this.publish.setAttribute("value", appealId);
       this.report.setAttribute("value", appealId);
       this.allReports.setAttribute("value", appealId);
+      this.multipleEdit.setAttribute("value", appealId);
       this.element.removeAttribute("style");
     }
     this.hide();
@@ -314,6 +372,14 @@
       editForm.hide();
       appealId = this.allReports.getAttribute("value");
       reports.show("all", appealId);
+      });
+      //add event listener to multipleEdit button
+      let multipleEditSubmit = this.multipleEdit.nextSibling.nextSibling; //line to get the buttons
+      //may want to find a better way to get the button
+      multipleEditSubmit.addEventListener("click", (e) => {
+      e.preventDefault();
+      multipleEdit.show();
+      editForm.hide();
       });
     }
     this.registerEvents();
@@ -423,6 +489,26 @@
     }
   }
 
+  function MultipleEdit(){
+    this.element = document.querySelector("div.MultipleEdit");
+    this.closer = document.querySelector("div.MultipleEdit span.closer");
+    this.show = function show(){
+      let mebg = this.element.closest("div.mebg");
+      mebg.classList.add("active");
+    }
+    this.hide = function hide(){
+      let mebg = this.element.closest("div.mebg");
+      mebg.classList.remove("active");
+    }
+    this.registerEvents = function registerEvents(){
+      this.closer.addEventListener("click", function(){
+        multipleEdit.hide();
+      })
+    }
+    this.registerEvents();
+  }
+
+
 
   function PageOrchestrator(){
     this.start = function (){
@@ -432,6 +518,7 @@
       editForm = new EditForm();
       buttons = new Buttons();
       reports = new Reports();
+      multipleEdit = new MultipleEdit();
     }
     this.clearAll = function clearAll() {
       let temp = document.querySelector("div[class='appeals']");
