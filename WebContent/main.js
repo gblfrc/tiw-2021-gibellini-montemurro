@@ -304,7 +304,7 @@
         editForm.button.addEventListener("click", (e) => {
           e.preventDefault();
           let form = e.target.closest("form");
-          makeCall("POST", "EditRIA", form, function(req){
+          makeCall("POST", "EditRIA", new FormData(form), function(req){
             if (req.readyState === 4 && req.status === 200){
               let appeal = JSON.parse(req.responseText);
               subscribers.show(appeal.appealId, appeal.date);
@@ -343,7 +343,7 @@
       e.preventDefault();
       editForm.hide();
       let form = e.target.closest("form");
-      makeCall("POST", "PublishRIA", form, function(req){
+      makeCall("POST", "PublishRIA", new FormData(form), function(req){
         if (req.readyState === 4 && req.status === 200){
           let appeal = JSON.parse(req.responseText);
           subscribers.show(appeal.appealId, appeal.date);
@@ -356,7 +356,7 @@
       e.preventDefault();
       editForm.hide();
       let form = e.target.closest("form");
-      makeCall("POST", "ReportRIA", form, function(req){
+      makeCall("POST", "ReportRIA", new FormData(form), function(req){
         if (req.readyState === 4 && req.status === 200){
           let appeal = JSON.parse(req.responseText);
           subscribers.show(appeal.appealId, appeal.date);
@@ -493,6 +493,7 @@
   function MultipleEdit(){
     this.element = document.querySelector("div.MultipleEdit");
     this.closer = document.querySelector("div.MultipleEdit span.closer");
+    this.enter = document.querySelector("div.MultipleEdit input[type='submit']");
     this.show = function show(appealId){
       makeCall("GET", "GetNotEnteredRIA?appealId=" + appealId, null, multipleEdit.update);
       let mebg = this.element.closest("div.mebg");
@@ -510,10 +511,29 @@
       for (let i=0; i<5; i++){
         tbody.children[0].children[i].innerText = "";
       }
+      let form = tbody.children[0].children[5].children[0];
+      form.children[0].selectedIndex=0;
+      form.children[1].removeAttribute("value");
+      form.children[2].removeAttribute("value");
     }
     this.registerEvents = function registerEvents(){
       this.closer.addEventListener("click", function(){
         multipleEdit.hide();
+      })
+      this.enter.addEventListener("click", function(e){
+        e.preventDefault();
+        let forms = document.querySelectorAll("div.MultipleEdit tbody tr form");
+        let toSend = new Array(forms.length);
+        for (let i=0; i<forms.length; i++){
+          toSend[i] = new FormData(forms[i]);
+        }
+        makeCall ("POST", "MultipleEditRIA", toSend, () => {
+          if (req.readyState === 4 && req.status === 200){
+            multipleEdit.hide();
+            let appeal = JSON.parse(req.responseText);
+            subscribers.show(appeal.appealId, appeal.date);
+          }
+        })
       })
     }
     this.clear();
@@ -539,7 +559,10 @@
           newRow.children[2].innerText = array[i].studentName;
           newRow.children[3].innerText = array[i].email;
           newRow.children[4].innerText = array[i].degreeCourse;
-          let select = newRow.children[5].children[0].children[0];
+          let form = newRow.children[5].children[0];
+          form.children[1].setAttribute("value", array[i].appealId);
+          form.children[2].setAttribute("value", array[i].studentId);
+          let select = form.children[0];
           select.addEventListener("change", (e) => {
             if (e.target.closest("tr").getAttribute("selected")==="true"){
               let allSelects = document.querySelectorAll("div.MultipleEdit tr[selected='true'] select");
@@ -555,19 +578,6 @@
       }
     }
   }
-
-  function autoclick(grade) {
-  let e = new Event("click");
-  let options = document.querySelectorAll("MultipleEdit tr[selected=true] option[value=" + grade + "]");
-  for (let i=0; i<options.length; i++){
-    options[i].dispatchEvent(e);
-  }
-}
-
-  function autochange(grade){
-
-  }
-
 
   function rowSelector(e){
     if (!(e.target instanceof HTMLSelectElement)){
@@ -597,14 +607,14 @@
 
 
 
-  function makeCall(method, url, form, callback) {
+  function makeCall(method, url, object, callback) {
 	    var req = new XMLHttpRequest();
 	    req.onreadystatechange = function(e) {
 		  e.preventDefault();
 	      callback(req)
 	    };
 	    req.open(method, url);
-		if (form !== null) req.send(new FormData(form));
+		if (object !== null) req.send(object);
 		else req.send();
   }
 
