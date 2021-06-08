@@ -200,8 +200,8 @@
 	</div>
 	<div class="mebg">
 		<div class="MultipleEdit">
-		<span class="closer">X
-		<!-- may want to add a better icon --></span>
+			<span class="closer">X <!-- may want to add a better icon --></span>
+			<span class="message">Here are all the students whose state is 'NOT ENTERED' for the appeal:</span>
 			<table>
 				<thead>
 					<tr>
@@ -210,8 +210,6 @@
 						<th class="sortable">Name</th>
 						<th class="sortable">Email</th>
 						<th class="sortable">Degree course</th>
-						<th class="sortable">Grade</th>
-						<th class="sortable">State</th>
 						<th>Edit</th>
 					</tr>
 				</thead>
@@ -222,12 +220,10 @@
 						<td>Name</td>
 						<td>Email</td>
 						<td>Degree course</td>
-						<td>Grade</td>
-						<td>State</td>
 						<td>
 							<form>
 								<select name="gradeValue">
-									<option value="" selected></option>
+									<option value=""></option>
 									<option value="absent">ABSENT</option>
 									<option value="recalled">RECALLED</option>
 									<option value="failed">FAILED</option>
@@ -248,6 +244,15 @@
 								</select>
 							</form>
 						</td>
+					</tr>
+					<tr>
+						<td>StudentId</td>
+						<td>Surname</td>
+						<td>Name</td>
+						<td>Email</td>
+						<td>Degree course</td>
+						<td>Grade</td>
+						<td>State</td>
 					</tr>
 				</tbody>
 			</table>

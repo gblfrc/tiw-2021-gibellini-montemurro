@@ -378,7 +378,8 @@
       //may want to find a better way to get the button
       multipleEditSubmit.addEventListener("click", (e) => {
       e.preventDefault();
-      multipleEdit.show();
+      multipleEdit.clear();
+      multipleEdit.show(buttons.multipleEdit.getAttribute("value"));
       editForm.hide();
       });
     }
@@ -492,7 +493,8 @@
   function MultipleEdit(){
     this.element = document.querySelector("div.MultipleEdit");
     this.closer = document.querySelector("div.MultipleEdit span.closer");
-    this.show = function show(){
+    this.show = function show(appealId){
+      makeCall("GET", "GetNotEnteredRIA?appealId=" + appealId, null, multipleEdit.update);
       let mebg = this.element.closest("div.mebg");
       mebg.classList.add("active");
     }
@@ -500,15 +502,80 @@
       let mebg = this.element.closest("div.mebg");
       mebg.classList.remove("active");
     }
+    this.clear = function clear() {
+      let tbody=this.element.children[2].children[1];
+      while(tbody.children.length>1){
+        tbody.removeChild(tbody.children[1]);
+      }
+      for (let i=0; i<5; i++){
+        tbody.children[0].children[i].innerText = "";
+      }
+    }
     this.registerEvents = function registerEvents(){
       this.closer.addEventListener("click", function(){
         multipleEdit.hide();
       })
     }
+    this.clear();
     this.registerEvents();
+    this.update = function update(req){
+      if (req.readyState === 4 && req.status === 200){
+        let tbody=multipleEdit.element.children[2].children[1];
+        let i = 0;
+        let array = JSON.parse(req.responseText);
+        for (i = 0; i<array.length; i++){
+          let newRow;
+          if (i===0) {
+            newRow = tbody.children[0];
+            newRow.removeEventListener("click", rowSelector);
+            //may be useful when multipleEdit is used repeatedly
+          }
+          else {
+            newRow = tbody.children[0].cloneNode("deep");
+            //used cloning to avoid creation of select forms
+          }
+          newRow.children[0].innerText = array[i].studentId;
+          newRow.children[1].innerText = array[i].studentSurname;
+          newRow.children[2].innerText = array[i].studentName;
+          newRow.children[3].innerText = array[i].email;
+          newRow.children[4].innerText = array[i].degreeCourse;
+          let select = newRow.children[5].children[0].children[0];
+          select.addEventListener("change", (e) => {
+            if (e.target.closest("tr").getAttribute("selected")==="true"){
+              let allSelects = document.querySelectorAll("div.MultipleEdit tr[selected='true'] select");
+              for (let i=0; i<allSelects.length; i++){
+                allSelects[i].selectedIndex = e.target.selectedIndex;
+              }
+            }
+          })
+          tbody.appendChild(newRow);
+          newRow.addEventListener("click", rowSelector);
+        }
+        multipleEdit.element.setAttribute("appealId", array[0].appealId);
+      }
+    }
+  }
+
+  function autoclick(grade) {
+  let e = new Event("click");
+  let options = document.querySelectorAll("MultipleEdit tr[selected=true] option[value=" + grade + "]");
+  for (let i=0; i<options.length; i++){
+    options[i].dispatchEvent(e);
+  }
+}
+
+  function autochange(grade){
+
   }
 
 
+  function rowSelector(e){
+    if (!(e.target instanceof HTMLSelectElement)){
+      if (e.target.closest("tr").getAttribute("selected")==="true")
+        e.target.closest("tr").removeAttribute("selected");
+      else e.target.closest("tr").setAttribute("selected", "true");
+    }
+  }
 
   function PageOrchestrator(){
     this.start = function (){

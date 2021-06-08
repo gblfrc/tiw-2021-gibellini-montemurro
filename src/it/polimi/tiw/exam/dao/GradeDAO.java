@@ -80,6 +80,68 @@ public class GradeDAO {
 		return grades;
     }
 	
+	public List<Grade> getNotEnteredGradesByAppealId(int appealId) throws SQLException{
+		List<Grade> grades=new ArrayList<Grade>();
+		String query="SELECT * FROM student AS s join exam AS e on s.id_student=e.id_student WHERE e.id_appeal=? and e.state='not entered' ";			 
+		ResultSet result=null;
+		PreparedStatement pstatement=null;
+		
+		try {
+			pstatement=connection.prepareStatement(query);
+			pstatement.setInt(1, appealId);
+			
+			result=pstatement.executeQuery();
+			
+			while(result.next()) {
+				Grade grade=new Grade();
+				grade.setAppealId(result.getInt("id_appeal"));
+				grade.setStudentId(result.getInt("id_student"));
+				grade.setStudentSurname(result.getString("surname"));
+				grade.setStudentName(result.getString("name"));
+				grade.setEmail(result.getString("email"));
+				grade.setDegreeCourse(result.getString("degree_course"));
+				if(result.getBoolean("failed")==true) {
+					grade.setGrade("failed");
+				}
+				else if(result.getBoolean("recalled")==true) {
+					grade.setGrade("recalled");
+				}
+				else if(result.getBoolean("absent")==true) {
+					grade.setGrade("absent");
+				}
+				else {
+					if(result.getBoolean("merit")==true) {
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+					}
+					else {
+						grade.setGrade(Integer.toString(result.getInt("grade")));
+					}
+				}
+				grade.setState(result.getString("state"));
+				grades.add(grade);	
+			}
+		
+		} catch (SQLException e) {
+			throw new SQLException(e);
+
+		} finally {
+			try {
+				if (result != null)
+					result.close();
+			} catch (Exception e1) {
+				throw new SQLException(e1);
+			}
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (Exception e2) {
+				throw new SQLException(e2);
+			}
+		}
+			
+		return grades;
+    }
+	
 	public List<Grade> getGradesByFieldAsc(int appealId, String field) throws SQLException,InvalidParameterException{
 		List<Grade> grades=new ArrayList<Grade>();
 		String query;

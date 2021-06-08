@@ -50,7 +50,7 @@ table tr:not(:last-child) {
 	border-bottom-width: 1px;
 }
 
-tbody tr:hover {
+tbody tr:hover, tr[selected="true"] {
 	background-color: PaleTurquoise;
 }
 
