@@ -4,8 +4,8 @@
   document.getElementById("loginbutton").addEventListener('click', (e) => {
 	let errorMessage;
     var form = e.target.closest("form");
-	while(document.getElementById("errormessage").firstChild){
-		document.getElementById("errormessage").removeChild(document.getElementById("errormessage").firstChild);
+	while(document.querySelector("p.error").firstChild){
+		document.querySelector("p.error").removeChild(document.querySelector("p.error").firstChild);
 	}
     if (form.checkValidity()) {
       makeCall("POST", 'GetAccessRIA', e.target.closest("form"),
@@ -20,7 +20,7 @@
                  break;
               default: // error
 				 errorMessage = document.createTextNode(req.responseText);
-				 document.getElementById("errormessage").appendChild(errorMessage);
+				 document.querySelector("p.error").appendChild(errorMessage);
 				 break;
             }
           }

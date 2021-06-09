@@ -5,16 +5,15 @@
 <title>Project RIA Home</title>
 <link rel="stylesheet" type="text/css" media="all"
 	href="css/Stylesheet.css" />
-<script src="StudentMain.js" defer></script>
+<script src="student.js" defer></script>
 </head>
 <body>
-	<div class="main">
-		<div align="right">
+	<div align="right">
 			<a href="LogoutRIA">Logout</a>
 		</div>
-	
+	<div class="main">
 		<h1>Welcome back Student!!</h1>
-		<div id="idAlert"></div>	
+		<p class="error"></p>	
 		<div class="mainTables">
 			<div class="courses">
 				<span>Here are your courses:</span>
@@ -55,8 +54,8 @@
 			<div class="fields">
 			<h1>Result:</h1>
 			<h2>Student information:</h2>
-			<p><strong>Student ID:</strong><p id="studentId"></p>
-			<p><strong>Name:</strong><p id="studentName"></p>
+			<p><strong>Student ID:</strong><nobr id="studentId"></nobr></p>
+			<p><strong>Name:</strong><nobr id="studentName"></nobr></p>
 			<p><strong>Surname:</strong><p id="studentSurname"></p>
 			<p><strong>E-mail:</strong><p id="email"></p>
 			<p><strong>Degree course:</strong><p id="degreeCourse"></p>

@@ -14,8 +14,8 @@
 		while(document.querySelector("div[class='courses']>table>tbody").children.length>0){
 		document.querySelector("div[class='courses']>table>tbody").removeChild(document.querySelector("div[class='courses']>table>tbody").children[0]);
 		}
-		while(document.getElementById("idAlert").firstChild){
-			document.getElementById("idAlert").removeChild(document.getElementById("idAlert").firstChild);
+		while(document.querySelector("p.error").firstChild){
+			document.querySelector("p.error").removeChild(document.querySelector("p.error").firstChild);
 		}
 	}
 	this.clear();
@@ -29,7 +29,7 @@
 				}
 				else{
 					let textContent=document.createTextNode(message);
-					document.getElementById("idAlert").appendChild(textContent);
+					document.querySelector("p.error").appendChild(textContent);
 					document.querySelector("div[class='courses']").style.display="none";
 				}
 			}
@@ -73,8 +73,8 @@
 		while(document.querySelector("div[class='appeals']>table>tbody").children.length>0){
 		document.querySelector("div[class='appeals']>table>tbody").removeChild(document.querySelector("div [class='appeals']>table>tbody").children[0]);
 		}
-		while(document.getElementById("idAlert").firstChild){
-			document.getElementById("idAlert").removeChild(document.getElementById("idAlert").firstChild);
+		while(document.querySelector("p.error").firstChild){
+			document.querySelector("p.error").removeChild(document.querySelector("p.error").firstChild);
 		}
 		}
 		this.clear();
@@ -90,7 +90,7 @@
 				}
 				else{
 					let textContent=document.createTextNode(message);
-					document.getElementById("idAlert").appendChild(textContent);
+					document.querySelector("p.error").appendChild(textContent);
 					document.querySelector("div[class='appeals']").style.display="none";
 				}
 			}
@@ -122,6 +122,17 @@
 	
  	  function GradeDetails(){
 	 	this.element = document.querySelector("div[class='gradeDetails']");
+		this.mainContent=document.getElementById("mainContent");
+		this.studentId=document.getElementById("studentId");
+		this.studentName=document.getElementById("studentName");
+		this.studentSurname=document.getElementById("studentSurname");
+		this.email=document.getElementById("email");
+		this.degreeCourse=document.getElementById("degreeCourse");
+		this.courseId=document.getElementById("courseId");
+		this.date=document.getElementById("date");
+		this.courseTitle=document.getElementById("courseTitle");
+		this.grade=document.getElementById("grade");
+		
 		
 		this.hide = function hide(){
       		this.element.style.display = "none";
@@ -134,42 +145,21 @@
 			if (button !== undefined) button.hide();
     	}
 		this.clear = function clear() {
-			while(document.getElementById("idAlert").firstChild){
-			document.getElementById("idAlert").removeChild(document.getElementById("idAlert").firstChild);
+			while(document.querySelector("div[class='appeals']>table>tbody").children.length>0){
+		 	document.querySelector("p.error").removeChild(document.querySelector("p.error").children[0]);
 			}
-			while(document.getElementsByClassName("gradeDetails").firstChild){
-				document.getElementById("gradeDetails").removeChild(document.getElementById("gradeDetails").firstChild);
-			}
-			while(document.getElementById("mainContent").firstChild){
-				document.getElementById("mainContent").removeChild(document.getElementById("mainContent").firstChild);
-			}
-			while(document.getElementById("studentId").firstChild){
-				document.getElementById("studentId").removeChild(document.getElementById("studentId").firstChild);
-			}
-			while(document.getElementById("studentName").firstChild){
-				document.getElementById("studentName").removeChild(document.getElementById("studentName").firstChild);
-			}
-			while(document.getElementById("studentSurname").firstChild){
-				document.getElementById("studentSurname").removeChild(document.getElementById("studentSurname").firstChild);
-			}
-			while(document.getElementById("email").firstChild){
-				document.getElementById("email").removeChild(document.getElementById("email").firstChild);
-			}
-			while(document.getElementById("degreeCourse").firstChild){
-				document.getElementById("degreeCourse").removeChild(document.getElementById("degreeCourse").firstChild);
-			}
-			while(document.getElementById("courseId").firstChild){
-				document.getElementById("courseId").removeChild(document.getElementById("courseId").firstChild);
-			}
-			while(document.getElementById("date").firstChild){
-				document.getElementById("date").removeChild(document.getElementById("date").firstChild);
-			}
-			while(document.getElementById("courseTitle").firstChild){
-				document.getElementById("courseTitle").removeChild(document.getElementById("courseTitle").firstChild);
-			}
-			while(document.getElementById("grade").firstChild){
-				document.getElementById("grade").removeChild(document.getElementById("grade").firstChild);
-			}
+			document.querySelector("p.error").removeChild(document.querySelector("p.error").children[0]);
+			document.getElementById("gradeDetails").removeChild(document.getElementById("gradeDetails").children);
+			this.mainContent.innerText="";
+			this.studentId.innerText="";
+			this.studentName.innerText="";
+			this.studentSurname.innerText="";
+			this.email.innerText="";
+			this.degreeCourse.innerText="";
+			this.courseId.innerText="";
+			this.date.innerText="";
+			this.courseTitle.innerText="";
+			this.grade.innerText="";
 			document.querySelector("div.fields").style.display = "none";
 	   	}
 		this.hide();
@@ -185,34 +175,24 @@
 				var i=0;
 				if(gr.grade>=18 && gr.state=='published'){button.show(appeal.appealId);}   
 				if(gr.state=="not entered"){
-					let text= document.createTextNode("Grade not entered yet");
-					document.getElementById("mainContent").appendChild(text);
+					gradeDetails.mainContent.innerText="Grade not entered yet";
 				}       
 				else{
 					document.querySelector("div.fields").removeAttribute("style");
-		        	let text = document.createTextNode(gr.studentId);
-					document.getElementById("studentId").appendChild(text);
-					text = document.createTextNode(gr.studentName);
-					document.getElementById("studentName").appendChild(text);
-					text = document.createTextNode(gr.studentSurname);
-					document.getElementById("studentSurname").appendChild(text);
-					text = document.createTextNode(gr.email);
-					document.getElementById("email").appendChild(text);
-					text = document.createTextNode(gr.degreeCourse);
-					document.getElementById("degreeCourse").appendChild(text);
-					text = document.createTextNode(appeal.courseId);
-					document.getElementById("courseId").appendChild(text);
-					text = document.createTextNode(appeal.date);
-					document.getElementById("date").appendChild(text);
-					text = document.createTextNode(appeal.courseTitle);
-					document.getElementById("courseTitle").appendChild(text);
-					text = document.createTextNode(gr.grade);
-					document.getElementById("grade").appendChild(text);
+					gradeDetails.studentId.innerText=gr.studentId;
+					gradeDetails.studentId.innerText=gr.studentName;
+					gradeDetails.studentId.innerText=gr.studentSurname;
+					gradeDetails.studentId.innerText=gr.email;
+					gradeDetails.studentId.innerText=gr.degreeCourse;
+					gradeDetails.studentId.innerText=appeal.courseId;
+					gradeDetails.studentId.innerText=appeal.date;
+		        	gradeDetails.studentId.innerText=appeal.courseTitle;
+					gradeDetails.studentId.innerText=gr.grade;
 				}
 			}
 			else{
 				let textContent=document.createTextNode(message);
-				document.getElementById("idAlert").appendChild(textContent);
+				document.querySelector("p.error").appendChild(textContent);
 				document.querySelector("div[class='gradeDetails']").style.display="none";
 			}
         }
@@ -242,11 +222,11 @@
 						gradeDetails.show( document.querySelector("div.Button form.refuse input[type='hidden']").getAttribute("value"));
 					}
 					else{
-					while(document.getElementById("idAlert").firstChild){
-						document.getElementById("idAlert").removeChild(document.getElementById("idAlert").firstChild);
+					while(document.querySelector("p.error").firstChild){
+						document.querySelector("p.error").removeChild(document.querySelector("p.error").firstChild);
 					}
 					let textContent=document.createTextNode(req.responseText);
-					document.getElementById("idAlert").appendChild(textContent);
+					document.querySelector("p.error").appendChild(textContent);
 				}
 				}
         	},form);

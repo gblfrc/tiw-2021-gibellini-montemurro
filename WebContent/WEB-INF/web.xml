@@ -14,7 +14,7 @@
 	</context-param>
 	<context-param>
 		<param-name>dbPassword</param-name>
-		<param-value>ComeOnYouIrons1571@</param-value>
+		<param-value>EleSQLace1309162020ita?</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbDriver</param-name>
@@ -39,6 +39,8 @@
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
 		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/ProfessorHome.html</url-pattern> 
+		<url-pattern>/StudentHome.html</url-pattern> 
 	</filter-mapping>
 	<filter>
 		<filter-name>ProfessorFilter</filter-name>
@@ -52,6 +54,7 @@
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
 		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/ProfessorHome.html</url-pattern> 
 	</filter-mapping>
 		<filter>
 		<filter-name>StudentFilter</filter-name>
@@ -61,6 +64,7 @@
 		<filter-name>StudentFilter</filter-name>
 		<url-pattern>/GetResult</url-pattern>
 		<url-pattern>/RefuseGrade</url-pattern>
+		<url-pattern>/StudentHome.html</url-pattern> 
 	</filter-mapping>
 	
 </web-app>
