@@ -56,7 +56,8 @@
 				appealList.hide();
 				gradeDetails.clear();
 				gradeDetails.hide();
-				appealList.show(e.target.getAttribute("courseId"));
+				let title = e.target.parentElement.previousSibling.innerText;
+				appealList.show(e.target.getAttribute("courseId"),title);
 			});
 			document.querySelector("div[class='courses']>table>tbody").appendChild(newRow);
 		}
@@ -81,6 +82,7 @@
 		this.hide();
 		this.show=function show(courseId,title){
 		document.querySelector("div[class='appeals']").removeAttribute("style");
+		document.querySelector("div[class='appeals']>span").innerText = "Here are the appeals for the course: " + title.toUpperCase();
 		makeCall("GET","GetAppealsRIA?courseId="+ courseId,function(req){
 			if(req.readyState==4){
 				var message = req.responseText;
@@ -112,7 +114,8 @@
 			anchor.addEventListener("click", (e) => {
 				gradeDetails.clear();
 				gradeDetails.hide();
-				gradeDetails.show(e.target.getAttribute("appealId"));
+				let date =e.target.innerText;
+				gradeDetails.show(e.target.getAttribute("appealId"),date);
 			});
 			document.querySelector("div[class='appeals']>table>tbody").appendChild(newRow);
 		}
@@ -122,6 +125,7 @@
 	
  	  function GradeDetails(){
 	 	this.element = document.querySelector("div[class='gradeDetails']");
+		this.message = document.querySelector("div[class='gradeDetails']>span");
 		this.mainContent=document.getElementById("mainContent");
 		this.studentId=document.getElementById("studentId");
 		this.studentName=document.getElementById("studentName");
@@ -133,23 +137,20 @@
 		this.courseTitle=document.getElementById("courseTitle");
 		this.grade=document.getElementById("grade");
 		
-		
 		this.hide = function hide(){
       		this.element.style.display = "none";
 			if (button !== undefined) button.hide();
     	}
-    	this.show = function show(appealId){
+    	this.show = function show(appealId,date){
       		makeCall("GET", "GetResultRIA?appeal=" + appealId, this.update,null);
       		this.element.removeAttribute("style");
-			
+			this.message.innerText = "Here is the result of the exam you took on " + date.toUpperCase();
 			if (button !== undefined) button.hide();
     	}
 		this.clear = function clear() {
-			while(document.querySelector("div[class='appeals']>table>tbody").children.length>0){
-		 	document.querySelector("p.error").removeChild(document.querySelector("p.error").children[0]);
+			while(document.querySelector("p.error").children.length>0){
+		 		document.querySelector("p.error").removeChild(document.querySelector("p.error").children[0]);
 			}
-			document.querySelector("p.error").removeChild(document.querySelector("p.error").children[0]);
-			document.getElementById("gradeDetails").removeChild(document.getElementById("gradeDetails").children);
 			this.mainContent.innerText="";
 			this.studentId.innerText="";
 			this.studentName.innerText="";
@@ -180,14 +181,14 @@
 				else{
 					document.querySelector("div.fields").removeAttribute("style");
 					gradeDetails.studentId.innerText=gr.studentId;
-					gradeDetails.studentId.innerText=gr.studentName;
-					gradeDetails.studentId.innerText=gr.studentSurname;
-					gradeDetails.studentId.innerText=gr.email;
-					gradeDetails.studentId.innerText=gr.degreeCourse;
-					gradeDetails.studentId.innerText=appeal.courseId;
-					gradeDetails.studentId.innerText=appeal.date;
-		        	gradeDetails.studentId.innerText=appeal.courseTitle;
-					gradeDetails.studentId.innerText=gr.grade;
+					gradeDetails.studentName.innerText=gr.studentName;
+					gradeDetails.studentSurname.innerText=gr.studentSurname;
+					gradeDetails.email.innerText=gr.email;
+					gradeDetails.degreeCourse.innerText=gr.degreeCourse;
+					gradeDetails.courseId.innerText=appeal.courseId;
+					gradeDetails.date.innerText=appeal.date;
+		        	gradeDetails.courseTitle.innerText=appeal.courseTitle;
+					gradeDetails.grade.innerText=gr.grade;
 				}
 			}
 			else{
