@@ -44,7 +44,8 @@ public class GetAppealsRIA extends HttpServlet {
 		try {
 			cId = Integer.parseInt(request.getParameter("courseId"));
 		} catch (NumberFormatException| NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect param values");
 			return;
 		}
 		HttpSession session=request.getSession();
@@ -52,14 +53,17 @@ public class GetAppealsRIA extends HttpServlet {
 		CourseDAO coursesDAO = new CourseDAO(connection);
 		User user=null;
 		try {
-			//user=(User)session.getAttribute("user");
-			user = new User (3, "Professor");
+			user=(User)session.getAttribute("user");
+			//user = new User (3, "Professor");
 			if(coursesDAO.hasCourse(cId, user.getPersonId(), user.getAccessRights())==false) {
-				response.sendRedirect(getServletContext().getContextPath()+"/GetCourses");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("It's not a course of yours");
+				//response.sendRedirect(getServletContext().getContextPath()+"/GetCourses");
 				return;
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Illegal course request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Illegal course request");
 			return;
 		}
 		
@@ -68,7 +72,8 @@ public class GetAppealsRIA extends HttpServlet {
 		try {
 			course = coursesDAO.getCourseById(cId);
 			if (course == null) {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Course not found");
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				response.getWriter().println("Course not found");
 				return;
 			}
 			

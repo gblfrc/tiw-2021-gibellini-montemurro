@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
 @WebServlet("/GetCoursesRIA")
+@MultipartConfig
 public class GetCoursesRIA extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -32,9 +34,9 @@ public class GetCoursesRIA extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		/*HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");*/
-		User user= new User(3, "Professor"); //correct this after getting login page
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		//User user= new User(3, "Professor"); //correct this after getting login page
 		CourseDAO courseDAO= new CourseDAO(connection);
 		List<Course> courses= new ArrayList<Course>();
 
@@ -42,7 +44,8 @@ public class GetCoursesRIA extends HttpServlet {
 			if(user.getAccessRights().equals("Professor")) courses=courseDAO.getCoursesByProfessorId(user.getPersonId());
 			else courses=courseDAO.getCoursesByStudentId(user.getPersonId());
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find courses");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to find courses");
 			return;
 		}
 
