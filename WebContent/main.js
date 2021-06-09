@@ -523,12 +523,18 @@
       this.enter.addEventListener("click", function(e){
         e.preventDefault();
         let forms = document.querySelectorAll("div.MultipleEdit tbody tr form");
-        let toSend = new Array(forms.length);
+        let array = new Array(forms.length);
         for (let i=0; i<forms.length; i++){
-          toSend[i] = new FormData(forms[i]);
+          let content = new Object();
+          content.appealId = forms[i].children[1].getAttribute("value");
+          content.studentId = forms[i].children[2].getAttribute("value");
+          let select = forms[i].children[0];
+          content.gradeValue = select.children[select.selectedIndex].getAttribute("value");
+          array[i] = content;
         }
-        makeCall ("POST", "MultipleEditRIA", toSend, () => {
-          if (req.readyState === 4 && req.status === 200){
+        let toSend = JSON.stringify(array);
+        makeCall ("POST", "MultipleEditRIA", toSend, (req) => {
+          if (req.readyState === 4 && (req.status === 200|| req.status === 206)){
             multipleEdit.hide();
             let appeal = JSON.parse(req.responseText);
             subscribers.show(appeal.appealId, appeal.date);
