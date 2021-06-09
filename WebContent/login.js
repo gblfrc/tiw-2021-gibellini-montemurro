@@ -15,8 +15,8 @@
               case 200:
 				 let user=JSON.parse(req.responseText);
             	 sessionStorage.setItem('username', user.personId);
-				 if(user.accessRights=='Student') window.location.href = "HomeStudent.html";
-				 if(user.accessRights=='Professor') window.location.href = "HomeRIA.html";
+				 if(user.accessRights=='Student') window.location.href = "StudentHome.html";
+				 if(user.accessRights=='Professor') window.location.href = "ProfessorHome.html";
                  break;
               default: // error
 				 errorMessage = document.createTextNode(req.responseText);
