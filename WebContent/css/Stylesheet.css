@@ -203,3 +203,7 @@ td.checkbox {
 	top: 5px;
 	cursor: pointer;
 }
+
+th.sortable {
+	cursor: pointer;
+}

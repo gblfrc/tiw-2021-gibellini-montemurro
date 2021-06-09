@@ -49,7 +49,7 @@ public class GradeDAO {
 				}
 				else {
 					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" with merit");
 					}
 					else {
 						grade.setGrade(Integer.toString(result.getInt("grade")));
@@ -111,7 +111,7 @@ public class GradeDAO {
 				}
 				else {
 					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" with merit");
 					}
 					else {
 						grade.setGrade(Integer.toString(result.getInt("grade")));
@@ -204,7 +204,7 @@ public class GradeDAO {
 				}
 				else {
 					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" with merit");
 					}
 					else {
 						grade.setGrade(Integer.toString(result.getInt("grade")));
@@ -297,7 +297,7 @@ public class GradeDAO {
 				}
 				else {
 					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" with merit");
 					}
 					else {
 						grade.setGrade(Integer.toString(result.getInt("grade")));
@@ -440,7 +440,7 @@ public class GradeDAO {
 				pstatement.setNull(6, java.sql.Types.BOOLEAN);
 			}
 			else {
-				if(grade.getGrade().equals("30 e lode")) {
+				if(grade.getGrade().equals("30 with merit")) {
 					pstatement.setBoolean(2, false);
 					pstatement.setBoolean(3, false);
 					pstatement.setBoolean(4, false);
@@ -626,7 +626,7 @@ public class GradeDAO {
 				}
 				else {
 					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" with merit");
 					}
 					else {
 						grade.setGrade(Integer.toString(result.getInt("grade")));
@@ -686,7 +686,7 @@ public class GradeDAO {
 				}
 				else {
 					if(result.getBoolean("exam.merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" e lode");
+						grade.setGrade(Integer.toString(result.getInt("grade"))+" with merit");
 					}
 					else {
 						grade.setGrade(Integer.toString(result.getInt("grade")));
