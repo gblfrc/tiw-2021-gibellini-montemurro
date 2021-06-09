@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +29,7 @@ import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 
 
-@WebServlet("/GetAppealsRIA")
+@WebServlet("/GetAppealsRIA") @MultipartConfig
 public class GetAppealsRIA extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -54,11 +55,9 @@ public class GetAppealsRIA extends HttpServlet {
 		User user=null;
 		try {
 			user=(User)session.getAttribute("user");
-			//user = new User (3, "Professor");
 			if(coursesDAO.hasCourse(cId, user.getPersonId(), user.getAccessRights())==false) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				response.getWriter().println("It's not a course of yours");
-				//response.sendRedirect(getServletContext().getContextPath()+"/GetCourses");
 				return;
 			}
 		} catch (Exception e) {

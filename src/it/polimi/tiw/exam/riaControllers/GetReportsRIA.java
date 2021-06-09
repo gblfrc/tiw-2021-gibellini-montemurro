@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ import it.polimi.tiw.exam.objects.Report;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
-@WebServlet("/GetReportsRIA")
+@WebServlet("/GetReportsRIA") @MultipartConfig
 public class GetReportsRIA extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -45,8 +46,7 @@ public class GetReportsRIA extends HttpServlet {
 
 		// control on professor's rights to access the appeal
 		HttpSession session = request.getSession();
-		User user = null;// (User) session.getAttribute("user");
-		user = new User(3, "Professor");
+		User user = (User) session.getAttribute("user");
 		try {
 			AppealDAO appealDAO = new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appealId"));

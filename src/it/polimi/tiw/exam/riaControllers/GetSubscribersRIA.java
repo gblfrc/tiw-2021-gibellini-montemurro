@@ -41,8 +41,7 @@ public class GetSubscribersRIA extends HttpServlet {
 		
 		//control on professor's rights to access the appeal
 		Integer appId = null;
-		User user = null; //(User) session.getAttribute("user");
-		user = new User (3, "Professor");
+		User user = (User) session.getAttribute("user");
 		try {
 			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appealId"));

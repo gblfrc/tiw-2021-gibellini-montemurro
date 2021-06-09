@@ -32,9 +32,8 @@ public class EditRIA extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//HttpSession session = request.getSession();
-		User user = null;//(User) session.getAttribute("user");
-		user = new User(3, "Professor");
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
 		int appealId;
 		int studentId;
 		String gradeValue;

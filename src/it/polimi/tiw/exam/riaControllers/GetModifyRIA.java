@@ -35,8 +35,7 @@ public class GetModifyRIA extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		User user = new User(3, "Professor"); 
-				//(User) session.getAttribute("user");
+		User user = (User) session.getAttribute("user");
 		GradeDAO gradeDAO = new GradeDAO(connection);
 		Grade grade = null;
 

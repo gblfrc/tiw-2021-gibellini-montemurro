@@ -36,7 +36,6 @@ public class GetCoursesRIA extends HttpServlet {
 
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
-		//User user= new User(3, "Professor"); //correct this after getting login page
 		CourseDAO courseDAO= new CourseDAO(connection);
 		List<Course> courses= new ArrayList<Course>();
 

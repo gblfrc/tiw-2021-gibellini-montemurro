@@ -38,8 +38,7 @@ public class PublishRIA extends HttpServlet {
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		Integer appId = null;
-		User user = null;// (User) session.getAttribute("user");
-		user = new User(3, "Professor");
+		User user = (User) session.getAttribute("user");
 		Appeal appeal = null;
 
 		try {

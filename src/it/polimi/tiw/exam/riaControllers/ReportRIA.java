@@ -44,8 +44,7 @@ public class ReportRIA extends HttpServlet {
 		
 		//control on professor's rights to access the appeal
 		HttpSession session = request.getSession();
-		User user = null;//(User) session.getAttribute("user");
-		user = new User(3, "Professor");		
+		User user = (User) session.getAttribute("user");
 		try {
 			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
