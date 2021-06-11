@@ -24,7 +24,8 @@ import it.polimi.tiw.exam.objects.Report;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
-@WebServlet("/GetReportsRIA") @MultipartConfig
+@WebServlet("/GetReportsRIA")
+@MultipartConfig
 public class GetReportsRIA extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -40,7 +41,8 @@ public class GetReportsRIA extends HttpServlet {
 		try {
 			appId = Integer.parseInt(request.getParameter("appealId"));
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't handle the request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Couldn't handle the request");
 			return;
 		}
 
@@ -54,7 +56,8 @@ public class GetReportsRIA extends HttpServlet {
 				throw new InvalidParameterException();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Unavailable appeal");
 			return;
 		}
 
@@ -70,13 +73,9 @@ public class GetReportsRIA extends HttpServlet {
 			if (type.equalsIgnoreCase("last")) {
 				reports.add(reportDao.getReportById(reportDao.getLastReport(appId)));
 			}
-			/*
-			 * AppealDAO adao = new AppealDAO(connection); appeal =
-			 * adao.getAppealById(appId);
-			 */
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					"An accidental error occurred, couldn't retrieve report");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred, couldn't retrieve report");
 			return;
 		}
 

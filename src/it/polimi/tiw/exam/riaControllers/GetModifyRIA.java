@@ -47,7 +47,8 @@ public class GetModifyRIA extends HttpServlet {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Unavailable appeal");
 			return;
 		}
 
@@ -61,7 +62,8 @@ public class GetModifyRIA extends HttpServlet {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable student ");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Unavailable student");
 			return;
 		}
 
@@ -71,7 +73,8 @@ public class GetModifyRIA extends HttpServlet {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Grade has already been published");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Grade has already been published");
 			return;
 		}
 
@@ -79,7 +82,8 @@ public class GetModifyRIA extends HttpServlet {
 		try {
 			appeal = appealDAO.getAppealById(appealId);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find courses");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to find courses");
 			return;
 		}
 		//may want to update usage of appeal object (may be an unnecessary object)

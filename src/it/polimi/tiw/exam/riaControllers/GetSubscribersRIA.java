@@ -49,7 +49,8 @@ public class GetSubscribersRIA extends HttpServlet {
 				throw new InvalidParameterException();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Unavailable appeal");
 			return;
 		}
 		
@@ -62,7 +63,8 @@ public class GetSubscribersRIA extends HttpServlet {
 				grades=gradeDAO.getGradesByAppealId(appId);
 			}
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find grades");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to find grades");
 			return;
 		}
 		

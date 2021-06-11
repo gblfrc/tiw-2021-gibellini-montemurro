@@ -37,8 +37,8 @@ public class ReportRIA extends HttpServlet {
 		try {
 			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't handle the request");
-			System.out.println("Couldn't handle the request");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Couldn't handle the request");
 			return;
 		}
 		
@@ -52,8 +52,8 @@ public class ReportRIA extends HttpServlet {
 				throw new InvalidParameterException();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
-			System.out.println("Unavailable appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Unavailable appeal");
 			return;
 		}
 
@@ -63,8 +63,8 @@ public class ReportRIA extends HttpServlet {
 			int reportableGrades = gdao.countReportableGrades(appId);
 			if (reportableGrades == 0) throw new InvalidParameterException("No grades reportable for specified appeal");
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-			System.out.println(e.getMessage());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println(e.getMessage());
 			return;
 		}
 		
@@ -77,16 +77,16 @@ public class ReportRIA extends HttpServlet {
 		try {
 			reportDao.createReport(appId);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An accidental error occurred, couldn't create report");
-			System.out.println("An accidental error occurred, couldn't create report");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred, couldn't create report");
 			return;
 		}
 		
 		try {
 			report = reportDao.getReportById(reportDao.getLastReport(appId));
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An accidental error occurred, couldn't retrieve report");
-			System.out.println("An accidental error occurred, couldn't retrieve report");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred, couldn't retrieve report");
 			return;
 		}
 		

@@ -62,7 +62,8 @@ public class MultipleEditRIA extends HttpServlet {
 				}
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect param values");
 			return;
 		}
 
@@ -73,7 +74,8 @@ public class MultipleEditRIA extends HttpServlet {
 					throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Illegal request for given appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Illegal request for given appeal");
 			return;
 		}
 
@@ -84,7 +86,8 @@ public class MultipleEditRIA extends HttpServlet {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Unavailable appeal");
 			return;
 		}
 		
@@ -101,7 +104,8 @@ public class MultipleEditRIA extends HttpServlet {
 					throw new Exception("Illegal request for multiple editing");
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println(e.getMessage());
 			return;
 		}
 
@@ -120,7 +124,8 @@ public class MultipleEditRIA extends HttpServlet {
 					throw new Exception("Illegal request for grades");
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println(e.getMessage());			
 			return;
 		}
 
@@ -131,6 +136,7 @@ public class MultipleEditRIA extends HttpServlet {
 			} catch (Exception e) {
 				//having checked the legality of submitted JSON objects, this part should actually be unreachable
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+				response.getWriter().println("An error occurred while entering grades; some have been entered, some haven't");
 				return;
 			}
 		}
@@ -141,6 +147,7 @@ public class MultipleEditRIA extends HttpServlet {
 		} catch (Exception e) {
 			//having checked the legality of submitted JSON objects, this part should actually be unreachable
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Couldn't retrieve the appeal");
 		}
 
 		String json = new Gson().toJson(appeal);

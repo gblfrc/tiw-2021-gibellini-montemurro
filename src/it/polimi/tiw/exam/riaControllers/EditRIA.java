@@ -43,7 +43,8 @@ public class EditRIA extends HttpServlet {
 			studentId=Integer.parseInt(request.getParameter("studentId"));
 			gradeValue=request.getParameter("gradeValue");
 		}catch(NumberFormatException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect param values");
 			return;
 		}
 		
@@ -54,7 +55,8 @@ public class EditRIA extends HttpServlet {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Unavailable appeal");
 			return;
 		}
 		
@@ -64,13 +66,15 @@ public class EditRIA extends HttpServlet {
 			if(grade==null) throw new Exception("Nonexistent student");
 			if(!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) throw new Exception("Uneditable grade");
 		}catch(Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println(e.getMessage());
 			return;
 		}
 		try {
 			gradeDAO.enterGrade(appealId,studentId,gradeValue);
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Impossible to enter grade");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Impossible to enter grade");
 			return;
 		}
 		
@@ -79,6 +83,7 @@ public class EditRIA extends HttpServlet {
 			appeal = appealDAO.getAppealById(appealId);
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Impossible to retrieve appeal");
 		}
 		
 		String json = new Gson().toJson(appeal);

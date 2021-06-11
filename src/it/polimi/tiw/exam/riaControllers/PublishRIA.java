@@ -49,7 +49,8 @@ public class PublishRIA extends HttpServlet {
 			}
 			appeal = appealDAO.getAppealById(appId);
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't find appeal");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Couldn't find appeal");
 			return;
 		}
 		GradeDAO gradeDAO = new GradeDAO(connection);
@@ -57,9 +58,11 @@ public class PublishRIA extends HttpServlet {
 		try {
 			gradeDAO.publishGrade(appId);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find grades");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Not possible to find grades");
 			return;
 		}
+		
 		String json = new Gson().toJson(appeal);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
