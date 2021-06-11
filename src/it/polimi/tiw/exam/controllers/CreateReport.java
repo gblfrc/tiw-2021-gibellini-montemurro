@@ -71,31 +71,16 @@ public class CreateReport extends HttpServlet {
 			return;
 		}
 		
-		//may want to check that no additional parameters have been given
-		
-		//main section: report grades and fetch latest report
+		//report grades
 		ReportDAO reportDao = new ReportDAO(connection);
-		Report report = null;
-		
 		try {
 			reportDao.createReport(appId);
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An accidental error occurred, couldn't create report");
 			return;
 		}
-		
-		try {
-			report = reportDao.getReportById(reportDao.getLastReport(appId));
-		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An accidental error occurred, couldn't retrieve report");
-			return;
-		}
-		
-		String path = "/WEB-INF/Report.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("report", report);
-		templateEngine.process(path, ctx, response.getWriter());
+
+		response.sendRedirect("GetReports?appeal=" + appId + "&type=last");
 	}
 
 }

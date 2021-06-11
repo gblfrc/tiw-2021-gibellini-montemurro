@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -25,8 +26,8 @@ import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 
-@WebServlet("/GetAllReports")
-public class GetAllReports extends HttpServlet {
+@WebServlet("/GetReports")
+public class GetReports extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
 	private TemplateEngine templateEngine;
@@ -60,13 +61,26 @@ public class GetAllReports extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
 			return;
 		}
-
+		
+		//control on "appeal" request parameter legitimacy
+		String type;
+		try {
+			type = request.getParameter("type");
+			if (type == null) type = "all";
+			if (!type.equals("all") && !type.equals("last")) throw new Exception();
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Illegal request");
+			return;
+		}
+		
 		//main section: report grades and fetch latest report
 		ReportDAO reportDao = new ReportDAO(connection);
 		List<Report> reports = null;
 		Appeal appeal = null;
+		reports = new LinkedList<>();
 		try {
-			reports = reportDao.getAllReports(appId);
+			if (type.equals("all")) reports = reportDao.getAllReports(appId);
+			else if (type.equals("last")) reports.add(reportDao.getReportById(reportDao.getLastReport(appId)));
 			AppealDAO adao = new AppealDAO(connection);
 			appeal = adao.getAppealById(appId);
 		} catch (SQLException e) {
@@ -74,9 +88,10 @@ public class GetAllReports extends HttpServlet {
 			return;
 		}
 		
-		String path = "/WEB-INF/AllReports.html";
+		String path = "/WEB-INF/Reports.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("type", type);
 		ctx.setVariable("reports", reports);
 		ctx.setVariable("appeal", appeal);
 		templateEngine.process(path, ctx, response.getWriter());
