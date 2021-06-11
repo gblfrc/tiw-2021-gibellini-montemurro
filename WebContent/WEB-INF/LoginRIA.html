@@ -3,26 +3,23 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>TIW Exam Project</title>
-<link rel="stylesheet" type="text/css" media="all" href="css/Stylesheet.css" />
+<link rel="stylesheet" type="text/css" media="all"
+	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 <script src="login.js" charset="utf-8" defer></script>
 <script src="utils.js" charset="utf-8" defer></script>
 </head>
 <body>
-	<div align="right">
- 	<form action="Login.html">
-		<button type="submit">
-		  LOGIN HTML
-		</button>  
-	</form>
+	<div class="loginSwitch">
+		<a href="GetLogin"><button>LOGIN HTML</button></a>
 	</div>
 	<div class="main">
-		<h1>Welcome to Exam project</h1>
+		<h1>Welcome to Exam project - RIA version</h1>
 		<div class="login">
 			<form action="#">
 				Person ID: <input type="text" name="personId" required> <br>
 				<br> Password: <input type="password" name="password" required><br>
 				<br> <input id="loginbutton" type="submit" value="Login">
-			</form>	
+			</form>
 		</div>
 	</div>
 </body>

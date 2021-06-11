@@ -7,7 +7,10 @@
 <title>Result display page</title>
 </head>
 <body>
-	<div class="logout" align="right">
+	<div class="back">
+		<a th:href="@{/GetAppeal(courseId, ${appeal.courseId)}">Back</a>
+	</div>
+	<div class="logout">
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">

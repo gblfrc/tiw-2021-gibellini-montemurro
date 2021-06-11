@@ -17,7 +17,7 @@ public class LogoutRIA extends HttpServlet {
 		if (session != null) {
 			session.invalidate();
 		}
-		response.sendRedirect(getServletContext().getContextPath() +  "/LoginRIA.html");
+		response.sendRedirect(getServletContext().getContextPath() +  "/GetLogin?type=ria");
 	}
 
 }

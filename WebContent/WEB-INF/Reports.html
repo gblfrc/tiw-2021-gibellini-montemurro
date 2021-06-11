@@ -7,7 +7,10 @@
 	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
-	<div class="logout" align="right">
+	<div class="back">
+		<a th:href="@{/GetSubscribers(appeal=${appeal.appealId})}">Back</a>
+	</div>
+	<div class="logout">
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">

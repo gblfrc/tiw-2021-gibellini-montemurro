@@ -14,14 +14,14 @@
 	</context-param>
 	<context-param>
 		<param-name>dbPassword</param-name>
-		<param-value>EleSQLace1309162020ita?</param-value>
+		<param-value>ComeOnYouIrons1571@</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbDriver</param-name>
 		<param-value>com.mysql.cj.jdbc.Driver</param-value>
 	</context-param>
 	<welcome-file-list>
-		<welcome-file>Login.html</welcome-file>
+		<welcome-file>GetLogin</welcome-file>
 	</welcome-file-list>
 	<filter>
 		<filter-name>SessionChecker</filter-name>

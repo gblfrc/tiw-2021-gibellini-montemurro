@@ -7,7 +7,19 @@ body {
 }
 
 div.logout {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+}
+
+div.logoutHome, div.loginSwitch {
 	text-align: right;
+}
+
+div.back {
+	position: relative;
+	left: 0px;
+	top: 0px;
 }
 
 form {
@@ -107,7 +119,8 @@ div.login>form {
 	padding-top: 10px;
 	padding-bottom: 10px;
 	border-radius: 5px;
-	width: 40%;
+	width: 50%;
+	max-width: 450px;
 }
 
 /*may want to extend this to input[type="button"]*/
@@ -192,13 +205,14 @@ td.checkbox {
 }
 
 .active {
-	visibility:visible;
+	visibility: visible;
 	opacity: 1;
 }
 
-.closer{
-	/*content: '\f00d';*/ /* use this property to replace the X with an icon */
-	position:absolute;
+.closer {
+	/*content: '\f00d';*/
+	/* use this property to replace the X with an icon */
+	position: absolute;
 	right: 15px;
 	top: 5px;
 	cursor: pointer;

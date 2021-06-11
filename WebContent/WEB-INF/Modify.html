@@ -7,7 +7,10 @@
 <title>Modify grade</title>
 </head>
 <body>
-	<div class="logout" align="right">
+	<div class="back">
+		<a th:href="@{/GetSubscribers(appeal=${grade.appealId})}">Back</a>
+	</div>
+	<div class="logout">
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">

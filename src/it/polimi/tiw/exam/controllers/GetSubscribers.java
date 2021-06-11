@@ -22,6 +22,7 @@ import org.thymeleaf.context.WebContext;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.CourseDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.Course;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
@@ -44,6 +45,7 @@ public class GetSubscribers extends HttpServlet {
 		HttpSession session = request.getSession();
 		Boolean changeOrder=false;
 		String field=null;
+		Appeal appeal = null;
 		
 		//control on professor's rights to access the appeal
 		Integer appId = null;
@@ -55,6 +57,7 @@ public class GetSubscribers extends HttpServlet {
 			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new InvalidParameterException();
 			}
+			appeal = appealDAO.getAppealById(appId);
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
 			return;
@@ -115,7 +118,7 @@ public class GetSubscribers extends HttpServlet {
 		String path = "/WEB-INF/Subscribers.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("appId", appId);
+		ctx.setVariable("appeal", appeal);
 		ctx.setVariable("grades", grades);
 		templateEngine.process(path, ctx, response.getWriter());
 		

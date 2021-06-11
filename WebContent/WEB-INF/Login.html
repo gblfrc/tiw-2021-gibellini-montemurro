@@ -3,20 +3,16 @@
 <head>
 <meta charset="ISO-8859-1">
 <link rel="stylesheet" type="text/css" media="all"
-	href="css/Stylesheet.css" th:href="@{css/Stylesheet.css}" />
+	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 <title>TIW Exam Project</title>
 </head>
 <body>
-	<div align="right">
-    <form action="LoginRIA.html">
-		<button type="submit">
-			  LOGIN RIA
-		</button>  
-	</form>
+	<div class="loginSwitch">
+		<a href="GetLogin?type=ria"><button>LOGIN RIA</button></a>
 	</div>
 	<div class="main">
 
-		<h1>Welcome to Exam project</h1>
+		<h1>Welcome to Exam project - Pure HTML version</h1>
 		<div class="login">
 			<form action="GetAccess" method="POST">
 				Person ID: <input type="text" name="personId" required> <br>
@@ -24,9 +20,10 @@
 				<br> <input type="submit" value="Login">
 			</form>
 		</div>
-		<p class="error" th:text="${uf.idError}">Arma virumque cano,
-			Troiae qui primus ab oris</p>
-		<p class="error" th:text="${uf.pwdError}">Italiam fato profugus...</p>
+		<p class="error" th:if="${error != null}"
+			th:text="${error.status} + ': ' + ${error.message}">Arma virumque
+			cano, Troiae qui primus ab oris
+		</p>
 	</div>
 </body>
 </html>

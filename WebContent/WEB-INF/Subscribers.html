@@ -7,7 +7,10 @@
 	href="../css/Stylesheet.css" th:href="@{/css/Stylesheet.css}" />
 </head>
 <body>
-	<div class="logout" align="right">
+	<div class="back">
+		<a th:href="@{/GetAppeal(courseId=${appeal.courseId})}">Back</a>
+	</div>
+	<div class="logout">
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">
@@ -16,20 +19,20 @@
 			<thead>
 				<tr>
 					<th><a href="Login.html"
-						th:href="@{/GetSubscribers(appeal=${appId},field='studentId',changeOrder='true')}">StudentId</a></th>
+						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='studentId',changeOrder='true')}">StudentId</a></th>
 					<th><a href="Login.html"
-						th:href="@{/GetSubscribers(appeal=${appId},field='surname',changeOrder='true')}">Surname</a></th>
+						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='surname',changeOrder='true')}">Surname</a></th>
 					<th><a href="Login.html"
-						th:href="@{/GetSubscribers(appeal=${appId},field='name',changeOrder='true')}">Name</a></th>
+						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='name',changeOrder='true')}">Name</a></th>
 					<th><a href="Login.html"
-						th:href="@{/GetSubscribers(appeal=${appId},field='email',changeOrder='true')}">Email</a></th>
+						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='email',changeOrder='true')}">Email</a></th>
 					<th><a href="Login.html"
-						th:href="@{/GetSubscribers(appeal=${appId},field='degree_course',changeOrder='true')}">Degree
+						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='degree_course',changeOrder='true')}">Degree
 							course</a></th>
 					<th><a href="Login.html"
-						th:href="@{/GetSubscribers(appeal=${appId},field='grade',changeOrder='true')}">Grade</a></th>
+						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='grade',changeOrder='true')}">Grade</a></th>
 					<th><a href="Login.html"
-						th:href="@{/GetSubscribers(appeal=${appId},field='state',changeOrder='true')}">State</a></th>
+						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='state',changeOrder='true')}">State</a></th>
 					<th>Edit</th>
 				</tr>
 			</thead>
@@ -58,15 +61,15 @@
 			</tbody>
 		</table>
 		<form action="PublishGrade" method="POST">
-			<input type="hidden" name="appeal" th:value="${appId}"><input
+			<input type="hidden" name="appeal" th:value="${appeal.appealId}"><input
 				type="submit" value="Publish">
 		</form>
 		<form action="CreateReport" method="POST">
-			<input type="hidden" name="appeal" th:value="${appId}"><input
+			<input type="hidden" name="appeal" th:value="${appeal.appealId}"><input
 				type="submit" value="Report">
 		</form>
 		<form action="GetReports" method="GET">
-			<input type="hidden" name="appeal" th:value="${appId}"><input
+			<input type="hidden" name="appeal" th:value="${appeal.appealId}"><input
 				type="submit" value="See all reports">
 		</form>
 	</div>
