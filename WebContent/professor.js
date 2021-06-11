@@ -140,48 +140,44 @@
           let newRow = document.createElement("tr");
           //studentId
           let studentIdCell = document.createElement("td");
-          let text = document.createTextNode(array[i].studentId);
-          studentIdCell.appendChild(text);
+          studentIdCell.innerText = array[i].studentId;
           newRow.appendChild(studentIdCell);
           //studentSurname
           let surnameCell = document.createElement("td");
-          text = document.createTextNode(array[i].studentSurname);
-          surnameCell.appendChild(text);
+          surnameCell.innerText = array[i].studentSurname;
           newRow.appendChild(surnameCell);
           //studentName
           let nameCell = document.createElement("td");
-          text = document.createTextNode(array[i].studentName);
-          nameCell.appendChild(text);
+          nameCell.innerText = array[i].studentName;
           newRow.appendChild(nameCell);
           //email
           let emailCell = document.createElement("td");
-          text = document.createTextNode(array[i].email);
-          emailCell.appendChild(text);
+          emailCell.innerText = array[i].email;
           newRow.appendChild(emailCell);
           //degreeCourse
           let degreeCourseCell = document.createElement("td");
-          text = document.createTextNode(array[i].degreeCourse);
-          degreeCourseCell.appendChild(text);
+          degreeCourseCell.innerText = array[i].degreeCourse;
           newRow.appendChild(degreeCourseCell);
           //grade
           let gradeCell = document.createElement("td");
-          text = document.createTextNode(array[i].grade.toUpperCase());
-          gradeCell.appendChild(text);
+          gradeCell.innerText = array[i].grade.toUpperCase();
           if (array[i].grade == "failed" || array[i].grade == "recalled" ||
               array[i].grade == "absent"){
                 //may want to use a more formal method to compare strings
                 gradeCell.setAttribute("class", "fail");
               }
+          else if (array[i].state === "not entered") {
+            gradeCell.innerText = "";
+          }
           else gradeCell.setAttribute("class", "passed");
           newRow.appendChild(gradeCell);
           //state
           let stateCell = document.createElement("td");
-          text = document.createTextNode(array[i].state.toUpperCase());
-          stateCell.appendChild(text);
+          stateCell.innerText = array[i].state.toUpperCase();
           newRow.appendChild(stateCell);
           //edit button
+          let editCell = document.createElement("td");
           if (stateCell.innerText == "ENTERED" || stateCell.innerText == "NOT ENTERED"){
-            let editCell = document.createElement("td");
             let form = document.createElement("form");
             //set student input
             let studentInput = document.createElement("input");
@@ -200,65 +196,21 @@
             button.setAttribute("type", "submit");
             button.setAttribute("value", "Edit");
             form.appendChild(button);
-            //button.innerText = "Edit";
-            //button.appendChild(text);  //it seems appendChild doesn't to work with button
-          /*let anchor = document.createElement("a");
-            anchor.appendChild(button);
-            anchor.setAttribute("href", "#");*/
+            //insert button in td and add event listener to it
             editCell.appendChild(form);
-            newRow.appendChild(editCell);
-            button.addEventListener("click", editButtonCallback);
+            button.addEventListener("click", (e) => {
+              e.preventDefault();
+              let appealId = e.target.closest("form").children[1].getAttribute("value");
+              let studentId = e.target.closest("form").children[0].getAttribute("value");
+              editForm.show(appealId, studentId);
+            });
           }
+          newRow.appendChild(editCell);
           subscribers.subs.appendChild(newRow);
         }
       }
     }
-    this.toCheckbox = function toCheckbox(){
-      let forms = document.querySelectorAll("div.subscribers tbody tr form");
-      if (forms.length>0){
-        for (let i=0; i<forms.length; i++){
-          forms[i].closest("td").setAttribute("class", "checkbox");
-          //remove both of the event listeners in case this function got called twice in a row
-          forms[i].children[2].removeEventListener("click", editButtonCallback);
-          forms[i].children[2].removeEventListener("click", editCheckboxCallback);
-          forms[i].children[2].removeAttribute("value");
-          forms[i].children[2].setAttribute("type", "checkbox");
-          forms[i].children[2].addEventListener("click", editCheckboxCallback);
-        }
-      }
-    }
-    this.toButton = function toButton(){
-      let forms = document.querySelectorAll("div.subscribers tbody tr form");
-      if (forms.length>0){
-        for (let i=0; i<forms.length; i++){
-          forms[i].closest("td").removeAttribute("class");
-          //remove both of the event listeners in case this function got called twice in a row
-          forms[i].children[2].removeEventListener("click", editCheckboxCallback);
-          forms[i].children[2].removeEventListener("click", editButtonCallback);
-          forms[i].children[2].removeAttribute("value");
-          forms[i].children[2].setAttribute("type", "submit");
-          forms[i].children[2].setAttribute("value", "Edit");
-          forms[i].children[2].addEventListener("click", editButtonCallback);
-        }
-      }
-    }
   }
-
-  function editButtonCallback(e){
-    e.preventDefault();
-    let appealId = e.target.closest("form").children[1].getAttribute("value");
-    let studentId = e.target.closest("form").children[0].getAttribute("value");
-    editForm.show(appealId, studentId);
-  }
-
-  function editCheckboxCallback(e){
-    //e.preventDefault();
-    //correct implmentation
-    let appealId = e.target.closest("form").children[1].getAttribute("value");
-    let studentId = e.target.closest("form").children[0].getAttribute("value");
-    //editForm.show(appealId, studentId);
-  }
-
 
   function EditForm(){
     this.studentId = document.querySelector("div.Edit div.studentId");
@@ -496,8 +448,6 @@
     this.enter = document.querySelector("div.MultipleEdit input[type='submit']");
     this.show = function show(appealId){
       makeCall("GET", "GetNotEnteredRIA?appealId=" + appealId, null, multipleEdit.update);
-      let mebg = this.element.closest("div.mebg");
-      mebg.classList.add("active");
     }
     this.hide = function hide(){
       let mebg = this.element.closest("div.mebg");
@@ -581,6 +531,8 @@
           newRow.addEventListener("click", rowSelector);
         }
         multipleEdit.element.setAttribute("appealId", array[0].appealId);
+        let mebg = multipleEdit.element.closest("div.mebg");
+        mebg.classList.add("active");
       }
     }
   }

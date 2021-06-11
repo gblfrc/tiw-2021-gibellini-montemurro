@@ -53,53 +53,13 @@ public class GetSubscribersRIA extends HttpServlet {
 			return;
 		}
 		
-		//controls on request parameters
-		try {			
-			List<String> params= Collections.list(request.getParameterNames());
-			//checks "changeOrder" has legal values
-			if(params.contains("changeOrder")&&
-			   !request.getParameter("changeOrder").equalsIgnoreCase("true")&&
-			   !request.getParameter("changeOrder").equalsIgnoreCase("false")) {
-					throw new InvalidParameterException("Unacceptable request");
-				}
-			params.remove("changeOrder");
-			//checks "field" has legal values 
-			if(params.contains("field")) {
-				field=request.getParameter("field");  //saves "field" request parameter in a variable
-				if(!field.equalsIgnoreCase("studentId")&&!field.equalsIgnoreCase("surname")&&!field.equalsIgnoreCase("name")&&
-			      !field.equalsIgnoreCase("email")&&!field.equalsIgnoreCase("degree_course")&&!field.equalsIgnoreCase("grade")&&
-			      !field.equalsIgnoreCase("state")) {
-					throw new InvalidParameterException("Unacceptable request");
-				}
-			}
-			params.remove("field");
-			
-			params.remove("appealId");
-			//checks there aren't too many parameters in the request
-			//if(params.size()>0) throw new InvalidParameterException("Couldn't handle request"); 
-			
-			changeOrder=Boolean.parseBoolean(request.getParameter("changeOrder")); //if there is no "changeOrder" parameter, parseBoolean returns false
-			//checks existence of the attribute related to "field" request parameter (and handles it)
-			if((session.getAttribute(field + "Order")==null||session.getAttribute(field+ "Order")=="DESC") && changeOrder) {
-				session.setAttribute(field + "Order", "ASC");
-			}
-			else if(session.getAttribute(field + "Order")=="ASC" && changeOrder) {
-				session.setAttribute(field + "Order", "DESC");
-			}
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-			return;
-		}
-		
 		//get list of grades (in specific order)
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		List<Grade> grades= new ArrayList<Grade>();
 		
 		try {
 			if(user.getAccessRights().equals("Professor")) {
-				if(field==null || session.getAttribute(field+ "Order")==null) grades=gradeDAO.getGradesByAppealId(appId);
-				else if (session.getAttribute(field + "Order")=="ASC") grades=gradeDAO.getGradesByFieldAsc(appId,field);
-				else if (session.getAttribute(field + "Order")=="DESC") grades=gradeDAO.getGradesByFieldDesc(appId,field);
+				grades=gradeDAO.getGradesByAppealId(appId);
 			}
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find grades");
