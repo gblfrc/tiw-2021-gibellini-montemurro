@@ -8,7 +8,7 @@
 		let pError = document.querySelector("p.error");
 		if (pError !== null) pError.remove();
 		if (form.checkValidity()) {
-			makeCall("POST", 'GetAccessRIA', e.target.closest("form"),
+			makeCall("POST", 'GetAccessRIA', new FormData(e.target.closest("form")),
 				function(req) {
 					if (req.readyState == XMLHttpRequest.DONE) {
 						switch (req.status) {

@@ -1,22 +1,20 @@
+//All the utility functions in this .js file have been adapted from code given
+//with MissionExpensesManagementCSnew project
+
 /**
  * AJAX call management
  */
 
-function makeCall(method, url, formElement, cback, reset = true) {
-	 var req = new XMLHttpRequest(); // visible by closure
-	 req.onreadystatechange = function() {
-	 	cback(req)
-	 }; // closure
-	 req.open(method, url);
-	 if (formElement == null) {
-	     req.send();
-	 } else {
-	    req.send(new FormData(formElement));
-	 }
-	 if (formElement !== null && reset === true) {
-	    formElement.reset();
-	 }
- }
+  function makeCall(method, url, object, callback) {
+	    var req = new XMLHttpRequest();
+	    req.onreadystatechange = function(e) {
+		  e.preventDefault();
+	      callback(req)
+	    };
+	    req.open(method, url);
+		if (object !== null) req.send(object);
+		else req.send();
+  }
 
 // TABLE SORTING MANAGEMENT FUNCTIONS
 

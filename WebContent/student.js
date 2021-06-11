@@ -20,7 +20,7 @@
 	}
 	this.clear();
 	this.show=function show(){
-		makeCall("GET","GetCoursesRIA",function(req){
+		makeCall("GET","GetCoursesRIA", null, function(req){
 			if(req.readyState==4){
 				var message = req.responseText;
 				if(req.status==200){
@@ -33,7 +33,7 @@
 					document.querySelector("div[class='courses']").style.display="none";
 				}
 			}
-		},null);
+		});
 	}
 	this.show();
 	this.update=function update(courses){
@@ -83,7 +83,7 @@
 		this.show=function show(courseId,title){
 		document.querySelector("div[class='appeals']").removeAttribute("style");
 		document.querySelector("div[class='appeals']>span").innerText = "Here are the appeals for the course: " + title.toUpperCase();
-		makeCall("GET","GetAppealsRIA?courseId="+ courseId,function(req){
+		makeCall("GET","GetAppealsRIA?courseId="+ courseId,null, function(req){
 			if(req.readyState==4){
 				var message = req.responseText;
 				if(req.status==200){
@@ -96,7 +96,7 @@
 					document.querySelector("div[class='appeals']").style.display="none";
 				}
 			}
-		},null);
+		});
 	}
 
 	this.update=function update(appeals){
@@ -142,7 +142,7 @@
 			if (button !== undefined) button.hide();
     	}
     	this.show = function show(appealId,date){
-      		makeCall("GET", "GetResultRIA?appeal=" + appealId, this.update,null);
+      		makeCall("GET", "GetResultRIA?appeal=" + appealId, null, this.update);
       		this.element.removeAttribute("style");
 			this.message.innerText = "Here is the result of the exam you took on " + date.toUpperCase();
 			if (button !== undefined) button.hide();
@@ -188,7 +188,7 @@
 					gradeDetails.courseId.innerText=appeal.courseId;
 					gradeDetails.date.innerText=appeal.date;
 		        	gradeDetails.courseTitle.innerText=appeal.courseTitle;
-					gradeDetails.grade.innerText=gr.grade;
+					gradeDetails.grade.innerText=gr.grade.toUpperCase();
 				}
 			}
 			else{
@@ -215,8 +215,7 @@
 	 		var form = e.target.closest("form");
 	        if (form.checkValidity()) {
 			  e.preventDefault();
-	          makeCall("POST", 'RefuseGradeRIA',
-	            function(req) {
+	          makeCall("POST", 'RefuseGradeRIA', new FormData(form), function(req) {
 	              if (req.readyState === 4){
 					if(req.status === 200){
 						gradeDetails.clear();
@@ -230,7 +229,7 @@
 					document.querySelector("p.error").appendChild(textContent);
 				}
 				}
-        	},form);
+        	});
       	}
     });
   }
@@ -251,19 +250,4 @@
    
   }
 
-  function makeCall(method, url,cback ,formElement , reset = true) {
-	    var req = new XMLHttpRequest(); // visible by closure
-	    req.onreadystatechange = function() {
-	      cback(req)
-	    }; // closure
-	    req.open(method, url);
-	    if (formElement == null) {
-	      req.send();
-	    } else {
-	      req.send(new FormData(formElement));
-	    }
-	    if (formElement !== null && reset === true) {
-	      formElement.reset();
-	    }
-	  }
 }())

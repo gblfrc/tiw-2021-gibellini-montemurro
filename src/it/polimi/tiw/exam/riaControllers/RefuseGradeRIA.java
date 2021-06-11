@@ -49,9 +49,7 @@ public class RefuseGradeRIA extends HttpServlet {
 			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Student")) {
 				throw new InvalidParameterException();
 			}
-			System.out.println(appId);
 		} catch (Exception e) {
-			System.out.println(appId);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Unavailable appeal");
 			return;
