@@ -35,15 +35,24 @@ public class GetLogin extends HttpServlet {
 			throws ServletException, IOException {
 
 		String type = null;
-		ErrorMsg error = null;
 		String path = "/WEB-INF/Login.html";
+		//try to get errors from a forwarded request
+		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
+		//try to get errors from a forwarded request
+		/*try {
+			error = (ErrorMsg) request.getAttribute("error");
+		} catch (ClassCastException cce) {
+			error = null;
+		}*/
 
-		type = request.getParameter("type");
-		if (type == null)
-			type = "pureHtml";
-		if (type.equalsIgnoreCase("ria")) path = "/WEB-INF/LoginRIA.html";
-		else if (!type.equalsIgnoreCase("pureHtml")) {
-			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Requested login page isn't available");
+		if (error==null) {
+			type = request.getParameter("type");
+			if (type == null)
+				type = "pureHtml";
+			if (type.equalsIgnoreCase("ria")) path = "/WEB-INF/LoginRIA.html";
+			else if (!type.equalsIgnoreCase("pureHtml")) {
+				error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Requested login page isn't available");
+			}
 		}
 
 		ServletContext servletContext = getServletContext();
@@ -52,6 +61,12 @@ public class GetLogin extends HttpServlet {
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
+	
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);
