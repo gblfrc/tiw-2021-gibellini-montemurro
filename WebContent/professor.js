@@ -18,10 +18,12 @@
       while(this.courses.children.length>0){
         this.courses.removeChild(this.courses.children[0]);
       }
+	  removeError();
     }
     this.clear();
     this.update = function update(req) {
-      if (req.readyState === 4 && req.status === 200){
+      if (req.readyState === 4){
+	 	if(req.status === 200){
 		courseList.clear(); //should be useless; line written to create analogy with other update methods
         let i = 0;
         let array = JSON.parse(req.responseText);
@@ -51,7 +53,11 @@
             let title = e.target.parentElement.previousSibling.innerText;
             appealList.show(e.target.getAttribute('courseId'), title);
           });
+		}
         }
+		else{
+			 document.querySelector("div.main").appendChild(errorManager(req));
+		}
       }
     }
     makeCall("GET", "GetCoursesRIA", null, this.update);
@@ -76,11 +82,13 @@
       while(this.appeals.children.length>0){
         this.appeals.removeChild(this.appeals.children[0]);
       }
+	  removeError();
     }
     this.hide();
     this.clear();
     this.update = function update(req) {
-      if (req.readyState === 4 && req.status === 200){
+      if (req.readyState === 4 ){
+		if( req.status === 200){
 		appealList.clear();
         let i = 0;
         let array = JSON.parse(req.responseText);
@@ -105,6 +113,11 @@
           });
         }
       }
+	  else{
+		document.querySelector("div.main").appendChild(errorManager(req));
+		document.querySelector("div[class='appeals']").style.display="none";
+	}
+	 }
     }
   }
 
@@ -127,11 +140,13 @@
       while(this.subs.children.length>0){
         this.subs.removeChild(this.subs.children[0]);
       }
+	  removeError();
     }
     this.hide();
     this.clear();
     this.update = function update(req) {
-      if (req.readyState === 4 && req.status === 200){
+      if (req.readyState === 4){
+		if(req.status === 200){
         subscribers.clear();
         editForm.hide();
         let i = 0;
@@ -209,6 +224,12 @@
           subscribers.subs.appendChild(newRow);
         }
       }
+	  else{
+		document.querySelector("div.main").appendChild(errorManager(req));
+		buttons.hide();
+        document.querySelector("div.subscribers").style.display="none";
+		}
+	}
     }
   }
 
@@ -238,11 +259,13 @@
       this.surname.children[1].innerText = "";
       this.courseTitle.children[1].innerText = "";
       this.appealDate.children[1].innerText = "";
+	  removeError();
     }
     this.hide();
     this.clear();
     this.update = function update(req){
-      if (req.readyState === 4 && req.status === 200){
+      if (req.readyState === 4){
+		if(req.status === 200){
         let objectStrings = req.responseText.split("}"); //needed to parse two different objects
         let grade = JSON.parse(objectStrings[0]+"}");
         let appeal = JSON.parse(objectStrings[1]+"}");
@@ -263,6 +286,11 @@
             }
           });
         })
+		} 
+		else{
+			document.querySelector("div.main").appendChild(errorManager(req));
+			document.querySelector("div.Edit").style.display="none";
+		}
       }
     }
   }
@@ -296,10 +324,16 @@
       editForm.hide();
       let form = e.target.closest("form");
       makeCall("POST", "PublishRIA", new FormData(form), function(req){
-        if (req.readyState === 4 && req.status === 200){
+        if (req.readyState === 4){
+		if(req.status === 200){
           let appeal = JSON.parse(req.responseText);
           subscribers.show(appeal.appealId, appeal.date);
           }
+		  else{
+			removeError();
+			document.querySelector("div.main").appendChild(errorManager(req));
+		}
+		}
         });
       });
       let reportSubmit = this.report.nextSibling.nextSibling; //line to get the buttons
@@ -309,11 +343,17 @@
       editForm.hide();
       let form = e.target.closest("form");
       makeCall("POST", "ReportRIA", new FormData(form), function(req){
-        if (req.readyState === 4 && req.status === 200){
+        if (req.readyState === 4){
+		if(req.status === 200){
           let appeal = JSON.parse(req.responseText);
           subscribers.show(appeal.appealId, appeal.date);
           reports.show("last", appeal.appealId);
           }
+		else{
+			removeError();
+			document.querySelector("div.main").appendChild(errorManager(req));
+		}
+		}
         });
       });
       //add event listener to allReports button
@@ -365,6 +405,7 @@
       this.element.removeAttribute("style");
     }
     this.clear = function clear() {
+	 removeError();
       //get all report details
       let allDetails = document.querySelector("div.Reports div.details");
       //delete all but first report details
@@ -387,7 +428,8 @@
     this.hide();
     this.clear();
     this.update = function update(req){
-      if (req.readyState === 4 && req.status === 200){
+      if (req.readyState === 4){
+      if(req.status === 200){
         let reportsArr = JSON.parse(req.responseText);
         let course = reportsArr[0].appeal.courseTitle;
         reports.courseTitle.children[1].innerText = reportsArr[0].appeal.courseTitle;
@@ -439,8 +481,13 @@
           }
         }
       }
+	  else{
+		document.querySelector("div.main").appendChild(errorManager(req));
+		document.querySelector("div.Reports").style.display="none";
+	  }
     }
   }
+ }
 
   function MultipleEdit(){
     this.element = document.querySelector("div.MultipleEdit");
@@ -454,6 +501,7 @@
       mebg.classList.remove("active");
     }
     this.clear = function clear() {
+	  removeError();
       let tbody=this.element.children[2].children[1];
       while(tbody.children.length>1){
         tbody.removeChild(tbody.children[1]);
@@ -484,18 +532,24 @@
         }
         let toSend = JSON.stringify(array);
         makeCall ("POST", "MultipleEditRIA", toSend, (req) => {
-          if (req.readyState === 4 && (req.status === 200|| req.status === 206)){
+          if (req.readyState === 4){
+    		if(req.status === 200|| req.status === 206){
             multipleEdit.hide();
             let appeal = JSON.parse(req.responseText);
             subscribers.show(appeal.appealId, appeal.date);
           }
+		  else{
+			document.querySelector("div.main").appendChild(errorManager(req));
+		}
+		}
         })
       })
     }
     this.clear();
     this.registerEvents();
     this.update = function update(req){
-      if (req.readyState === 4 && req.status === 200){
+      if (req.readyState === 4){
+		if(req.status === 200){
         let tbody=multipleEdit.element.children[2].children[1];
         let i = 0;
         let array = JSON.parse(req.responseText);
@@ -534,6 +588,10 @@
         let mebg = multipleEdit.element.closest("div.mebg");
         mebg.classList.add("active");
       }
+      else{
+		document.querySelector("div.main").appendChild(errorManager(req));
+	 }
+	}
     }
   }
 

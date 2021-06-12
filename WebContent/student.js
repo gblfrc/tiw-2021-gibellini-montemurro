@@ -14,9 +14,7 @@
 		while(document.querySelector("div[class='courses']>table>tbody").children.length>0){
 		document.querySelector("div[class='courses']>table>tbody").removeChild(document.querySelector("div[class='courses']>table>tbody").children[0]);
 		}
-		while(document.querySelector("p.error").firstChild){
-			document.querySelector("p.error").removeChild(document.querySelector("p.error").firstChild);
-		}
+		removeError();
 	}
 	this.clear();
 	this.show=function show(){
@@ -28,8 +26,7 @@
 					self.update(courses);
 				}
 				else{
-					let textContent=document.createTextNode(message);
-					document.querySelector("p.error").appendChild(textContent);
+					document.querySelector("div.main").appendChild(errorManager(req));
 					document.querySelector("div[class='courses']").style.display="none";
 				}
 			}
@@ -74,9 +71,7 @@
 		while(document.querySelector("div[class='appeals']>table>tbody").children.length>0){
 		document.querySelector("div[class='appeals']>table>tbody").removeChild(document.querySelector("div [class='appeals']>table>tbody").children[0]);
 		}
-		while(document.querySelector("p.error").firstChild){
-			document.querySelector("p.error").removeChild(document.querySelector("p.error").firstChild);
-		}
+		removeError();
 		}
 		this.clear();
 		this.hide();
@@ -91,8 +86,7 @@
 					self.update(appeals);
 				}
 				else{
-					let textContent=document.createTextNode(message);
-					document.querySelector("p.error").appendChild(textContent);
+					document.querySelector("div.main").appendChild(errorManager(req));
 					document.querySelector("div[class='appeals']").style.display="none";
 				}
 			}
@@ -148,10 +142,8 @@
 			if (button !== undefined) button.hide();
     	}
 		this.clear = function clear() {
-			while(document.querySelector("p.error").children.length>0){
-		 		document.querySelector("p.error").removeChild(document.querySelector("p.error").children[0]);
-			}
-			this.mainContent.innerText="";
+			removeError();
+			this.mainContent.style.display="none";
 			this.studentId.innerText="";
 			this.studentName.innerText="";
 			this.studentSurname.innerText="";
@@ -176,7 +168,7 @@
 				var i=0;
 				if(gr.grade>=18 && gr.state=='published'){button.show(appeal.appealId);}   
 				if(gr.state=="not entered"){
-					gradeDetails.mainContent.innerText="Grade not entered yet";
+					gradeDetails.mainContent.removeAttribute("style");
 				}       
 				else{
 					document.querySelector("div.fields").removeAttribute("style");
@@ -192,8 +184,7 @@
 				}
 			}
 			else{
-				let textContent=document.createTextNode(message);
-				document.querySelector("p.error").appendChild(textContent);
+				document.querySelector("div.main").appendChild(errorManager(req));
 				document.querySelector("div[class='gradeDetails']").style.display="none";
 			}
         }
@@ -222,11 +213,8 @@
 						gradeDetails.show( document.querySelector("div.Button form.refuse input[type='hidden']").getAttribute("value"));
 					}
 					else{
-					while(document.querySelector("p.error").firstChild){
-						document.querySelector("p.error").removeChild(document.querySelector("p.error").firstChild);
-					}
-					let textContent=document.createTextNode(req.responseText);
-					document.querySelector("p.error").appendChild(textContent);
+					removeError();
+					document.querySelector("div.main").appendChild(errorManager(req));
 				}
 				}
         	});

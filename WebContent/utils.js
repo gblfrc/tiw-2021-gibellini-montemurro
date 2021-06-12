@@ -16,6 +16,20 @@
 		else req.send();
   }
 
+function errorManager(req){
+	let error = document.createElement("p");
+	error.setAttribute("class","error");
+	errorMessage = document.createTextNode(req.responseText);
+	error.appendChild(errorMessage);
+	return error;
+}
+
+function removeError(){
+	let pError = document.querySelector("p.error");
+	if (pError !== null) pError.remove();
+}
+
+
 // TABLE SORTING MANAGEMENT FUNCTIONS
 
 /*

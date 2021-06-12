@@ -3,10 +3,8 @@
 
 	document.getElementById("loginbutton").addEventListener('click', (e) => {
 		e.preventDefault();
-		let errorMessage;
 		var form = e.target.closest("form");
-		let pError = document.querySelector("p.error");
-		if (pError !== null) pError.remove();
+		removeError();
 		if (form.checkValidity()) {
 			makeCall("POST", 'GetAccessRIA', new FormData(e.target.closest("form")),
 				function(req) {
@@ -20,11 +18,7 @@
 								break;
 								}
 							default: {// error
-								let error = document.createElement("p");
-								error.setAttribute("class","error");
-								errorMessage = document.createTextNode(req.responseText);
-								error.appendChild(errorMessage);
-								document.querySelector("div.main").appendChild(error);
+								document.querySelector("div.main").appendChild(errorManager(req));
 								break;
 							}
 						}

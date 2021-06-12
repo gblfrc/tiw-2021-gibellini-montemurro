@@ -19,6 +19,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.CourseDAO;
@@ -83,9 +84,11 @@ public class GetAppealsRIA extends HttpServlet {
 			return;
 		}
 		
-		String json = new Gson().toJson(appeals);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
+		String json = gson.toJson(appeals);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
+		System.out.println(json);
 		response.getWriter().write(json);
 	}
 
