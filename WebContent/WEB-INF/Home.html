@@ -15,8 +15,10 @@
 		<h2>Select a course to see its appeals</h2>
 		<table>
 			<thead>
-				<th>Course Name</th>
-				<th>Appeals Link</th>
+				<tr>
+					<th>Course Name</th>
+					<th>Appeals Link</th>
+				</tr>
 			</thead>
 			<tbody th:remove="all-but-first">
 				<tr th:each="course : ${courses}">
@@ -26,6 +28,9 @@
 				</tr>
 			</tbody>
 		</table>
+		<p class="error" th:if="${error != null}"
+			th:text="${error.status} + ': ' + ${error.message}">Arma virumque
+			cano, Troiae qui primus ab oris</p>
 	</div>
 </body>
 </html>

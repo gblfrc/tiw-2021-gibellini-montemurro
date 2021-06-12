@@ -19,12 +19,11 @@ public class StudentFilter implements Filter{
 		System.out.print("Checking student's access rights ...\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String loginpath = req.getServletContext().getContextPath() + "/Login.html";
 		// check if the logged user is a student
 		HttpSession s = req.getSession();
 		User user=(User)s.getAttribute("user");
 		if(!user.getAccessRights().equalsIgnoreCase("Student")) {
-			res.sendRedirect(loginpath);
+			res.sendRedirect(req.getServletContext().getContextPath() + "/GetLogin");
 			return;
 		}
 		// pass the request along the filter chain

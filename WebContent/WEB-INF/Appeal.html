@@ -14,9 +14,9 @@
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">
-		<h1>Welcome to appeals page</h1>
-		<h2>Select an appeal to see its subscribers</h2>
-		<table>
+		<h1 th:if="${error == null}">Welcome to appeals page</h1>
+		<h2 th:if="${error == null}">Select an appeal to see its subscribers</h2>
+		<table th:if="${error == null}">
 			<thead>
 				<tr>
 					<th>Appeal date</th>
@@ -32,6 +32,9 @@
 				</tr>
 			</tbody>
 		</table>
+		<p class="error" th:if="${error != null}"
+			th:text="${error.status} + ': ' + ${error.message}">Arma virumque
+			cano, Troiae qui primus ab oris</p>
 	</div>
 </body>
 </html>

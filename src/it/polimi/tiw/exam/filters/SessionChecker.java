@@ -19,11 +19,10 @@ public class SessionChecker implements Filter {
 		System.out.print("Session checker executing ...\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String loginpath = req.getServletContext().getContextPath() + "/Login.html";
 		// check if the client is logged
 		HttpSession s = req.getSession();
 		if (s.isNew() || s.getAttribute("user") == null) {
-			res.sendRedirect(loginpath);
+			res.sendRedirect(req.getServletContext().getContextPath() + "/GetLogin");
 			return;
 		}		
 		// pass the request along the filter chain
