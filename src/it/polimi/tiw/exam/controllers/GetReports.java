@@ -1,12 +1,12 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,6 +21,7 @@ import org.thymeleaf.context.WebContext;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.ReportDAO;
 import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Report;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -37,57 +38,86 @@ public class GetReports extends HttpServlet {
 		templateEngine = TemplateEngineHandler.getEngine(getServletContext());
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		//control on "appeal" request parameter legitimacy
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
+		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+
+		// control on "appeal" request parameter legitimacy
 		int appId;
 		try {
 			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't handle the request");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
-		
-		//control on professor's rights to access the appeal
+
+		// check existence of selected appeal
+		Appeal appeal = null;
+		AppealDAO adao = new AppealDAO(connection);
+		try {
+			appeal = adao.getAppealById(appId);
+			if (appeal == null)
+				throw new Exception();
+		} catch (Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+
+		// control on professor's rights to access the appeal
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		try {
-			AppealDAO appealDAO= new AppealDAO(connection);
-			appId = Integer.parseInt(request.getParameter("appeal"));
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new InvalidParameterException();
+			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
+				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected course");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
-		
-		//control on "appeal" request parameter legitimacy
+
+		// control on "type" request parameter legitimacy
 		String type;
 		try {
 			type = request.getParameter("type");
-			if (type == null) type = "all";
-			if (!type.equals("all") && !type.equals("last")) throw new Exception();
+			if (type == null)
+				type = "all";
+			if (!type.equals("all") && !type.equals("last"))
+				throw new Exception();
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Illegal request");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal report request");
+			rd = request.getRequestDispatcher("GetSubscribers");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
-		
-		//main section: report grades and fetch latest report
+
+		// main section: report grades and fetch latest report
 		ReportDAO reportDao = new ReportDAO(connection);
 		List<Report> reports = null;
-		Appeal appeal = null;
 		reports = new LinkedList<>();
 		try {
-			if (type.equals("all")) reports = reportDao.getAllReports(appId);
-			else if (type.equals("last")) reports.add(reportDao.getReportById(reportDao.getLastReport(appId)));
-			AppealDAO adao = new AppealDAO(connection);
-			appeal = adao.getAppealById(appId);
+			if (type.equals("all"))
+				reports = reportDao.getAllReports(appId);
+			else if (type.equals("last"))
+				reports.add(reportDao.getReportById(reportDao.getLastReport(appId)));
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An accidental error occurred, couldn't retrieve report");
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while retrieving reports");
+			request.setAttribute("error", error);
+			rd = request.getRequestDispatcher("GetSubscribers");
+			rd.forward(request, response);
 			return;
 		}
-		
+
+		// actually give access to report page
 		String path = "/WEB-INF/Reports.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());

@@ -110,13 +110,6 @@ public class GetAppeal extends HttpServlet {
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		ErrorMsg error = new ErrorMsg(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Illegal request");
-		request.setAttribute("error", error);
-		doGet(request, response);
-	}
-
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);

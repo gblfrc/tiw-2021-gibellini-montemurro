@@ -38,7 +38,7 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
-		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/GetReports</url-pattern>
 		<url-pattern>/ProfessorHome.html</url-pattern> 
 		<url-pattern>/StudentHome.html</url-pattern> 
 	</filter-mapping>
@@ -53,7 +53,7 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
-		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/GetReports</url-pattern>
 		<url-pattern>/ProfessorHome.html</url-pattern> 
 	</filter-mapping>
 		<filter>
