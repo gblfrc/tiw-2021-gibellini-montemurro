@@ -50,6 +50,8 @@
             appealList.clear();
             subscribers.hide();
             subscribers.clear();
+			reports.hide();
+			reports.clear();
             let title = e.target.parentElement.previousSibling.innerText;
             appealList.show(e.target.getAttribute('courseId'), title);
           });
@@ -399,7 +401,7 @@
     }
     this.show = function show(msgType, appealId){
       reports.clear();
-      makeCall("GET", "GetReportsRIA?type=" + msgType + "&appealId=" + appealId, null, this.update);
+      makeCall("GET", "GetReportsRIA?type=" + msgType + "&appeal=" + appealId, null, this.update);
       //may want to find a better way to express the url
       this.showMessage(msgType);
       this.element.removeAttribute("style");
@@ -494,7 +496,7 @@
     this.closer = document.querySelector("div.MultipleEdit span.closer");
     this.enter = document.querySelector("div.MultipleEdit input[type='submit']");
     this.show = function show(appealId){
-      makeCall("GET", "GetNotEnteredRIA?appealId=" + appealId, null, multipleEdit.update);
+      makeCall("GET", "GetNotEnteredRIA?appeal=" + appealId, null, multipleEdit.update);
     }
     this.hide = function hide(){
       let mebg = this.element.closest("div.mebg");

@@ -89,7 +89,6 @@ public class GetAppealsRIA extends HttpServlet {
 		String json = gson.toJson(appeals);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		System.out.println(json);
 		response.getWriter().write(json);
 	}
 

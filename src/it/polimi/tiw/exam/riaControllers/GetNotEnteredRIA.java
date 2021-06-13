@@ -85,8 +85,8 @@ public class GetNotEnteredRIA extends HttpServlet {
 
 		// send a specific response if selected appeal doesn't have any 'not entered' grade
 		if (grades.size() == 0) {
-			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-			response.getWriter().println("It seems this appeal doesn't have any \"NOT ENTERED\" grade");
+			response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+			response.getWriter().println("Appeal doesn't have any 'NOT ENTERED' grade");
 			return;
 		}
 

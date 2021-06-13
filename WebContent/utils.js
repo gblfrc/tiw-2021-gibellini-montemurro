@@ -19,7 +19,7 @@
 function errorManager(req){
 	let error = document.createElement("p");
 	error.setAttribute("class","error");
-	errorMessage = document.createTextNode(req.responseText);
+	errorMessage = document.createTextNode(req.status + ": " + req.responseText);
 	error.appendChild(errorMessage);
 	return error;
 }
