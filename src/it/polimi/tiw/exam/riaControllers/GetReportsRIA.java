@@ -1,7 +1,6 @@
 package it.polimi.tiw.exam.riaControllers;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -36,13 +35,27 @@ public class GetReportsRIA extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
 		// control on "appeal" request parameter legitimacy
 		int appId;
 		try {
-			appId = Integer.parseInt(request.getParameter("appealId"));
+			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Couldn't handle the request");
+			response.getWriter().println("Illegal appeal request");
+			return;
+		}
+
+		// check existence of selected appeal
+		Appeal appeal = null;
+		AppealDAO adao = new AppealDAO(connection);
+		try {
+			appeal = adao.getAppealById(appId);
+			if (appeal == null)
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Appeal not found");
 			return;
 		}
 
@@ -50,35 +63,45 @@ public class GetReportsRIA extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		try {
-			AppealDAO appealDAO = new AppealDAO(connection);
-			appId = Integer.parseInt(request.getParameter("appealId"));
-			if (!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new InvalidParameterException();
+			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
+				throw new Exception();
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Unavailable appeal");
+			response.getWriter().println("Denied access to selected course");
+			return;
+		}
+
+		// control on "type" request parameter legitimacy
+		String type;
+		try {
+			type = request.getParameter("type");
+			if (type == null)
+				type = "all";
+			if (!type.equals("all") && !type.equals("last"))
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Illegal report request");
 			return;
 		}
 
 		// main section: report grades and fetch latest report
 		ReportDAO reportDao = new ReportDAO(connection);
-		List<Report> reports = new LinkedList<>();
-		Appeal appeal = null;
+		List<Report> reports = null;
+		reports = new LinkedList<>();
 		try {
-			String type = request.getParameter("type");
-			if (type.equalsIgnoreCase("all")) {
+			if (type.equals("all"))
 				reports = reportDao.getAllReports(appId);
-			}
-			if (type.equalsIgnoreCase("last")) {
+			else if (type.equals("last"))
 				reports.add(reportDao.getReportById(reportDao.getLastReport(appId)));
-			}
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.getWriter().println("An accidental error occurred, couldn't retrieve report");
+			response.getWriter().println("An accidental error occurred while retrieving reports");
 			return;
 		}
 
+		//build response object and send it
 		String json = new Gson().toJson(reports);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

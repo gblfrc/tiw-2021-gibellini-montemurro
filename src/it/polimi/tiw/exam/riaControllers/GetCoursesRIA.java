@@ -26,28 +26,34 @@ import it.polimi.tiw.exam.utils.ConnectionHandler;
 public class GetCoursesRIA extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private Connection connection=null;
+	private Connection connection = null;
 
 	public void init() throws ServletException {
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
-		CourseDAO courseDAO= new CourseDAO(connection);
-		List<Course> courses= new ArrayList<Course>();
+		CourseDAO courseDAO = new CourseDAO(connection);
+		List<Course> courses = new ArrayList<Course>();
 
+		// no need to check user's rights to access courses
+		// just retrieve courses
 		try {
-			if(user.getAccessRights().equals("Professor")) courses=courseDAO.getCoursesByProfessorId(user.getPersonId());
-			else courses=courseDAO.getCoursesByStudentId(user.getPersonId());
+			if (user.getAccessRights().equals("Professor"))
+				courses = courseDAO.getCoursesByProfessorId(user.getPersonId());
+			else
+				courses = courseDAO.getCoursesByStudentId(user.getPersonId());
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.getWriter().println("Not possible to find courses");
+			response.getWriter().println("An accidental error occurred while retrieving courses");
 			return;
 		}
 
+		// build response object and send it
 		String json = new Gson().toJson(courses);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
@@ -56,8 +62,10 @@ public class GetCoursesRIA extends HttpServlet {
 
 	public void destroy() {
 		try {
-		ConnectionHandler.closeConnection(connection);
-		} catch (SQLException e) {};
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+		}
+		;
 	}
 
 }

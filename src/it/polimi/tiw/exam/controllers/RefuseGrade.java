@@ -97,7 +97,7 @@ public class RefuseGrade extends HttpServlet {
 			gradeDao.refuseGrade(appId, user.getPersonId());
 		} catch (SQLException e) {
 			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					"An accidental error occurred while retrieving result");
+					"An accidental error occurred while refusing result");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;

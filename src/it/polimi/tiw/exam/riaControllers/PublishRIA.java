@@ -3,8 +3,6 @@ package it.polimi.tiw.exam.riaControllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -19,10 +17,8 @@ import com.google.gson.Gson;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Appeal;
-import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
-import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 
 @WebServlet("/PublishRIA")
 @MultipartConfig
@@ -36,33 +32,55 @@ public class PublishRIA extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
 		HttpSession session = request.getSession();
 		Integer appId = null;
 		User user = (User) session.getAttribute("user");
-		Appeal appeal = null;
 
+		// control on "appeal" request parameter legitimacy
 		try {
-			AppealDAO appealDAO = new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
-			if (!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
-			appeal = appealDAO.getAppealById(appId);
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Couldn't find appeal");
+			response.getWriter().println("Illegal appeal request");
 			return;
 		}
-		GradeDAO gradeDAO = new GradeDAO(connection);
 
+		// check existence of selected appeal
+		Appeal appeal = null;
+		AppealDAO adao = new AppealDAO(connection);
+		try {
+			appeal = adao.getAppealById(appId);
+			if (appeal == null)
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Appeal not found");
+			return;
+		}
+
+		// control on professor's rights to access the appeal
+		try {
+			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Denied access to selected appeal");
+			return;
+		}
+
+		// try to publish grades
+		GradeDAO gradeDAO = new GradeDAO(connection);
 		try {
 			gradeDAO.publishGrade(appId);
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.getWriter().println("Not possible to find grades");
+			response.getWriter().println("An accidental error occurred while retrieving reports");
 			return;
 		}
-		
+
+		//build response object and send it
 		String json = new Gson().toJson(appeal);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
