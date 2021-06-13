@@ -3,10 +3,8 @@ package it.polimi.tiw.exam.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.servlet.ServletContext;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,66 +12,89 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
-import it.polimi.tiw.exam.objects.Grade;
+import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
-import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 
-/**
- * Servlet implementation class PublishGrade
- */
 @WebServlet("/PublishGrade")
 public class PublishGrade extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	private TemplateEngine templateEngine;
-   
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+
 	public void init() throws ServletException {
 		connection = ConnectionHandler.getConnection(getServletContext());
-		ServletContext servletContext = getServletContext();
-		templateEngine = TemplateEngineHandler.getEngine(servletContext);
 	}
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		ErrorMsg error = null;
+		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
 		HttpSession session = request.getSession();
 		Integer appId = null;
 		User user = (User) session.getAttribute("user");
-		
+
+		// control on "appeal" request parameter legitimacy
 		try {
-			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
+		} catch (Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+
+		// check existence of selected appeal
+		Appeal appeal = null;
+		AppealDAO adao = new AppealDAO(connection);
+		try {
+			appeal = adao.getAppealById(appId);
+			if (appeal == null)
+				throw new Exception();
+		} catch (Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+
+		// control on professor's rights to access the appeal
+		try {
+			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Couldn't find appeal");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected appeal");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
-		
-		GradeDAO gradeDAO= new GradeDAO(connection);
-		
+
+		// try to publish grades
+		GradeDAO gradeDAO = new GradeDAO(connection);
 		try {
 			gradeDAO.publishGrade(appId);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find grades");
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while retrieving reports");
+			request.setAttribute("error", error);
+			rd = request.getRequestDispatcher("GetSubscribers");
+			rd.forward(request, response);
 			return;
 		}
-		
-		response.sendRedirect("GetSubscribers?appeal=" + appId );
-		
+
+		// everything was alright; go back to subscribers page
+		response.sendRedirect("GetSubscribers?appeal=" + appId);
 	}
-	
+
 	public void destroy() {
 		try {
-		ConnectionHandler.closeConnection(connection);
-		} catch (SQLException e) {};
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+		}
+		;
 	}
 }

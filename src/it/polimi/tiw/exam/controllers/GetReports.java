@@ -41,7 +41,7 @@ public class GetReports extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
+		ErrorMsg error = null;
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
 
 		// control on "appeal" request parameter legitimacy

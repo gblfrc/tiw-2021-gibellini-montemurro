@@ -8,48 +8,56 @@
 </head>
 <body>
 	<div class="back">
-		<a th:href="@{/GetAppeal(courseId, ${appeal.courseId)}">Back</a>
+		<a th:href="@{/GetAppeal(courseId=${appeal.courseId})}">Back</a>
 	</div>
 	<div class="logout">
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">
-		<p th:if="${#strings.equalsIgnoreCase(grade.state, 'not entered')}">Grade
-			not entered yet</p>
-		<div
-			th:if="${not #strings.equalsIgnoreCase(grade.state, 'not entered')}">
+		<div>
 			<h1>Result:</h1>
 			<h2>Student information:</h2>
 			<p>
 				<strong>Student ID:</strong>
 				<nobr th:text=${grade.studentId}>1492</nobr>
+			</p>
 			<p>
 				<strong>Name:</strong>
 				<nobr th:text=${grade.studentName}>John</nobr>
+			</p>
 			<p>
 				<strong>Surname:</strong>
 				<nobr th:text=${grade.studentSurname}>Smith</nobr>
+			</p>
 			<p>
 				<strong>E-mail:</strong>
 				<nobr th:text=${grade.email}>john.smith@mail.provider.com</nobr>
+			</p>
 			<p>
 				<strong>Degree course:</strong>
 				<nobr th:text=${grade.degreeCourse}>Literature</nobr>
-
-				<!-- may want to give a more consistent form to appeal and grade objects -->
+			</p>
 			<h2>Appeal information:</h2>
 			<p>
 				<strong>Course Id:</strong>
 				<nobr th:text=${appeal.courseId}>1571</nobr>
+			</p>
 			<p>
 				<strong>Title:</strong>
 				<nobr th:text=${appeal.courseTitle}>Metrics</nobr>
+			</p>
 			<p>
 				<strong>Appeal date:</strong>
 				<nobr th:text=${{appeal.date}}>29.5.1453</nobr>
-			<p>
+			</p>
+			<p
+				th:if="${not #strings.equalsIgnoreCase(grade.state, 'not entered')}">
 				<strong>Grade:</strong>
 				<nobr th:text=${#strings.toUpperCase(grade.grade)}>25</nobr>
+			</p>
+			<p th:if="${#strings.equalsIgnoreCase(grade.state, 'not entered')}">Grade
+				not entered yet</p>
+
 		</div>
 
 		<div
@@ -62,6 +70,9 @@
 				<input type="submit" value="Refuse">
 			</form>
 		</div>
+		<p class="error" th:if="${error != null}"
+			th:text="${error.status} + ': ' + ${error.message}">Arma virumque
+			cano, Troiae qui primus ab oris</p>
 	</div>
 </body>
 </html>
