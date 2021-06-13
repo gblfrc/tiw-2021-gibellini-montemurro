@@ -34,7 +34,6 @@ public class RefuseGrade extends HttpServlet {
 			throws ServletException, IOException {
 		GradeDAO gradeDao = new GradeDAO(connection);
 
-		// control on student's rights to access the appeal
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		ErrorMsg error = null;
@@ -80,9 +79,6 @@ public class RefuseGrade extends HttpServlet {
 		// check grade is refusable (grade is neither refused nor recorded)
 		try {
 			Grade grade = gradeDao.getResultByAppealAndStudent(appId, user.getPersonId());
-			
-			System.out.println(grade.getState());
-			
 			if (grade.getState().equalsIgnoreCase("Refused") || grade.getState().equalsIgnoreCase("Recorded"))
 				throw new Exception("Grade has already been " + grade.getState().toLowerCase());
 		} catch (Exception e) {

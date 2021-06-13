@@ -44,7 +44,6 @@ public class GetResult extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User)session.getAttribute("user");
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
-		// forward to GetCourses if an error has already occurred
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
 		
 		// control on "appeal" request parameter legitimacy

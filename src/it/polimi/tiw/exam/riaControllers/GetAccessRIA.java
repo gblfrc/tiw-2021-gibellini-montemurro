@@ -14,17 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-/*
-import org.apache.commons.lang.StringEscapeUtils;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-*/
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.dao.UserDAO;
-import it.polimi.tiw.exam.forms.UserForm;
 
 @WebServlet("/GetAccessRIA")
 @MultipartConfig
@@ -40,54 +32,43 @@ public class GetAccessRIA extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		Integer personId = null;
 		String password = null;
 
+		// get credentials and check their validity
 		try {
-			personId = Integer.parseInt(request.getParameter("personId"));
+			personId = Integer.parseInt(request.getParameter("personId")); // can throw NumberFormatException
 			password = request.getParameter("password");
+			if (personId <= 0 || password == null || password.isEmpty())
+				throw new Exception(); // throws Exception
 		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			response.getWriter().println("Invalid credentials");
 			return;
 		}
 
-		UserForm uf = new UserForm(personId, password);
+		// get user after checking all parameters are legal
 		UserDAO userDAO = new UserDAO(connection);
 		User user = null;
-		
-		if (!uf.isValid()) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			String errorString="";
-			if(uf.getIdError()!=null)errorString+= uf.getIdError()+" ";
-			if(uf.getPwdError()!=null)errorString+= uf.getPwdError();
-			response.getWriter().println(errorString);
-			return;
-		} 
-		
 		try {
-			user = userDAO.getUser(personId, password);
-		} catch (SQLException e) {
+			user = userDAO.getUser(personId, password); // can throw SQLException
+			if (user == null)
+				throw new Exception(); // throws Exception
+		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			response.getWriter().println("User not found");
 			return;
 		}
 
-		if (user == null) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			response.getWriter().println("User not found");
-			return;
-		} else {
-			request.getSession().setAttribute("user", user);
-			response.setStatus(HttpServletResponse.SC_OK);
-			String json = new Gson().toJson(user);
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().println(json);
-			return;
-		}
-
+		// found a legal user --> give access to main section
+		request.getSession().setAttribute("user", user);
+		response.setStatus(HttpServletResponse.SC_OK);
+		String json = new Gson().toJson(user);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().println(json);
+		return;
 	}
 
 	public void destroy() {
