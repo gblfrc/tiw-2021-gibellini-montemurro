@@ -68,8 +68,11 @@ public class GetCourses extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		ErrorMsg error = new ErrorMsg(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Illegal request");
-		request.setAttribute("error", error);
+		ErrorMsg error=(ErrorMsg)request.getAttribute("error");
+		if(error==null) {
+			error = new ErrorMsg(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Illegal request");
+			request.setAttribute("error", error);
+		}
 		doGet(request, response);
 	}
 

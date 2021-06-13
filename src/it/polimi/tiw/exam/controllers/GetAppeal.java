@@ -44,12 +44,13 @@ public class GetAppeal extends HttpServlet {
 
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
 		// forward to GetCourses if an error has already occurred
+		
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
 		if (error != null) {
 			rd.forward(request, response);
 			return;
 		}
-
+		
 		// check course parameter validity
 		Integer cId = null;
 		try {
@@ -96,7 +97,7 @@ public class GetAppeal extends HttpServlet {
 			appeals = appealDAO.getAppealsByCourse(course.getCourseId(), user.getPersonId(), user.getAccessRights());
 		} catch (SQLException e) {
 			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					"An accidental error occurred while retrieving courses");
+					"An accidental error occurred while retrieving appeals");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;
@@ -107,6 +108,7 @@ public class GetAppeal extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("appeals", appeals);
+		ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

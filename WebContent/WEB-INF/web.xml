@@ -14,7 +14,7 @@
 	</context-param>
 	<context-param>
 		<param-name>dbPassword</param-name>
-		<param-value>ComeOnYouIrons1571@</param-value>
+		<param-value>EleSQLace1309162020ita?</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbDriver</param-name>
@@ -38,9 +38,17 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
-		<url-pattern>/GetReports</url-pattern>
-		<url-pattern>/ProfessorHome.html</url-pattern> 
-		<url-pattern>/StudentHome.html</url-pattern> 
+		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/ProfessorHome.html</url-pattern>
+		<url-pattern>/StudentHome.html</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>GetMethodFilter</filter-name>
+		<filter-class>it.polimi.tiw.exam.filters.GetMethodFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>GetMethodFilter</filter-name>
+		<url-pattern>/GetAppeal</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>ProfessorFilter</filter-name>
@@ -53,10 +61,10 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
-		<url-pattern>/GetReports</url-pattern>
-		<url-pattern>/ProfessorHome.html</url-pattern> 
+		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/ProfessorHome.html</url-pattern>
 	</filter-mapping>
-		<filter>
+	<filter>
 		<filter-name>StudentFilter</filter-name>
 		<filter-class>it.polimi.tiw.exam.filters.StudentFilter</filter-class>
 	</filter>
@@ -64,7 +72,7 @@
 		<filter-name>StudentFilter</filter-name>
 		<url-pattern>/GetResult</url-pattern>
 		<url-pattern>/RefuseGrade</url-pattern>
-		<url-pattern>/StudentHome.html</url-pattern> 
+		<url-pattern>/StudentHome.html</url-pattern>
 	</filter-mapping>
-	
+
 </web-app>
