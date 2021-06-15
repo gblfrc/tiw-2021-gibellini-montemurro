@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.dao.ReportDAO;
+import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Report;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -38,33 +40,43 @@ public class ReportRIA extends HttpServlet {
 			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Couldn't handle the request");
+			response.getWriter().println("Illegal appeal request");
 			return;
 		}
 		
 		//control on professor's rights to access the appeal
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
+		AppealDAO appealDAO= new AppealDAO(connection);
+		Appeal appeal;
 		try {
-			AppealDAO appealDAO= new AppealDAO(connection);
-			appId = Integer.parseInt(request.getParameter("appeal"));
+			appeal = appealDAO.getAppealById(appId);
+			if (appeal == null)
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Appeal not found");
+			return;
+		}
+		
+		try {
 			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new InvalidParameterException();
 			}
-		} catch (Exception e) {
+		}catch(Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Unavailable appeal");
-			return;
+			response.getWriter().println("Denied access to create report");
+			return;		
 		}
-
+		
 		//control on number of reportable grades: if none is reportable, won't create an empty report
 		GradeDAO gdao = new GradeDAO(connection);
 		try {
 			int reportableGrades = gdao.countReportableGrades(appId);
-			if (reportableGrades == 0) throw new InvalidParameterException("No grades reportable for specified appeal");
+			if (reportableGrades == 0) throw new Exception();
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println(e.getMessage());
+			response.getWriter().println("No grades reportable for specified appeal");
 			return;
 		}
 		

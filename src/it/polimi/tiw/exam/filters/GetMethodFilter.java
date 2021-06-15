@@ -10,9 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import it.polimi.tiw.exam.objects.User;
 
 public class GetMethodFilter implements Filter{
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

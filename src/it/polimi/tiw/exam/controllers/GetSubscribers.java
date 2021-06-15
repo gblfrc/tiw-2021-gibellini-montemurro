@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,10 +21,9 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
-import it.polimi.tiw.exam.dao.CourseDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Appeal;
-import it.polimi.tiw.exam.objects.Course;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -34,7 +34,7 @@ public class GetSubscribers extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
-
+	
 	public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
 		connection = ConnectionHandler.getConnection(servletContext);
@@ -46,23 +46,50 @@ public class GetSubscribers extends HttpServlet {
 		Boolean changeOrder=false;
 		String field=null;
 		Appeal appeal = null;
+		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
+		boolean entered=false;
+				
+		// forward to GetCourses if an error has already occurred
+		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+		if (error != null) {
+			rd.forward(request, response);
+			return;
+		}
 		
 		//control on professor's rights to access the appeal
 		Integer appId = null;
 		User user = (User) session.getAttribute("user");
+		AppealDAO appealDAO= new AppealDAO(connection);
 		try {
-			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appeal"));
 			//may want to change appeal parameter name to appealId to make this servlet equal to the RIA one
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new InvalidParameterException();
-			}
-			appeal = appealDAO.getAppealById(appId);
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
 		
+		try {
+			appeal = appealDAO.getAppealById(appId);  //Can throw SQLException
+			if(appeal==null)throw new Exception();
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
+		try {
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
+				throw new InvalidParameterException();
+			}
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected course");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
 		//controls on request parameters
 		try {			
 			List<String> params= Collections.list(request.getParameterNames());
@@ -70,49 +97,58 @@ public class GetSubscribers extends HttpServlet {
 			if(params.contains("changeOrder")&&
 			   !request.getParameter("changeOrder").equalsIgnoreCase("true")&&
 			   !request.getParameter("changeOrder").equalsIgnoreCase("false")) {
-					throw new InvalidParameterException("Unacceptable request");
+					entered=true;
 				}
-			params.remove("changeOrder");
+			//params.remove("changeOrder");
 			//checks "field" has legal values 
 			if(params.contains("field")) {
 				field=request.getParameter("field");  //saves "field" request parameter in a variable
 				if(!field.equalsIgnoreCase("studentId")&&!field.equalsIgnoreCase("surname")&&!field.equalsIgnoreCase("name")&&
 			      !field.equalsIgnoreCase("email")&&!field.equalsIgnoreCase("degree_course")&&!field.equalsIgnoreCase("grade")&&
 			      !field.equalsIgnoreCase("state")) {
-					throw new InvalidParameterException("Unacceptable request");
+						entered=true;
+						field="studentId";
 				}
 			}
-			params.remove("field");
 			
-			params.remove("appeal");
+			if(entered==true) throw new Exception();
+			//params.remove("field");
+			
+			//params.remove("appeal");
 			//checks there aren't too many parameters in the request
-			if(params.size()>0) throw new InvalidParameterException("Couldn't handle request"); 
+			//if(params.size()>0) throw new InvalidParameterException("Couldn't handle request"); 
 			
-			changeOrder=Boolean.parseBoolean(request.getParameter("changeOrder")); //if there is no "changeOrder" parameter, parseBoolean returns false
+			changeOrder=Boolean.parseBoolean(request.getParameter("changeOrder")); 
+			//if there is no "changeOrder" parameter, parseBoolean returns false
+			
 			//checks existence of the attribute related to "field" request parameter (and handles it)
-			if((session.getAttribute(field + "Order")==null||session.getAttribute(field+ "Order")=="DESC") && changeOrder) {
-				session.setAttribute(field + "Order", "ASC");
-			}
-			else if(session.getAttribute(field + "Order")=="ASC" && changeOrder) {
-				session.setAttribute(field + "Order", "DESC");
-			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-			return;
+			changeOrder=false;
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal sorting request");	
 		}
-		
+				
+		if((session.getAttribute(field + "Order")==null||session.getAttribute(field+ "Order")=="DESC") && changeOrder) {
+			session.setAttribute(field + "Order", "ASC");
+		}
+		else if(session.getAttribute(field + "Order")=="ASC" && changeOrder) {
+			session.setAttribute(field + "Order", "DESC");
+		}
+	
 		//get list of grades (in specific order)
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		List<Grade> grades= new ArrayList<Grade>();
-		
+
 		try {
-			if(user.getAccessRights().equals("Professor")) {
+			//if(user.getAccessRights().equals("Professor")) {
 				if(field==null || session.getAttribute(field+ "Order")==null) grades=gradeDAO.getGradesByAppealId(appId);
 				else if (session.getAttribute(field + "Order")=="ASC") grades=gradeDAO.getGradesByFieldAsc(appId,field);
 				else if (session.getAttribute(field + "Order")=="DESC") grades=gradeDAO.getGradesByFieldDesc(appId,field);
-			}
+			//}
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find grades");
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while retrieving subscribers");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
 		String path = "/WEB-INF/Subscribers.html";
@@ -120,6 +156,7 @@ public class GetSubscribers extends HttpServlet {
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("appeal", appeal);
 		ctx.setVariable("grades", grades);
+		ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
 		templateEngine.process(path, ctx, response.getWriter());
 		
 	}

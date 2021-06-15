@@ -1,6 +1,7 @@
 package it.polimi.tiw.exam.riaControllers;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -16,6 +17,7 @@ import com.google.gson.Gson;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -43,30 +45,51 @@ public class GetModifyRIA extends HttpServlet {
 		int appealId;
 		try {
 			appealId = Integer.parseInt(request.getParameter("appealId"));
-			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Unavailable appeal");
+			response.getWriter().println("Illegal appeal request");
 			return;
 		}
 
+		Appeal appeal;
+		try {
+			appeal = appealDAO.getAppealById(appealId);  //Can throw SQLException
+			if(appeal==null)throw new Exception();
+		}catch(Exception e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Appeal not found");
+			return;
+		}
+		
+		try {
+			if(!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
+				throw new InvalidParameterException();
+			}
+		}catch(Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Denied access to selected course");
+			return;
+		}
+		
 		int studentId;
 		try {
 			studentId = Integer.parseInt(request.getParameter("studentId"));
-			
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Illegal student request");
+			return;
+		}
+		
+		try {
 			if (!appealDAO.hasAppeal(appealId, studentId, "Student")) {
 				throw new Exception();
 			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		}catch(Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Unavailable student");
 			return;
 		}
-
+		
 		try {
 			grade = gradeDAO.getResultByAppealAndStudent(appealId, studentId);
 			if (!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) {
@@ -77,15 +100,7 @@ public class GetModifyRIA extends HttpServlet {
 			response.getWriter().println("Grade has already been published");
 			return;
 		}
-
-		Appeal appeal = null;
-		try {
-			appeal = appealDAO.getAppealById(appealId);
-		} catch (SQLException e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.getWriter().println("Not possible to find courses");
-			return;
-		}
+		
 		//may want to update usage of appeal object (may be an unnecessary object)
 		String json = new Gson().toJson(grade);
 		String json1 = new Gson().toJson(appeal);

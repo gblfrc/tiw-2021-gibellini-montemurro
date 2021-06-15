@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -34,26 +36,40 @@ public class GetSubscribersRIA extends HttpServlet {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
 		HttpSession session = request.getSession();
-		Boolean changeOrder=false;
-		String field=null;
 		
 		//control on professor's rights to access the appeal
 		Integer appId = null;
 		User user = (User) session.getAttribute("user");
 		try {
-			AppealDAO appealDAO= new AppealDAO(connection);
 			appId = Integer.parseInt(request.getParameter("appealId"));
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new InvalidParameterException();
-			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Unavailable appeal");
+			response.getWriter().println("Illegal appeal request");
 			return;
 		}
 		
+		AppealDAO appealDAO= new AppealDAO(connection);
+		Appeal appeal = null;
+		try {
+			appeal = appealDAO.getAppealById(appId);  //Can throw SQLException
+			if(appeal==null)throw new Exception();
+		}catch(Exception e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Appeal not found");
+			return;
+		}
+		
+		try {
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
+				throw new InvalidParameterException();
+			}
+		}catch(Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println( "Denied access to selected course");
+			return;
+		}
+
 		//get list of grades (in specific order)
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		List<Grade> grades= new ArrayList<Grade>();
@@ -64,7 +80,7 @@ public class GetSubscribersRIA extends HttpServlet {
 			}
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.getWriter().println("Not possible to find grades");
+			response.getWriter().println("An accidental error occurred while retrieving grades");
 			return;
 		}
 		

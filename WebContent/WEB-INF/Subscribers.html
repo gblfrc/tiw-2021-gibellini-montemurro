@@ -17,7 +17,7 @@
 		<h1>Welcome to subscribers page</h1>
 		<table>
 			<thead>
-				<tr>
+				<tr >
 					<th><a href="Login.html"
 						th:href="@{/GetSubscribers(appeal=${appeal.appealId},field='studentId',changeOrder='true')}">StudentId</a></th>
 					<th><a href="Login.html"
@@ -72,6 +72,10 @@
 			<input type="hidden" name="appeal" th:value="${appeal.appealId}"><input
 				type="submit" value="See all reports">
 		</form>
+		<p class="error" th:if="${error != null}"
+			th:text="${error.status} + ': ' + ${error.message}">Arma virumque
+			cano, Troiae qui primus ab oris
+		</p>
 	</div>
 </body>
 </html>

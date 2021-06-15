@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -49,41 +50,51 @@ public class EditRIA extends HttpServlet {
 		}
 		
 		AppealDAO appealDAO = new AppealDAO(connection);
+		Appeal appeal;
 		try {
-			appealId = Integer.parseInt(request.getParameter("appealId"));
+			appeal = appealDAO.getAppealById(appealId);
+			if (appeal == null)
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Appeal not found");
+			return;
+		}
+		try {
 			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
 				throw new Exception();
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Unavailable appeal");
+			response.getWriter().println("Denied access to edit grades");
 			return;
 		}
 		
 		GradeDAO gradeDAO= new GradeDAO(connection);
+		Grade grade;
 		try {
-			Grade grade=gradeDAO.getResultByAppealAndStudent(appealId,studentId);
-			if(grade==null) throw new Exception("Nonexistent student");
-			if(!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) throw new Exception("Uneditable grade");
+			grade=gradeDAO.getResultByAppealAndStudent(appealId,studentId);
+			if(grade==null) throw new Exception();
 		}catch(Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println(e.getMessage());
-			return;
-		}
-		try {
-			gradeDAO.enterGrade(appealId,studentId,gradeValue);
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Impossible to enter grade");
+			response.getWriter().println("Nonexistent student");
 			return;
 		}
 		
-		Appeal appeal = null;
 		try {
-			appeal = appealDAO.getAppealById(appealId);
+			if(!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) throw new Exception();
+		}catch(Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Uneditable grade");
+			return;
+		}
+		
+		try {
+			gradeDAO.enterGrade(appealId,studentId,gradeValue);
 		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			response.getWriter().println("Impossible to retrieve appeal");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while entering grades");
+			return;
 		}
 		
 		String json = new Gson().toJson(appeal);

@@ -1,9 +1,10 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
-import java.sql.SQLException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,6 +19,7 @@ import org.thymeleaf.context.WebContext;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -44,30 +46,68 @@ public class GetModify extends HttpServlet {
 		User user = (User) session.getAttribute("user");
 		GradeDAO gradeDAO = new GradeDAO(connection);
 		Grade grade = null;
-
+		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
+		
+		// forward to GetCourses if an error has already occurred
+		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+		if (error != null) {
+			System.out.println("ERRORE");
+			rd.forward(request, response);
+			return;
+		}
+		
 		AppealDAO appealDAO = new AppealDAO(connection);
 		int appealId;
 		try {
 			appealId = Integer.parseInt(request.getParameter("appealId"));
-			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable appeal");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
-
+		
+		Appeal appeal;
+		try {
+			appeal = appealDAO.getAppealById(appealId);  //Can throw SQLException
+			if(appeal==null)throw new Exception();
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
+		try {
+			if(!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
+				throw new InvalidParameterException();
+			}
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected course");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+	
 		int studentId;
+		
 		try {
 			studentId = Integer.parseInt(request.getParameter("studentId"));
-			
+		} catch (Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal student request");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
+		try {
 			if (!appealDAO.hasAppeal(appealId, studentId, "Student")) {
 				throw new Exception();
 			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unavailable student ");
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Unavailable student");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
 
@@ -77,15 +117,9 @@ public class GetModify extends HttpServlet {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Grade has already been published");
-			return;
-		}
-
-		Appeal appeal = null;
-		try {
-			appeal = appealDAO.getAppealById(appealId);
-		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to find courses");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Grade has already been published");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
 			return;
 		}
 
