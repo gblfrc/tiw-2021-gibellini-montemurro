@@ -49,6 +49,21 @@
 	<filter-mapping>
 		<filter-name>GetMethodFilter</filter-name>
 		<url-pattern>/GetAppeal</url-pattern>
+		<url-pattern>/GetModify</url-pattern>
+		<url-pattern>/GetSubscribers</url-pattern>
+		<url-pattern>/GetReports</url-pattern>
+		<url-pattern>/GetResult</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>PostMethodFilter</filter-name>
+		<filter-class>it.polimi.tiw.exam.filters.PostMethodFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>PostMethodFilter</filter-name>
+		<url-pattern>/Edit</url-pattern>
+		<url-pattern>/CreateReport</url-pattern>
+		<url-pattern>/PublishGrade</url-pattern>
+		<url-pattern>/RefuseGrade</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>ProfessorFilter</filter-name>
