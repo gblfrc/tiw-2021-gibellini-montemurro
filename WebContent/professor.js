@@ -535,8 +535,8 @@
         let toSend = JSON.stringify(array);
         makeCall ("POST", "MultipleEditRIA", toSend, (req) => {
           if (req.readyState === 4){
-    		if(req.status === 200|| req.status === 206){
             multipleEdit.hide();
+    		if(req.status === 200|| req.status === 206){
             let appeal = JSON.parse(req.responseText);
             subscribers.show(appeal.appealId, appeal.date);
           }

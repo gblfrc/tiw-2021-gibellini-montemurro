@@ -36,15 +36,12 @@ public class MultipleEditRIA extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
-		int appealId = 0;
-		int studentId;
-		String gradeValue;
-		Gson gson = new Gson();
+		int appId = 0;
 		List<JsonObject> jlist = null;
 		int i;
-		boolean badRequest = false;
 
 		// save request body into a string object, then create a JsonArray with the info
 		// from the forms
@@ -56,38 +53,51 @@ public class MultipleEditRIA extends HttpServlet {
 			for (i = 0; i < temp.size(); i++) {
 				JsonObject tempObj = temp.get(i).getAsJsonObject();
 				if (i == 0)
-					appealId = tempObj.get("appealId").getAsInt(); // may want to check behavior with null (should throw exception)
+					appId = tempObj.get("appealId").getAsInt(); // may want to check behavior with null (should throw exception)
+				//discard grades which are yet not entered
 				if (!tempObj.get("gradeValue").getAsString().equals("")) {
 					jlist.add(temp.get(i).getAsJsonObject());
 				}
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Incorrect param values");
+			response.getWriter().println("Illegal request: couldn't recognize appeal");
 			return;
 		}
 
 		// check all grades share the same appealId
 		try {
 			for (i = 0; i < jlist.size(); i++) {
-				if (jlist.get(i).get("appealId").getAsInt() != appealId)
+				if (jlist.get(i).get("appealId").getAsInt() != appId)
 					throw new Exception();
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Illegal request for given appeal");
+			response.getWriter().println("Illegal request: found grades for different appeals");
 			return;
 		}
 
-		//check professor has the rights to access appeal information
-		AppealDAO appealDAO = new AppealDAO(connection);
+		// check existence of selected appeal
+		Appeal appeal = null;
+		AppealDAO adao = new AppealDAO(connection);
 		try {
-			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
+			appeal = adao.getAppealById(appId);
+			if (appeal == null)
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Appeal not found");
+			return;
+		}
+
+		// control on professor's rights to access the appeal
+		try {
+			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new Exception();
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Unavailable appeal");
+			response.getWriter().println("Denied access to selected appeal");
 			return;
 		}
 		
@@ -96,8 +106,8 @@ public class MultipleEditRIA extends HttpServlet {
 		try {
 			for (i = 0; i < jlist.size(); i++) {
 				if (jlist.get(i).get("studentId") == null)
-					throw new Exception("Nonexistent student");
-				Grade grade = gradeDAO.getResultByAppealAndStudent(appealId, jlist.get(i).get("studentId").getAsInt());
+					throw new Exception("Illegal student request");
+				Grade grade = gradeDAO.getResultByAppealAndStudent(appId, jlist.get(i).get("studentId").getAsInt());
 				if (grade == null)
 					throw new Exception("Undefined grade for a student");
 				if (!grade.getState().equalsIgnoreCase("not entered"))
@@ -113,7 +123,7 @@ public class MultipleEditRIA extends HttpServlet {
 		try {
 			for (i = 0; i < jlist.size(); i++) {
 				if (jlist.get(i).get("gradeValue") == null)
-					throw new Exception("Illegal request for grades");
+					throw new Exception();
 				String tempGrade = jlist.get(i).get("gradeValue").getAsString();
 				if (!tempGrade.equalsIgnoreCase("absent") && !tempGrade.equalsIgnoreCase("failed") &&!tempGrade.equalsIgnoreCase("recalled") &&
 						!tempGrade.equalsIgnoreCase("18") &&!tempGrade.equalsIgnoreCase("19") &&!tempGrade.equalsIgnoreCase("20") && 
@@ -121,33 +131,24 @@ public class MultipleEditRIA extends HttpServlet {
 						!tempGrade.equalsIgnoreCase("24") &&!tempGrade.equalsIgnoreCase("25") &&!tempGrade.equalsIgnoreCase("26") && 
 						!tempGrade.equalsIgnoreCase("27") &&!tempGrade.equalsIgnoreCase("28") &&!tempGrade.equalsIgnoreCase("29") && 
 						!tempGrade.equalsIgnoreCase("30") &&!tempGrade.equalsIgnoreCase("30 with merit"))
-					throw new Exception("Illegal request for grades");
+					throw new Exception();
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println(e.getMessage());			
+			response.getWriter().println("Illegal grade request");			
 			return;
 		}
 
 		
 		for (i = 0; i < jlist.size(); i++) {
 			try {
-				gradeDAO.enterGrade(appealId, jlist.get(i).get("studentId").getAsInt(),	jlist.get(i).get("gradeValue").getAsString());
+				gradeDAO.enterGrade(appId, jlist.get(i).get("studentId").getAsInt(), jlist.get(i).get("gradeValue").getAsString());
 			} catch (Exception e) {
-				//having checked the legality of submitted JSON objects, this part should actually be unreachable
+				//having checked the legality of received JSON objects, this part should actually be unreachable
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 				response.getWriter().println("An error occurred while entering grades; some have been entered, some haven't");
 				return;
 			}
-		}
-
-		Appeal appeal = null;
-		try {
-			appeal = appealDAO.getAppealById(appealId);
-		} catch (Exception e) {
-			//having checked the legality of submitted JSON objects, this part should actually be unreachable
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			response.getWriter().println("Couldn't retrieve the appeal");
 		}
 
 		String json = new Gson().toJson(appeal);
