@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 
 import it.polimi.tiw.exam.dao.CourseDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Course;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -53,6 +54,16 @@ public class GetCoursesRIA extends HttpServlet {
 			return;
 		}
 
+		//security check
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			secDAO.clearRow(user.getPersonId());
+		}catch(SQLException e){
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while updating security settings");
+			return;
+		}
+		
 		// build response object and send it
 		String json = new Gson().toJson(courses);
 		response.setContentType("application/json");

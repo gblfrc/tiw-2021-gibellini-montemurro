@@ -100,6 +100,7 @@ public class GetAppeal extends HttpServlet {
 			return;
 		}
 
+		//security: setting last visited course
 		SecurityDAO secDAO=new SecurityDAO(connection);
 		try {
 			secDAO.setLastCourse(user.getPersonId(), cId);

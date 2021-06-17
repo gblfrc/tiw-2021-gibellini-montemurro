@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.dao.UserDAO;
 
 @WebServlet("/GetAccessRIA")
@@ -61,6 +62,25 @@ public class GetAccessRIA extends HttpServlet {
 			return;
 		}
 
+		//remove previously entered security row (if logout hadn't been done)
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			secDAO.removeRow(user.getPersonId());
+		}catch(SQLException e){
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while updating security settings");
+			return;
+		}
+		
+		//insert new security row
+		try {
+			secDAO.insertRow(user.getPersonId());
+		}catch(SQLException e){
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while updating security settings");
+			return;
+		}
+		
 		// found a legal user --> give access to main section
 		request.getSession().setAttribute("user", user);
 		response.setStatus(HttpServletResponse.SC_OK);

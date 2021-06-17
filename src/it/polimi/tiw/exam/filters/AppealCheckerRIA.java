@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -16,12 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
-import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
-
-public class AppealChecker implements Filter{	
+public class AppealCheckerRIA implements Filter{	
 	private Connection connection;
 	
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -29,15 +26,14 @@ public class AppealChecker implements Filter{
 		System.out.print("Checking appeal's existence ...\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
-		// check if the logged user is a professor
 
+		// control on "appeal" request parameter legitimacy
 		int appId;
 		try {
 			appId = Integer.parseInt(req.getParameter("appeal"));
 		} catch (Exception e) {
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
-			rd.forward(req, res);
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Illegal appeal request");
 			return;
 		}
 		
@@ -50,11 +46,12 @@ public class AppealChecker implements Filter{
 			if (appeal == null)
 				throw new Exception();
 		} catch (Exception e) {
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
-			rd.forward(req, res);
+			res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			res.getWriter().println("Appeal not found");
 			return;
 		}
 		
+		// control on user's rights to access the appeal
 		User user=(User)req.getSession().getAttribute("user");
 		try {
 			if(user.getAccessRights().equalsIgnoreCase("Professor")) {
@@ -68,23 +65,21 @@ public class AppealChecker implements Filter{
 				}
 			}
 		}catch(Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST,  "Denied access to edit grades");
-			request.setAttribute("error", error);
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
-			rd.forward(request, response);
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Access denied to selected appeal");
 			return;
 		}
 		
+		//security: get last-visited appeal
 		SecurityDAO secDAO=new SecurityDAO(connection);
 		try {
 			if(secDAO.getLastAppeal(user.getPersonId())!=appId) throw new Exception();
 		}catch(Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
-			request.setAttribute("error", error);
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
-			rd.forward(request, response);
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Access denied for security reasons");
 			return;
 		}
+		
 		// pass the request along the filter chain
 		chain.doFilter(request, response);
 	}

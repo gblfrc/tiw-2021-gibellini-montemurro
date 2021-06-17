@@ -101,7 +101,7 @@
           let text = document.createTextNode(array[i].date);
           anchor.appendChild(text);
           anchor.setAttribute("href", "#");
-          anchor.setAttribute("appealId", array[i].appealId);
+          anchor.setAttribute("appeal", array[i].appealId);
           dateCell.appendChild(anchor);
           newRow.appendChild(dateCell);
           appealList.appeals.appendChild(newRow);
@@ -111,7 +111,7 @@
             subscribers.clear();
             reports.hide();
             let date = e.target.innerText;
-            subscribers.show(e.target.getAttribute('appealId'), date);
+            subscribers.show(e.target.getAttribute('appeal'), date);
           });
         }
       }
@@ -132,10 +132,10 @@
       if (buttons !== undefined) buttons.hide();
     }
     this.show = function show(appealId, date){
-      makeCall("GET", "GetSubscribersRIA?appealId=" + appealId, null, this.update);
+      makeCall("GET", "GetSubscribersRIA?appeal=" + appealId, null, this.update);
       buttons.show(appealId);
       this.message.innerText = "Here is the list of students who took part the appeal on " + date.toUpperCase();
-      this.element.setAttribute("appealId", appealId); //may want to save appealId in a different var
+      this.element.setAttribute("appeal", appealId); //may want to save appealId in a different var
       this.element.removeAttribute("style");
     }
     this.clear = function clear() {
@@ -205,8 +205,8 @@
             //set appeal input
             let appealInput = document.createElement("input");
             appealInput.setAttribute("type", "hidden");
-            appealInput.setAttribute("name", "appealId");
-            appealInput.setAttribute("value", subscribers.element.getAttribute("appealId"));
+            appealInput.setAttribute("name", "appeal");
+            appealInput.setAttribute("value", subscribers.element.getAttribute("appeal"));
             form.appendChild(appealInput);
             //create button
             let button = document.createElement("input");
@@ -237,7 +237,7 @@
 
   function EditForm(){
     this.studentId = document.querySelector("div.Edit div.studentId");
-    this.appealId = document.querySelector("div.Edit input[name='appealId']");
+    this.appealId = document.querySelector("div.Edit input[name='appeal']");
     this.name = document.querySelector("div.Edit div.name");
     this.surname = document.querySelector("div.Edit div.surname");
     this.courseTitle = document.querySelector("div.Edit div.courseTitle");
@@ -249,7 +249,7 @@
       this.element.style.display = "none";
     }
     this.show = function show(appealId, studentId){
-      makeCall("GET", "GetModifyRIA?appealId=" + appealId + "&studentId=" + studentId, null, this.update);
+      makeCall("GET", "GetModifyRIA?appeal=" + appealId + "&studentId=" + studentId, null, this.update);
       //may want to find a better way to express the url
       this.studentId.setAttribute("value", studentId);
       this.appealId.setAttribute("value", appealId);
@@ -282,10 +282,16 @@
           e.preventDefault();
           let form = e.target.closest("form");
           makeCall("POST", "EditRIA", new FormData(form), function(req){
-            if (req.readyState === 4 && req.status === 200){
-              let appeal = JSON.parse(req.responseText);
-              subscribers.show(appeal.appealId, appeal.date);
-            }
+            if (req.readyState === 4){
+				if( req.status === 200){
+	              let appeal = JSON.parse(req.responseText);
+	              subscribers.show(appeal.appealId, appeal.date);
+	            }
+				else {
+					document.querySelector("div.main").appendChild(errorManager(req));
+					//document.querySelector("div.Edit").style.display="none";
+				}
+			} 
           });
         })
 		} 
@@ -586,7 +592,7 @@
           tbody.appendChild(newRow);
           newRow.addEventListener("click", rowSelector);
         }
-        multipleEdit.element.setAttribute("appealId", array[0].appealId);
+        multipleEdit.element.setAttribute("appeal", array[0].appealId);
         let mebg = multipleEdit.element.closest("div.mebg");
         mebg.classList.add("active");
       }

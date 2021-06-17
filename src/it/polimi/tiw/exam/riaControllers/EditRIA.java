@@ -2,9 +2,7 @@ package it.polimi.tiw.exam.riaControllers;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -17,8 +15,8 @@ import com.google.gson.Gson;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
-import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -35,12 +33,12 @@ public class EditRIA extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
-		int appealId;
+		int appId;
 		int studentId;
 		String gradeValue;
 		
 		try {
-			appealId=Integer.parseInt(request.getParameter("appealId"));
+			appId=Integer.parseInt(request.getParameter("appeal"));
 			studentId=Integer.parseInt(request.getParameter("studentId"));
 			gradeValue=request.getParameter("gradeValue");
 		}catch(NumberFormatException e) {
@@ -49,10 +47,20 @@ public class EditRIA extends HttpServlet {
 			return;
 		}
 		
+		//security: get last-visited student
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			if(secDAO.getLastStudent(user.getPersonId())!=studentId) throw new Exception();
+		}catch(Exception e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Access denied for security reasons");
+			return;
+		}
+		
 		AppealDAO appealDAO = new AppealDAO(connection);
 		Appeal appeal;
 		try {
-			appeal = appealDAO.getAppealById(appealId);
+			appeal = appealDAO.getAppealById(appId);
 			if (appeal == null)
 				throw new Exception();
 		} catch (Exception e) {
@@ -60,20 +68,11 @@ public class EditRIA extends HttpServlet {
 			response.getWriter().println("Appeal not found");
 			return;
 		}
-		try {
-			if (!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Denied access to edit grades");
-			return;
-		}
 		
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		Grade grade;
 		try {
-			grade=gradeDAO.getResultByAppealAndStudent(appealId,studentId);
+			grade=gradeDAO.getResultByAppealAndStudent(appId,studentId);
 			if(grade==null) throw new Exception();
 		}catch(Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -90,7 +89,7 @@ public class EditRIA extends HttpServlet {
 		}
 		
 		try {
-			gradeDAO.enterGrade(appealId,studentId,gradeValue);
+			gradeDAO.enterGrade(appId,studentId,gradeValue);
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("An accidental error occurred while entering grades");

@@ -3,7 +3,6 @@ package it.polimi.tiw.exam.riaControllers;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +16,6 @@ import com.google.gson.Gson;
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Appeal;
-import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -42,9 +40,9 @@ public class GetModifyRIA extends HttpServlet {
 		Grade grade = null;
 
 		AppealDAO appealDAO = new AppealDAO(connection);
-		int appealId;
+		int appId;
 		try {
-			appealId = Integer.parseInt(request.getParameter("appealId"));
+			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Illegal appeal request");
@@ -53,7 +51,7 @@ public class GetModifyRIA extends HttpServlet {
 
 		Appeal appeal;
 		try {
-			appeal = appealDAO.getAppealById(appealId);  //Can throw SQLException
+			appeal = appealDAO.getAppealById(appId);  //Can throw SQLException
 			if(appeal==null)throw new Exception();
 		}catch(Exception e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -62,7 +60,7 @@ public class GetModifyRIA extends HttpServlet {
 		}
 		
 		try {
-			if(!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new InvalidParameterException();
 			}
 		}catch(Exception e) {
@@ -81,7 +79,7 @@ public class GetModifyRIA extends HttpServlet {
 		}
 		
 		try {
-			if (!appealDAO.hasAppeal(appealId, studentId, "Student")) {
+			if (!appealDAO.hasAppeal(appId, studentId, "Student")) {
 				throw new Exception();
 			}
 		}catch(Exception e) {
@@ -91,7 +89,7 @@ public class GetModifyRIA extends HttpServlet {
 		}
 		
 		try {
-			grade = gradeDAO.getResultByAppealAndStudent(appealId, studentId);
+			grade = gradeDAO.getResultByAppealAndStudent(appId, studentId);
 			if (!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) {
 				throw new Exception();
 			}

@@ -74,8 +74,8 @@ public class GetAccess extends HttpServlet {
 		// found a legal user --> give access to main section
 		request.getSession().setAttribute("user", user);
 		
+		//remove previously entered security row (if logout hadn't been done)
 		SecurityDAO secDAO=new SecurityDAO(connection);
-		
 		try {
 			secDAO.removeRow(user.getPersonId());
 		}catch(SQLException e){
@@ -86,6 +86,7 @@ public class GetAccess extends HttpServlet {
 			return;
 		}
 		
+		//insert new security row
 		try {
 			secDAO.insertRow(user.getPersonId());
 		}catch(SQLException e){

@@ -5,7 +5,6 @@ import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -20,8 +19,8 @@ import com.google.gson.Gson;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
-import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -42,7 +41,7 @@ public class GetSubscribersRIA extends HttpServlet {
 		Integer appId = null;
 		User user = (User) session.getAttribute("user");
 		try {
-			appId = Integer.parseInt(request.getParameter("appealId"));
+			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Illegal appeal request");
@@ -57,6 +56,16 @@ public class GetSubscribersRIA extends HttpServlet {
 		}catch(Exception e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			response.getWriter().println("Appeal not found");
+			return;
+		}
+		
+		//security: get last-visited course
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			if(secDAO.getLastCourse(user.getPersonId())!=appeal.getCourseId()) throw new Exception();
+		}catch(Exception e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Access denied for security reasons");
 			return;
 		}
 		
@@ -81,6 +90,15 @@ public class GetSubscribersRIA extends HttpServlet {
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("An accidental error occurred while retrieving grades");
+			return;
+		}
+		
+		//security: set last-visited appeal
+		try {
+			secDAO.setLastAppeal(user.getPersonId(), appId);
+		}catch(SQLException e){
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while updating security settings");
 			return;
 		}
 		

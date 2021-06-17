@@ -58,6 +58,7 @@ public class GetCourses extends HttpServlet {
 					"An accidental error occurred while retrieving courses");
 		}
 
+		//security check
 		SecurityDAO secDAO=new SecurityDAO(connection);
 		try {
 			secDAO.clearRow(user.getPersonId());

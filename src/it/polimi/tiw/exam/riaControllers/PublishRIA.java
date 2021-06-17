@@ -10,14 +10,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Appeal;
-import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
 @WebServlet("/PublishRIA")
@@ -33,11 +31,9 @@ public class PublishRIA extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		HttpSession session = request.getSession();
 		Integer appId = null;
-		User user = (User) session.getAttribute("user");
 
-		// control on "appeal" request parameter legitimacy
+		// get appeal Id
 		try {
 			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
@@ -46,7 +42,7 @@ public class PublishRIA extends HttpServlet {
 			return;
 		}
 
-		// check existence of selected appeal
+		// fetch selected appeal
 		Appeal appeal = null;
 		AppealDAO adao = new AppealDAO(connection);
 		try {
@@ -56,17 +52,6 @@ public class PublishRIA extends HttpServlet {
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			response.getWriter().println("Appeal not found");
-			return;
-		}
-
-		// control on professor's rights to access the appeal
-		try {
-			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Denied access to selected appeal");
 			return;
 		}
 

@@ -72,6 +72,17 @@ public class GetResult extends HttpServlet {
 			return;
 		}
 		
+		//security: get last-visited course
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			if(secDAO.getLastCourse(user.getPersonId())!=appeal.getCourseId()) throw new Exception();
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		//control on student's rights to access the appeal
 		try {
 			if(!adao.hasAppeal(appId, user.getPersonId(), "Student")) {
@@ -97,7 +108,7 @@ public class GetResult extends HttpServlet {
 			return;
 		}
 
-		SecurityDAO secDAO=new SecurityDAO(connection);
+		//security: set last-visited appeal
 		try {
 			secDAO.setLastAppeal(user.getPersonId(), appId);
 		}catch(SQLException e){

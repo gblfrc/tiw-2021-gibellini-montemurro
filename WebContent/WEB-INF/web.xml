@@ -14,7 +14,7 @@
 	</context-param>
 	<context-param>
 		<param-name>dbPassword</param-name>
-		<param-value>EleSQLace1309162020ita?</param-value>
+		<param-value>ComeOnYouIrons1571@</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbDriver</param-name>
@@ -101,5 +101,19 @@
 		<url-pattern>/CreateReport</url-pattern>
 		<url-pattern>/GetReports</url-pattern>
 		<url-pattern>/RefuseGrade</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>AppealCheckerRIA</filter-name>
+		<filter-class>it.polimi.tiw.exam.filters.AppealCheckerRIA</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AppealCheckerRIA</filter-name>
+		<url-pattern>/GetModifyRIA</url-pattern>
+		<url-pattern>/EditRIA</url-pattern>
+		<url-pattern>/PublishRIA</url-pattern>
+		<url-pattern>/ReportRIA</url-pattern>
+		<url-pattern>/GetReportsRIA</url-pattern>
+		<url-pattern>/RefuseGradeRIA</url-pattern>
+		<url-pattern>/GetNotEnteredRIA</url-pattern>
 	</filter-mapping>
 </web-app>

@@ -28,9 +28,9 @@ public class Logout extends HttpServlet {
 			throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
 		if (session != null) {
-			SecurityDAO secDAO=new SecurityDAO(connection);
 			try {
 				User user=(User)session.getAttribute("user");
+				SecurityDAO secDAO=new SecurityDAO(connection);
 				secDAO.removeRow(user.getPersonId());
 			}catch(SQLException e){
 			}

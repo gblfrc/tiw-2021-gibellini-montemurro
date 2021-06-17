@@ -104,12 +104,12 @@
 			anchor.appendChild(textContent);
 			newRow.appendChild(newLink);
 			anchor.setAttribute("href", "#");
-          	anchor.setAttribute("appealId", appeals[i].appealId);
+          	anchor.setAttribute("appeal", appeals[i].appealId);
 			anchor.addEventListener("click", (e) => {
 				gradeDetails.clear();
 				gradeDetails.hide();
 				let date =e.target.innerText;
-				gradeDetails.show(e.target.getAttribute("appealId"),date);
+				gradeDetails.show(e.target.getAttribute("appeal"),date);
 			});
 			document.querySelector("div[class='appeals']>table>tbody").appendChild(newRow);
 		}

@@ -12,15 +12,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 
-import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.ReportDAO;
-import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.Report;
-import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
 @WebServlet("/GetReportsRIA")
@@ -43,32 +39,6 @@ public class GetReportsRIA extends HttpServlet {
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Illegal appeal request");
-			return;
-		}
-
-		// check existence of selected appeal
-		Appeal appeal = null;
-		AppealDAO adao = new AppealDAO(connection);
-		try {
-			appeal = adao.getAppealById(appId);
-			if (appeal == null)
-				throw new Exception();
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			response.getWriter().println("Appeal not found");
-			return;
-		}
-
-		// control on professor's rights to access the appeal
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
-		try {
-			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Denied access to selected course");
 			return;
 		}
 

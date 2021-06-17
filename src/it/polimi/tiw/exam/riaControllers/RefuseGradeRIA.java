@@ -13,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
-import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
@@ -49,31 +47,7 @@ public class RefuseGradeRIA extends HttpServlet {
 			return;
 		}
 
-		// check existence of selected appeal
-		Appeal appeal = null;
-		AppealDAO adao = new AppealDAO(connection);
-		try {
-			appeal = adao.getAppealById(appId);
-			if (appeal == null)
-				throw new Exception();
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			response.getWriter().println("Appeal not found");
-			return;
-		}
-
-		// control on student's rights to access the appeal
-		try {
-			if (!adao.hasAppeal(appId, user.getPersonId(), "Student")) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("No grade found for selected appeal");
-			return;
-		}
-
-		// check grade is refusable (grade is neither refused nor recorded)
+		// check grade is refutable (grade is neither refused nor recorded)
 		try {
 			Grade grade = gradeDao.getResultByAppealAndStudent(appId, user.getPersonId());
 			if (grade.getState().equalsIgnoreCase("Refused") || grade.getState().equalsIgnoreCase("Recorded"))

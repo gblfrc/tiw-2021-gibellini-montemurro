@@ -19,6 +19,7 @@ import com.google.gson.JsonObject;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
@@ -36,7 +37,7 @@ public class MultipleEditRIA extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		int appId = 0;
@@ -53,8 +54,9 @@ public class MultipleEditRIA extends HttpServlet {
 			for (i = 0; i < temp.size(); i++) {
 				JsonObject tempObj = temp.get(i).getAsJsonObject();
 				if (i == 0)
-					appId = tempObj.get("appealId").getAsInt(); // may want to check behavior with null (should throw exception)
-				//discard grades which are yet not entered
+					appId = tempObj.get("appealId").getAsInt(); // may want to check behavior with null (should throw
+																// exception)
+				// discard grades which are yet not entered
 				if (!tempObj.get("gradeValue").getAsString().equals("")) {
 					jlist.add(temp.get(i).getAsJsonObject());
 				}
@@ -62,6 +64,17 @@ public class MultipleEditRIA extends HttpServlet {
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Illegal request: couldn't recognize appeal");
+			return;
+		}
+
+		// security: get last-visited appeal
+		SecurityDAO secDAO = new SecurityDAO(connection);
+		try {
+			if (secDAO.getLastAppeal(user.getPersonId()) != appId)
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Access denied for security reasons");
 			return;
 		}
 
@@ -100,7 +113,7 @@ public class MultipleEditRIA extends HttpServlet {
 			response.getWriter().println("Denied access to selected appeal");
 			return;
 		}
-		
+
 		// check all students have 'not entered' grade for that appeal
 		GradeDAO gradeDAO = new GradeDAO(connection);
 		try {
@@ -125,28 +138,33 @@ public class MultipleEditRIA extends HttpServlet {
 				if (jlist.get(i).get("gradeValue") == null)
 					throw new Exception();
 				String tempGrade = jlist.get(i).get("gradeValue").getAsString();
-				if (!tempGrade.equalsIgnoreCase("absent") && !tempGrade.equalsIgnoreCase("failed") &&!tempGrade.equalsIgnoreCase("recalled") &&
-						!tempGrade.equalsIgnoreCase("18") &&!tempGrade.equalsIgnoreCase("19") &&!tempGrade.equalsIgnoreCase("20") && 
-						!tempGrade.equalsIgnoreCase("21") &&!tempGrade.equalsIgnoreCase("22") &&!tempGrade.equalsIgnoreCase("23") && 
-						!tempGrade.equalsIgnoreCase("24") &&!tempGrade.equalsIgnoreCase("25") &&!tempGrade.equalsIgnoreCase("26") && 
-						!tempGrade.equalsIgnoreCase("27") &&!tempGrade.equalsIgnoreCase("28") &&!tempGrade.equalsIgnoreCase("29") && 
-						!tempGrade.equalsIgnoreCase("30") &&!tempGrade.equalsIgnoreCase("30 with merit"))
+				if (!tempGrade.equalsIgnoreCase("absent") && !tempGrade.equalsIgnoreCase("failed")
+						&& !tempGrade.equalsIgnoreCase("recalled") && !tempGrade.equalsIgnoreCase("18")
+						&& !tempGrade.equalsIgnoreCase("19") && !tempGrade.equalsIgnoreCase("20")
+						&& !tempGrade.equalsIgnoreCase("21") && !tempGrade.equalsIgnoreCase("22")
+						&& !tempGrade.equalsIgnoreCase("23") && !tempGrade.equalsIgnoreCase("24")
+						&& !tempGrade.equalsIgnoreCase("25") && !tempGrade.equalsIgnoreCase("26")
+						&& !tempGrade.equalsIgnoreCase("27") && !tempGrade.equalsIgnoreCase("28")
+						&& !tempGrade.equalsIgnoreCase("29") && !tempGrade.equalsIgnoreCase("30")
+						&& !tempGrade.equalsIgnoreCase("30 with merit"))
 					throw new Exception();
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Illegal grade request");			
+			response.getWriter().println("Illegal grade request");
 			return;
 		}
 
-		
 		for (i = 0; i < jlist.size(); i++) {
 			try {
-				gradeDAO.enterGrade(appId, jlist.get(i).get("studentId").getAsInt(), jlist.get(i).get("gradeValue").getAsString());
+				gradeDAO.enterGrade(appId, jlist.get(i).get("studentId").getAsInt(),
+						jlist.get(i).get("gradeValue").getAsString());
 			} catch (Exception e) {
-				//having checked the legality of received JSON objects, this part should actually be unreachable
+				// having checked the legality of received JSON objects, this part should
+				// actually be unreachable
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-				response.getWriter().println("An error occurred while entering grades; some have been entered, some haven't");
+				response.getWriter()
+						.println("An error occurred while entering grades; some have been entered, some haven't");
 				return;
 			}
 		}

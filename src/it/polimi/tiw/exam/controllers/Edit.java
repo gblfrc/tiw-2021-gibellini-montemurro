@@ -1,7 +1,6 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -13,9 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
-import it.polimi.tiw.exam.objects.Appeal;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
@@ -54,26 +52,12 @@ public class Edit extends HttpServlet {
 			return;
 		}
 		
-		//control on professor's rights to access the appeal
-		AppealDAO appealDAO = new AppealDAO(connection);
-		Appeal appeal;
+		//security: get last-visited student
+		SecurityDAO secDAO=new SecurityDAO(connection);
 		try {
-			appeal = appealDAO.getAppealById(appId);
-			if (appeal == null)
-				throw new Exception();
-		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-		
-		try {
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new InvalidParameterException();
-			}
+			if(secDAO.getLastStudent(user.getPersonId())!=studentId) throw new Exception();
 		}catch(Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST,  "Denied access to edit grades");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;

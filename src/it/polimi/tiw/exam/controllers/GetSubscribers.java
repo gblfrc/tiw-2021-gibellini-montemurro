@@ -91,6 +91,7 @@ public class GetSubscribers extends HttpServlet {
 			return;
 		}
 		
+		//security: get last-visited course
 		SecurityDAO secDAO=new SecurityDAO(connection);
 		try {
 			if(secDAO.getLastCourse(user.getPersonId())!=appeal.getCourseId()) throw new Exception();
@@ -163,6 +164,7 @@ public class GetSubscribers extends HttpServlet {
 			return;
 		}
 		
+		//security: set last-visited appeal
 		try {
 			secDAO.setLastAppeal(user.getPersonId(), appId);
 		}catch(SQLException e){

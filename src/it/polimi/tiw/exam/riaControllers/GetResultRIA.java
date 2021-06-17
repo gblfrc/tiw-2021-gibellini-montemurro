@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
@@ -64,6 +65,17 @@ public class GetResultRIA extends HttpServlet {
 			return;
 		}
 
+		// security: get last-visited course
+		SecurityDAO secDAO = new SecurityDAO(connection);
+		try {
+			if (secDAO.getLastCourse(user.getPersonId()) != appeal.getCourseId())
+				throw new Exception();
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while updating security settings");
+			return;
+		}
+
 		// control on student's rights to access the appeal
 		try {
 			if (!adao.hasAppeal(appId, user.getPersonId(), "Student")) {
@@ -75,7 +87,8 @@ public class GetResultRIA extends HttpServlet {
 			return;
 		}
 
-		// main section: obtaining the student's grade (and information about the appeal)
+		// main section: obtaining the student's grade (and information about the
+		// appeal)
 		GradeDAO gradeDao = new GradeDAO(connection);
 		Grade grade = null;
 		try {
@@ -83,6 +96,15 @@ public class GetResultRIA extends HttpServlet {
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("An accidental error occurred while retrieving result");
+			return;
+		}
+
+		// security: set last-visited appeal
+		try {
+			secDAO.setLastAppeal(user.getPersonId(), appId);
+		} catch (SQLException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while updating security settings");
 			return;
 		}
 

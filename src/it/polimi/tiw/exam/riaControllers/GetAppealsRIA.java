@@ -19,6 +19,7 @@ import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.CourseDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Course;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.objects.Appeal;
@@ -84,6 +85,16 @@ public class GetAppealsRIA extends HttpServlet {
 			return;
 		}
 
+		//security: setting last visited course
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			secDAO.setLastCourse(user.getPersonId(), cId);
+		}catch(SQLException e){
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("An accidental error occurred while updating security settings");
+			return;
+		}
+		
 		//build response object and send it
 		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
 		String json = gson.toJson(appeals);
