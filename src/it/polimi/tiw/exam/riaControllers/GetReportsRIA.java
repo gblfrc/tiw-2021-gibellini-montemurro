@@ -70,6 +70,13 @@ public class GetReportsRIA extends HttpServlet {
 			response.getWriter().println("An accidental error occurred while retrieving reports");
 			return;
 		}
+		
+		// send a specific response if selected appeal doesn't have any report
+		if (reports.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+			response.getWriter().println("No reports for selected appeal");
+			return;
+		}
 
 		//build response object and send it
 		String json = new Gson().toJson(reports);

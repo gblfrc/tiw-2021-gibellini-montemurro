@@ -13,6 +13,9 @@
     this.element = document.querySelector("div[class='courses']");
     this.message = document.querySelector("div[class='courses']>span");
     this.courses = document.querySelector("div[class='courses']>table>tbody");
+	this.show = function(){
+    	makeCall("GET", "GetCoursesRIA", null, this.update);
+	}
     //introduce function to clear the table but the header row
     this.clear = function clear() {
       while(this.courses.children.length>0){
@@ -58,11 +61,11 @@
 		}
         }
 		else{
-			 document.querySelector("div.main").appendChild(errorManager(req));
+			document.querySelector("div.main").appendChild(errorManager(req));
 		}
       }
     }
-    makeCall("GET", "GetCoursesRIA", null, this.update);
+	this.show();
   }
 
   function AppealList(){
@@ -132,6 +135,8 @@
       if (buttons !== undefined) buttons.hide();
     }
     this.show = function show(appealId, date){
+      editForm.hide();
+	  reports.hide();
       makeCall("GET", "GetSubscribersRIA?appeal=" + appealId, null, this.update);
       buttons.show(appealId);
       this.message.innerText = "Here is the list of students who took part the appeal on " + date.toUpperCase();
@@ -149,8 +154,7 @@
     this.update = function update(req) {
       if (req.readyState === 4){
 		if(req.status === 200){
-        subscribers.clear();
-        editForm.hide();
+	    subscribers.clear();
         let i = 0;
         let array = JSON.parse(req.responseText);
         for (i = 0; i<array.length; i++){
@@ -217,6 +221,7 @@
             editCell.appendChild(form);
             button.addEventListener("click", (e) => {
               e.preventDefault();
+			  editForm.clear();
               let appealId = e.target.closest("form").children[1].getAttribute("value");
               let studentId = e.target.closest("form").children[0].getAttribute("value");
               editForm.show(appealId, studentId);
@@ -294,6 +299,7 @@
 			} 
           });
         })
+      makeCall("GET", "GetAppealsRIA?courseId=" + courseId, null, subscribers.update);
 		} 
 		else{
 			document.querySelector("div.main").appendChild(errorManager(req));
@@ -330,6 +336,8 @@
       publishSubmit.addEventListener("click", (e) => {
       e.preventDefault();
       editForm.hide();
+	  reports.hide();
+	  reports.clear();
       let form = e.target.closest("form");
       makeCall("POST", "PublishRIA", new FormData(form), function(req){
         if (req.readyState === 4){
@@ -378,6 +386,8 @@
       //may want to find a better way to get the button
       multipleEditSubmit.addEventListener("click", (e) => {
       e.preventDefault();
+	  editForm.hide();
+	  reports.hide();
       multipleEdit.clear();
       multipleEdit.show(buttons.multipleEdit.getAttribute("value"));
       editForm.hide();
@@ -415,7 +425,7 @@
     this.clear = function clear() {
 	 removeError();
       //get all report details
-      let allDetails = document.querySelector("div.Reports div.details");
+      let allDetails = document.querySelectorAll("div.Reports div.details");
       //delete all but first report details
       if (allDetails.length > 1){
         for (let i=1; i<allDetails.length; i++){
@@ -448,8 +458,8 @@
           let detailsElement;
           if (i===0) detailsElement = reports.details;
           if (i>0) {
-            detailsElement = reports.details.cloneNode();
-            this.element.appendChild(detailsElement);
+            detailsElement = reports.details.cloneNode("deep");
+            reports.element.appendChild(detailsElement);
           }
           //get details elements (get nobr tags)
           let reportId = detailsElement.children[1].children[1];
