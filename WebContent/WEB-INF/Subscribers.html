@@ -52,7 +52,7 @@
 						class="passed">30</td>
 					<td th:text=${#strings.toUpperCase(gr.state)}>ENTERED</td>
 					<td><a
-						th:href="@{/GetModify(appealId=${gr.appealId},studentId=${gr.studentId})}"
+						th:href="@{/GetModify(appeal=${gr.appealId},studentId=${gr.studentId})}"
 						th:if="${#strings.equalsIgnoreCase(gr.state, 'entered') or
 							 #strings.equalsIgnoreCase(gr.state, 'not entered')}">
 							<button>Edit</button>

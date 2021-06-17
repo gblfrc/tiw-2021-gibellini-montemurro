@@ -20,6 +20,7 @@ import org.thymeleaf.context.WebContext;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.CourseDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Course;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.User;
@@ -46,10 +47,6 @@ public class GetAppeal extends HttpServlet {
 		// forward to GetCourses if an error has already occurred
 		
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
-		if (error != null) {
-			rd.forward(request, response);
-			return;
-		}
 		
 		// check course parameter validity
 		Integer cId = null;
@@ -103,12 +100,23 @@ public class GetAppeal extends HttpServlet {
 			return;
 		}
 
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			secDAO.setLastCourse(user.getPersonId(), cId);
+		}catch(SQLException e){
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while updating security settings");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		// give access to actual appeals page
 		String path = "/WEB-INF/Appeal.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("appeals", appeals);
-		ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
+		//ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

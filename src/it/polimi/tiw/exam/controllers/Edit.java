@@ -36,19 +36,15 @@ public class Edit extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
-		int appealId;
+		int appId;
 		int studentId;
 		String gradeValue;
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
 		
-		if (error != null) {
-			rd.forward(request, response);
-			return;
-		}
-		
+		//controls on request parameters
 		try {
-			appealId=Integer.parseInt(request.getParameter("appealId"));
+			appId=Integer.parseInt(request.getParameter("appeal"));
 			studentId=Integer.parseInt(request.getParameter("studentId"));
 			gradeValue=request.getParameter("gradeValue");
 		}catch(NumberFormatException e) {
@@ -58,10 +54,11 @@ public class Edit extends HttpServlet {
 			return;
 		}
 		
+		//control on professor's rights to access the appeal
 		AppealDAO appealDAO = new AppealDAO(connection);
 		Appeal appeal;
 		try {
-			appeal = appealDAO.getAppealById(appealId);
+			appeal = appealDAO.getAppealById(appId);
 			if (appeal == null)
 				throw new Exception();
 		} catch (Exception e) {
@@ -72,7 +69,7 @@ public class Edit extends HttpServlet {
 		}
 		
 		try {
-			if(!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new InvalidParameterException();
 			}
 		}catch(Exception e) {
@@ -84,8 +81,9 @@ public class Edit extends HttpServlet {
 		
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		Grade grade;
+		//retrieve a grade
 		try {
-			grade=gradeDAO.getResultByAppealAndStudent(appealId,studentId);
+			grade=gradeDAO.getResultByAppealAndStudent(appId,studentId);
 			if(grade==null) throw new Exception();
 		}catch(Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST,"Nonexistent student");
@@ -94,6 +92,7 @@ public class Edit extends HttpServlet {
 			return;
 		}
 		
+		//control on state: if it's neither 'not entered' or 'entered', won't edit grade
 		try {
 			if(!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) throw new Exception();
 		}catch(Exception e) {
@@ -103,8 +102,9 @@ public class Edit extends HttpServlet {
 			return;
 		}
 		
+		//enter grade
 		try {
-			gradeDAO.enterGrade(appealId,studentId,gradeValue);
+			gradeDAO.enterGrade(appId,studentId,gradeValue);
 		} catch (SQLException e) {
 			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					"An accidental error occurred while entering grades");
@@ -112,7 +112,13 @@ public class Edit extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
-		response.sendRedirect("GetSubscribers?appeal=" + appealId);
+		response.sendRedirect("GetSubscribers?appeal=" + appId);
 	}
-	
+	public void destroy() {
+		try {
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

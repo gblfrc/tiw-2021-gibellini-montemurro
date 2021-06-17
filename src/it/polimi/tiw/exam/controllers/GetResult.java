@@ -18,6 +18,7 @@ import org.thymeleaf.context.WebContext;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
@@ -96,6 +97,17 @@ public class GetResult extends HttpServlet {
 			return;
 		}
 
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			secDAO.setLastAppeal(user.getPersonId(), appId);
+		}catch(SQLException e){
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while updating security settings");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		//give actual access to result page
 		String path = "/WEB-INF/Result.html";
 		ServletContext servletContext = getServletContext();

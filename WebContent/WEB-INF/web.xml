@@ -38,7 +38,7 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
-		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/GetReports</url-pattern>
 		<url-pattern>/ProfessorHome.html</url-pattern>
 		<url-pattern>/StudentHome.html</url-pattern>
 	</filter-mapping>
@@ -76,7 +76,7 @@
 		<url-pattern>/GetModify</url-pattern>
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
-		<url-pattern>/GetAllReports</url-pattern>
+		<url-pattern>/GetReports</url-pattern>
 		<url-pattern>/ProfessorHome.html</url-pattern>
 	</filter-mapping>
 	<filter>
@@ -89,5 +89,17 @@
 		<url-pattern>/RefuseGrade</url-pattern>
 		<url-pattern>/StudentHome.html</url-pattern>
 	</filter-mapping>
-
+	<filter>
+		<filter-name>AppealChecker</filter-name>
+		<filter-class>it.polimi.tiw.exam.filters.AppealChecker</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AppealChecker</filter-name>
+		<url-pattern>/GetModify</url-pattern>
+		<url-pattern>/Edit</url-pattern>
+		<url-pattern>/PublishGrade</url-pattern>
+		<url-pattern>/CreateReport</url-pattern>
+		<url-pattern>/GetReports</url-pattern>
+		<url-pattern>/RefuseGrade</url-pattern>
+	</filter-mapping>
 </web-app>

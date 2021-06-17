@@ -23,6 +23,7 @@ import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.objects.Course;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.dao.CourseDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 
 @WebServlet("/GetCourses")
 public class GetCourses extends HttpServlet {
@@ -57,6 +58,14 @@ public class GetCourses extends HttpServlet {
 					"An accidental error occurred while retrieving courses");
 		}
 
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			secDAO.clearRow(user.getPersonId());
+		}catch(SQLException e){
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while updating security settings");
+		}
+		
 		// give access to courses page
 		String path = "/WEB-INF/Home.html";
 		ServletContext servletContext = getServletContext();

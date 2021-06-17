@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.dao.UserDAO;
 
 @WebServlet("/GetAccess")
@@ -72,6 +73,29 @@ public class GetAccess extends HttpServlet {
 
 		// found a legal user --> give access to main section
 		request.getSession().setAttribute("user", user);
+		
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		
+		try {
+			secDAO.removeRow(user.getPersonId());
+		}catch(SQLException e){
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while updating security settings");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
+		try {
+			secDAO.insertRow(user.getPersonId());
+		}catch(SQLException e){
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while updating security settings");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		response.sendRedirect(getServletContext().getContextPath() + "/GetCourses");
 	}
 

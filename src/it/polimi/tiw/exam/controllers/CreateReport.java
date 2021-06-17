@@ -33,11 +33,8 @@ public class CreateReport extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
+		// forward to GetCourses if an error has already occurred
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
-		if (error != null) {
-			rd.forward(request, response);
-			return;
-		}
 		
 		//control on "appeal" request parameter legitimacy
 		int appId;
@@ -102,6 +99,13 @@ public class CreateReport extends HttpServlet {
 		}
 
 		response.sendRedirect("GetReports?appeal=" + appId + "&type=last");
+	}
+	public void destroy() {
+		try {
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

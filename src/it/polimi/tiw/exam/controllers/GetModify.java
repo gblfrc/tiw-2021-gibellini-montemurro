@@ -3,6 +3,7 @@ package it.polimi.tiw.exam.controllers;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -18,6 +19,7 @@ import org.thymeleaf.context.WebContext;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
@@ -50,26 +52,23 @@ public class GetModify extends HttpServlet {
 		
 		// forward to GetCourses if an error has already occurred
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
-		if (error != null) {
-			System.out.println("ERRORE");
-			rd.forward(request, response);
-			return;
-		}
-		
+	
 		AppealDAO appealDAO = new AppealDAO(connection);
-		int appealId;
+		int appId;
+		//control on "appeal" request parameter legitimacy
 		try {
-			appealId = Integer.parseInt(request.getParameter("appealId"));
+			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;
 		}
-		
+
 		Appeal appeal;
+		//control on professor's rights to access the appeal
 		try {
-			appeal = appealDAO.getAppealById(appealId);  //Can throw SQLException
+			appeal = appealDAO.getAppealById(appId);  //Can throw SQLException
 			if(appeal==null)throw new Exception();
 		}catch(Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
@@ -77,9 +76,9 @@ public class GetModify extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
-		
+	
 		try {
-			if(!appealDAO.hasAppeal(appealId, user.getPersonId(), "Professor")) {
+			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
 				throw new InvalidParameterException();
 			}
 		}catch(Exception e) {
@@ -88,9 +87,9 @@ public class GetModify extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
-	
+	;
 		int studentId;
-		
+		//control on "studentId" request parameter legitimacy
 		try {
 			studentId = Integer.parseInt(request.getParameter("studentId"));
 		} catch (Exception e) {
@@ -99,9 +98,9 @@ public class GetModify extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
-		
+
 		try {
-			if (!appealDAO.hasAppeal(appealId, studentId, "Student")) {
+			if (!appealDAO.hasAppeal(appId, studentId, "Student")) {
 				throw new Exception();
 			}
 		}catch(Exception e) {
@@ -110,9 +109,10 @@ public class GetModify extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
-
+		
+		//retrieve a grade
 		try {
-			grade = gradeDAO.getResultByAppealAndStudent(appealId, studentId);
+			grade = gradeDAO.getResultByAppealAndStudent(appId, studentId);
 			if (!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) {
 				throw new Exception();
 			}
@@ -122,12 +122,30 @@ public class GetModify extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
-
+		
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			secDAO.setLastStudent(user.getPersonId(), studentId);
+		}catch(SQLException e){
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while updating security settings");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		String path = "/WEB-INF/Modify.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("grade", grade);
 		ctx.setVariable("appeal", appeal);
 		templateEngine.process(path, ctx, response.getWriter());
+	}
+	public void destroy() {
+		try {
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -1,7 +1,6 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ import org.thymeleaf.context.WebContext;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
+import it.polimi.tiw.exam.dao.SecurityDAO;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
@@ -82,7 +82,7 @@ public class GetSubscribers extends HttpServlet {
 		
 		try {
 			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new InvalidParameterException();
+				throw new Exception();
 			}
 		}catch(Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected course");
@@ -90,6 +90,17 @@ public class GetSubscribers extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
+		
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			if(secDAO.getLastCourse(user.getPersonId())!=appeal.getCourseId()) throw new Exception();
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		//controls on request parameters
 		try {			
 			List<String> params= Collections.list(request.getParameterNames());
@@ -151,12 +162,23 @@ public class GetSubscribers extends HttpServlet {
 			rd.forward(request, response);
 			return;
 		}
+		
+		try {
+			secDAO.setLastAppeal(user.getPersonId(), appId);
+		}catch(SQLException e){
+			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"An accidental error occurred while updating security settings");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		String path = "/WEB-INF/Subscribers.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("appeal", appeal);
 		ctx.setVariable("grades", grades);
-		ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
+		//ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
 		templateEngine.process(path, ctx, response.getWriter());
 		
 	}
