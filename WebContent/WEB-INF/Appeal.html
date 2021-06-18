@@ -14,9 +14,10 @@
 		<a th:href="@{/Logout}">Logout</a>
 	</div>
 	<div class="main">
-		<h1 th:if="${error == null}">Welcome to appeals page</h1>
-		<h2 th:if="${error == null}">Select an appeal to see its subscribers</h2>
-		<table th:if="${error == null}">
+		<h1>Welcome to appeals page</h1>
+		<h2 th:if="${#strings.equalsIgnoreCase(session.user.accessRights,'Professor')}">Select an appeal to see its subscribers</h2>
+		<h2 th:if="${#strings.equalsIgnoreCase(session.user.accessRights,'Student')}">Select an appeal to see your result</h2>
+		<table>
 			<thead>
 				<tr>
 					<th>Appeal date</th>

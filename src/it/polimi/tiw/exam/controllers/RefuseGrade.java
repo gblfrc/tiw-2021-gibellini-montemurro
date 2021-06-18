@@ -12,9 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
-import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Grade;
 import it.polimi.tiw.exam.objects.User;
@@ -37,7 +35,7 @@ public class RefuseGrade extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		ErrorMsg error = null;
-		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+		RequestDispatcher rd = request.getRequestDispatcher("GetAppeal");
 
 		// control on "appeal" request parameter legitimacy
 		int appId;
@@ -45,32 +43,6 @@ public class RefuseGrade extends HttpServlet {
 			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-
-		// check existence of selected appeal
-		Appeal appeal = null;
-		AppealDAO adao = new AppealDAO(connection);
-		try {
-			appeal = adao.getAppealById(appId);
-			if (appeal == null)
-				throw new Exception();
-		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-
-		// control on student's rights to access the appeal
-		try {
-			if (!adao.hasAppeal(appId, user.getPersonId(), "Student")) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "No grade found for selected appeal");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;

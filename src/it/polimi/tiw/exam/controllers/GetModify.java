@@ -1,7 +1,6 @@
 package it.polimi.tiw.exam.controllers;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -49,9 +48,7 @@ public class GetModify extends HttpServlet {
 		GradeDAO gradeDAO = new GradeDAO(connection);
 		Grade grade = null;
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
-		
-		// forward to GetCourses if an error has already occurred
-		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+		RequestDispatcher rd = request.getRequestDispatcher("GetSubscribers");
 	
 		AppealDAO appealDAO = new AppealDAO(connection);
 		int appId;
@@ -77,17 +74,6 @@ public class GetModify extends HttpServlet {
 			return;
 		}
 	
-		try {
-			if(!appealDAO.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new InvalidParameterException();
-			}
-		}catch(Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected course");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-	;
 		int studentId;
 		//control on "studentId" request parameter legitimacy
 		try {
