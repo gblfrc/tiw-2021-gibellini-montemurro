@@ -45,7 +45,7 @@ public class GetResult extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User)session.getAttribute("user");
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
-		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+		RequestDispatcher rd = request.getRequestDispatcher("GetAppeal");
 		
 		// control on "appeal" request parameter legitimacy
 		int appId;
@@ -72,24 +72,24 @@ public class GetResult extends HttpServlet {
 			return;
 		}
 		
-		//security: get last-visited course
-		SecurityDAO secDAO=new SecurityDAO(connection);
-		try {
-			if(secDAO.getLastCourse(user.getPersonId())!=appeal.getCourseId()) throw new Exception();
-		}catch(Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-		
 		//control on student's rights to access the appeal
 		try {
 			if(!adao.hasAppeal(appId, user.getPersonId(), "Student")) {
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "No grade found for selected appeal");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to select appeal");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+				
+		//security: get last-visited course
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			if(secDAO.getLastCourse(user.getPersonId())!=appeal.getCourseId()) throw new Exception();
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;

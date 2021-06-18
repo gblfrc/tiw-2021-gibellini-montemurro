@@ -10,13 +10,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
-import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.ErrorMsg;
-import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 
 @WebServlet("/PublishGrade")
@@ -32,42 +28,14 @@ public class PublishGrade extends HttpServlet {
 			throws ServletException, IOException {
 
 		ErrorMsg error = null;
-		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
-		HttpSession session = request.getSession();
+		RequestDispatcher rd = request.getRequestDispatcher("GetSubscribers");
 		Integer appId = null;
-		User user = (User) session.getAttribute("user");
 
 		// control on "appeal" request parameter legitimacy
 		try {
 			appId = Integer.parseInt(request.getParameter("appeal"));
 		} catch (Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-
-		// check existence of selected appeal
-		Appeal appeal = null;
-		AppealDAO adao = new AppealDAO(connection);
-		try {
-			appeal = adao.getAppealById(appId);
-			if (appeal == null)
-				throw new Exception();
-		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND, "Appeal not found");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-
-		// control on professor's rights to access the appeal
-		try {
-			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected appeal");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;

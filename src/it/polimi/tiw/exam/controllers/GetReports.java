@@ -13,7 +13,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -23,7 +22,6 @@ import it.polimi.tiw.exam.dao.ReportDAO;
 import it.polimi.tiw.exam.objects.Appeal;
 import it.polimi.tiw.exam.objects.ErrorMsg;
 import it.polimi.tiw.exam.objects.Report;
-import it.polimi.tiw.exam.objects.User;
 import it.polimi.tiw.exam.utils.ConnectionHandler;
 import it.polimi.tiw.exam.utils.TemplateEngineHandler;
 
@@ -42,7 +40,7 @@ public class GetReports extends HttpServlet {
 			throws ServletException, IOException {
 
 		ErrorMsg error = null;
-		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+		RequestDispatcher rd = request.getRequestDispatcher("GetSubscibers");
 
 		// control on "appeal" request parameter legitimacy
 		int appId;
@@ -69,20 +67,6 @@ public class GetReports extends HttpServlet {
 			return;
 		}
 
-		// control on professor's rights to access the appeal
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
-		try {
-			if (!adao.hasAppeal(appId, user.getPersonId(), "Professor")) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Denied access to selected course");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-
 		// control on "type" request parameter legitimacy
 		String type;
 		try {
@@ -93,7 +77,6 @@ public class GetReports extends HttpServlet {
 				throw new Exception();
 		} catch (Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal report request");
-			rd = request.getRequestDispatcher("GetSubscribers");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;
@@ -112,7 +95,6 @@ public class GetReports extends HttpServlet {
 			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					"An accidental error occurred while retrieving reports");
 			request.setAttribute("error", error);
-			rd = request.getRequestDispatcher("GetSubscribers");
 			rd.forward(request, response);
 			return;
 		}

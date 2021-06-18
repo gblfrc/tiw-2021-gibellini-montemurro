@@ -48,28 +48,32 @@ public class GetSubscribers extends HttpServlet {
 		Appeal appeal = null;
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
 		boolean entered=false;
-				
-		// forward to GetCourses if an error has already occurred
-		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
-		if (error != null) {
-			rd.forward(request, response);
-			return;
-		}
-		
-		//control on professor's rights to access the appeal
 		Integer appId = null;
-		User user = (User) session.getAttribute("user");
-		AppealDAO appealDAO= new AppealDAO(connection);
-		try {
-			appId = Integer.parseInt(request.getParameter("appeal"));
-			//may want to change appeal parameter name to appealId to make this servlet equal to the RIA one
-		} catch (Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
+		User user = (User) session.getAttribute("user");		
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		
+		RequestDispatcher rd = request.getRequestDispatcher("GetAppeal");
+		if (error != null) {
+			try {
+				appId=secDAO.getLastAppeal(user.getPersonId());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+		//control on professor's rights to access the appeal
+			try {
+				appId = Integer.parseInt(request.getParameter("appeal"));
+				//may want to change appeal parameter name to appealId to make this servlet equal to the RIA one
+			} catch (Exception e) {
+				error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal appeal request");
+				request.setAttribute("error", error);
+				rd.forward(request, response);
+				return;
+			}
 		}
 		
+		AppealDAO appealDAO= new AppealDAO(connection);
 		try {
 			appeal = appealDAO.getAppealById(appId);  //Can throw SQLException
 			if(appeal==null)throw new Exception();
@@ -92,7 +96,6 @@ public class GetSubscribers extends HttpServlet {
 		}
 		
 		//security: get last-visited course
-		SecurityDAO secDAO=new SecurityDAO(connection);
 		try {
 			if(secDAO.getLastCourse(user.getPersonId())!=appeal.getCourseId()) throw new Exception();
 		}catch(Exception e) {
@@ -151,11 +154,9 @@ public class GetSubscribers extends HttpServlet {
 		List<Grade> grades= new ArrayList<Grade>();
 
 		try {
-			//if(user.getAccessRights().equals("Professor")) {
-				if(field==null || session.getAttribute(field+ "Order")==null) grades=gradeDAO.getGradesByAppealId(appId);
-				else if (session.getAttribute(field + "Order")=="ASC") grades=gradeDAO.getGradesByFieldAsc(appId,field);
-				else if (session.getAttribute(field + "Order")=="DESC") grades=gradeDAO.getGradesByFieldDesc(appId,field);
-			//}
+			if(field==null || session.getAttribute(field+ "Order")==null) grades=gradeDAO.getGradesByAppealId(appId);
+			else if (session.getAttribute(field + "Order")=="ASC") grades=gradeDAO.getGradesByFieldAsc(appId,field);
+			else if (session.getAttribute(field + "Order")=="DESC") grades=gradeDAO.getGradesByFieldDesc(appId,field);
 		} catch (SQLException e) {
 			error = new ErrorMsg(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					"An accidental error occurred while retrieving subscribers");
@@ -180,11 +181,21 @@ public class GetSubscribers extends HttpServlet {
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("appeal", appeal);
 		ctx.setVariable("grades", grades);
-		//ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
+		ctx.setVariable("error", error);  
 		templateEngine.process(path, ctx, response.getWriter());
 		
 	}
 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		ErrorMsg error=(ErrorMsg)request.getAttribute("error");
+		if(error==null) {
+			error = new ErrorMsg(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Illegal request");
+			request.setAttribute("error", error);
+		}
+		doGet(request, response);
+	}
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);

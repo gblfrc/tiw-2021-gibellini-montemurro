@@ -31,12 +31,14 @@ public class AppealChecker implements Filter{
 		HttpServletResponse res = (HttpServletResponse) response;
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
 		// check if the logged user is a professor
-
+		RequestDispatcher rd = req.getRequestDispatcher("GetAppeal");
+		
 		int appId;
 		try {
 			appId = Integer.parseInt(req.getParameter("appeal"));
 		} catch (Exception e) {
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST,  "Illegal appeal request");
+			request.setAttribute("error", error);
 			rd.forward(req, res);
 			return;
 		}
@@ -50,7 +52,8 @@ public class AppealChecker implements Filter{
 			if (appeal == null)
 				throw new Exception();
 		} catch (Exception e) {
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
+			error = new ErrorMsg(HttpServletResponse.SC_NOT_FOUND,  "Appeal not found");
+			request.setAttribute("error", error);
 			rd.forward(req, res);
 			return;
 		}
@@ -68,9 +71,8 @@ public class AppealChecker implements Filter{
 				}
 			}
 		}catch(Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST,  "Denied access to edit grades");
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST,  "Access denied to selected appeal");
 			request.setAttribute("error", error);
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
 			rd.forward(request, response);
 			return;
 		}
@@ -81,7 +83,6 @@ public class AppealChecker implements Filter{
 		}catch(Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
 			request.setAttribute("error", error);
-			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
 			rd.forward(request, response);
 			return;
 		}

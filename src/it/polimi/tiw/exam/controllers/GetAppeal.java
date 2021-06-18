@@ -44,21 +44,32 @@ public class GetAppeal extends HttpServlet {
 			throws ServletException, IOException {
 
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
-		// forward to GetCourses if an error has already occurred
-		
 		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
-		
-		// check course parameter validity
 		Integer cId = null;
-		try {
-			cId = Integer.parseInt(request.getParameter("courseId"));
-		} catch (NumberFormatException | NullPointerException e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal course request");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		
+		if (error != null) {
+			try {
+				cId=secDAO.getLastCourse(user.getPersonId());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-
+		else {
+			// check course parameter validity
+			try {
+				cId = Integer.parseInt(request.getParameter("courseId"));
+			} catch (NumberFormatException | NullPointerException e) {
+				e.printStackTrace();
+				error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal course request");
+				request.setAttribute("error", error);
+				rd.forward(request, response);
+				return;
+			}
+		}
 		// check requested course existence
 		Course course = null;
 		CourseDAO coursesDAO = new CourseDAO(connection);
@@ -73,11 +84,8 @@ public class GetAppeal extends HttpServlet {
 			return;
 		}
 
-		// check user rights to access selected course
-		HttpSession session = request.getSession();
-		User user = null;
+		// check user rights to access selected course	
 		try {
-			user = (User) session.getAttribute("user");
 			if (coursesDAO.hasCourse(cId, user.getPersonId(), user.getAccessRights()) == false)
 				throw new Exception();
 		} catch (Exception e) {
@@ -98,10 +106,9 @@ public class GetAppeal extends HttpServlet {
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;
-		}
+		}	
 
 		//security: setting last visited course
-		SecurityDAO secDAO=new SecurityDAO(connection);
 		try {
 			secDAO.setLastCourse(user.getPersonId(), cId);
 		}catch(SQLException e){
@@ -117,10 +124,20 @@ public class GetAppeal extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("appeals", appeals);
-		//ctx.setVariable("error", error); //DA CONTROLLARE, potrebbe essere inutile!!! 
+		ctx.setVariable("error", error); 
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		ErrorMsg error=(ErrorMsg)request.getAttribute("error");
+		if(error==null) {
+			error = new ErrorMsg(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Illegal request");
+			request.setAttribute("error", error);
+		}
+		doGet(request, response);
+	}
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);

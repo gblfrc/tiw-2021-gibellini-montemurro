@@ -38,7 +38,8 @@ public class Edit extends HttpServlet {
 		int studentId;
 		String gradeValue;
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
-		RequestDispatcher rd = request.getRequestDispatcher("GetCourses");
+		// forward to GetSubscribers if an error has already occurred
+		RequestDispatcher rd = request.getRequestDispatcher("GetSubscribers");
 		
 		//controls on request parameters
 		try {
@@ -52,19 +53,9 @@ public class Edit extends HttpServlet {
 			return;
 		}
 		
-		//security: get last-visited student
-		SecurityDAO secDAO=new SecurityDAO(connection);
-		try {
-			if(secDAO.getLastStudent(user.getPersonId())!=studentId) throw new Exception();
-		}catch(Exception e) {
-			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
-			request.setAttribute("error", error);
-			rd.forward(request, response);
-			return;
-		}
-		
 		GradeDAO gradeDAO= new GradeDAO(connection);
 		Grade grade;
+		
 		//retrieve a grade
 		try {
 			grade=gradeDAO.getResultByAppealAndStudent(appId,studentId);
@@ -76,11 +67,22 @@ public class Edit extends HttpServlet {
 			return;
 		}
 		
-		//control on state: if it's neither 'not entered' or 'entered', won't edit grade
+		//control on state: if it's neither 'not entered' nor 'entered', won't edit grade
 		try {
 			if(!grade.getState().equalsIgnoreCase("entered")&&!grade.getState().equalsIgnoreCase("not entered")) throw new Exception();
 		}catch(Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST,"Uneditable grade");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
+		//security: get last-visited student
+		SecurityDAO secDAO=new SecurityDAO(connection);
+		try {
+			if(secDAO.getLastStudent(user.getPersonId())!=studentId) throw new Exception();
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
 			request.setAttribute("error", error);
 			rd.forward(request, response);
 			return;
