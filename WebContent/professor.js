@@ -3,6 +3,8 @@
 	var courseList, appealList, subscribers, editForm,
 		buttons, reports, multipleEdit, pageOrchestrator;
 
+	//add event listener on load to window object
+	//assign objects to DOM elements
 	window.addEventListener("load", () => {
 		pageOrchestrator = new PageOrchestrator();
 		pageOrchestrator.start();
@@ -13,10 +15,11 @@
 		this.element = document.querySelector("div[class='courses']");
 		this.message = document.querySelector("div[class='courses']>span");
 		this.courses = document.querySelector("div[class='courses']>table>tbody");
+		//function to request courses from the server and show table
 		this.show = function() {
 			makeCall("GET", "GetCoursesRIA", null, this.update);
 		}
-		//introduce function to clear the table but the header row
+		//function to remove present courses from current table
 		this.clear = function clear() {
 			while (this.courses.children.length > 0) {
 				this.courses.removeChild(this.courses.children[0]);
@@ -24,29 +27,27 @@
 			removeError();
 		}
 		this.clear();
+		//function to update courses table
 		this.update = function update(req) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
-					courseList.clear(); //should be useless; line written to create analogy with other update methods
+					courseList.clear();
 					let i = 0;
 					let array = JSON.parse(req.responseText);
 					for (i = 0; i < array.length; i++) {
 						let newRow = document.createElement("tr");
 						let titleCell = document.createElement("td");
-						let text = document.createTextNode(array[i].title);
-						titleCell.appendChild(text);
+						titleCell.textContent = array[i].title;
 						newRow.appendChild(titleCell);
 						let appealLinkCell = document.createElement("td");
 						let anchor = document.createElement("a");
-						text = document.createTextNode("Show Appeals");
-						anchor.appendChild(text);
+						anchor.textContent = "Show Appeals";
 						anchor.setAttribute("href", "#");
 						anchor.setAttribute("courseId", array[i].courseId);
 						appealLinkCell.appendChild(anchor);
 						newRow.appendChild(appealLinkCell);
-						//may want to check why in this exact moment this.courses is undefined
-						//this.courses = document.querySelector("div[class='courses']>table>tbody");
 						courseList.courses.appendChild(newRow);
+						//add event listener to show appeals list after clicking on one anchor
 						anchor.addEventListener("click", (e) => {
 							e.preventDefault();
 							appealList.hide();
@@ -55,7 +56,7 @@
 							subscribers.clear();
 							reports.hide();
 							reports.clear();
-							let title = e.target.parentElement.previousSibling.innerText;
+							let title = e.target.parentElement.previousSibling.textContent;
 							appealList.show(e.target.getAttribute('courseId'), title);
 						});
 					}
@@ -72,17 +73,18 @@
 		this.element = document.querySelector("div[class='appeals']");
 		this.message = document.querySelector("div[class='appeals']>span");
 		this.appeals = document.querySelector("div[class='appeals']>table>tbody");
-		//this.message = "Here are the appeals for the course \"" + title + "\":";
-		//this.appeals = appeals;
+		// function to hide appeals table
 		this.hide = function hide() {
 			this.element.style.display = "none";
 		}
+		//function to request appeals from the server and show table
 		this.show = function show(courseId, title) {
 			makeCall("GET", "GetAppealsRIA?courseId=" + courseId, null, this.update);
-			this.message.innerText = "Here are the appeals for the course: " + title.toUpperCase();
+			this.message.textContent = "Here are the appeals for the course: " + title.toUpperCase();
 			this.element.setAttribute("courseId", courseId);
 			this.element.removeAttribute("style");
 		}
+		//function to remove present appeals from current table
 		this.clear = function clear() {
 			while (this.appeals.children.length > 0) {
 				this.appeals.removeChild(this.appeals.children[0]);
@@ -91,6 +93,7 @@
 		}
 		this.hide();
 		this.clear();
+		//function to update appeals table
 		this.update = function update(req) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
@@ -101,26 +104,26 @@
 						let newRow = document.createElement("tr");
 						let dateCell = document.createElement("td");
 						let anchor = document.createElement("a");
-						let text = document.createTextNode(array[i].date);
-						anchor.appendChild(text);
+						anchor.textContent = array[i].date;
 						anchor.setAttribute("href", "#");
 						anchor.setAttribute("appeal", array[i].appealId);
 						dateCell.appendChild(anchor);
 						newRow.appendChild(dateCell);
 						appealList.appeals.appendChild(newRow);
+						//add event listener to show subscribers list after clicking on one anchor
 						anchor.addEventListener("click", (e) => {
 							e.preventDefault();
 							subscribers.hide();
 							subscribers.clear();
 							reports.hide();
-							let date = e.target.innerText;
+							let date = e.target.textContent;
 							subscribers.show(e.target.getAttribute('appeal'), date);
 						});
 					}
 				}
 				else {
 					document.querySelector("div.main").appendChild(errorManager(req));
-					document.querySelector("div[class='appeals']").style.display = "none";
+					appealList.hide();
 				}
 			}
 		}
@@ -130,19 +133,22 @@
 		this.element = document.querySelector("div.subscribers");
 		this.message = document.querySelector("div.subscribers>span");
 		this.subs = document.querySelector("div.subscribers>table>tbody");
+		// function to hide subscribers table
 		this.hide = function hide() {
 			this.element.style.display = "none";
 			if (buttons !== undefined) buttons.hide();
 		}
+		//function to request subscribers from the server and show table
 		this.show = function show(appealId, date) {
 			editForm.hide();
 			reports.hide();
 			makeCall("GET", "GetSubscribersRIA?appeal=" + appealId, null, this.update);
 			buttons.show(appealId);
-			this.message.innerText = "Here is the list of students who took part the appeal on " + date.toUpperCase();
+			this.message.textContent = "Here is the list of students who took part the appeal on " + date.toUpperCase();
 			this.element.setAttribute("appeal", appealId); //may want to save appealId in a different var
 			this.element.removeAttribute("style");
 		}
+		//function to remove present appeals from current table
 		this.clear = function clear() {
 			while (this.subs.children.length > 0) {
 				this.subs.removeChild(this.subs.children[0]);
@@ -151,6 +157,7 @@
 		}
 		this.hide();
 		this.clear();
+		//function to update subscribers table
 		this.update = function update(req) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
@@ -161,44 +168,44 @@
 						let newRow = document.createElement("tr");
 						//studentId
 						let studentIdCell = document.createElement("td");
-						studentIdCell.innerText = array[i].studentId;
+						studentIdCell.textContent = array[i].studentId;
 						newRow.appendChild(studentIdCell);
 						//studentSurname
 						let surnameCell = document.createElement("td");
-						surnameCell.innerText = array[i].studentSurname;
+						surnameCell.textContent = array[i].studentSurname;
 						newRow.appendChild(surnameCell);
 						//studentName
 						let nameCell = document.createElement("td");
-						nameCell.innerText = array[i].studentName;
+						nameCell.textContent = array[i].studentName;
 						newRow.appendChild(nameCell);
 						//email
 						let emailCell = document.createElement("td");
-						emailCell.innerText = array[i].email;
+						emailCell.textContent = array[i].email;
 						newRow.appendChild(emailCell);
 						//degreeCourse
 						let degreeCourseCell = document.createElement("td");
-						degreeCourseCell.innerText = array[i].degreeCourse;
+						degreeCourseCell.textContent = array[i].degreeCourse;
 						newRow.appendChild(degreeCourseCell);
 						//grade
 						let gradeCell = document.createElement("td");
-						gradeCell.innerText = array[i].grade.toUpperCase();
+						gradeCell.textContent = array[i].grade.toUpperCase();
 						if (array[i].grade == "failed" || array[i].grade == "recalled" ||
 							array[i].grade == "absent") {
 							//may want to use a more formal method to compare strings
 							gradeCell.setAttribute("class", "fail");
 						}
 						else if (array[i].state === "not entered") {
-							gradeCell.innerText = "";
+							gradeCell.textContent = "";
 						}
 						else gradeCell.setAttribute("class", "passed");
 						newRow.appendChild(gradeCell);
 						//state
 						let stateCell = document.createElement("td");
-						stateCell.innerText = array[i].state.toUpperCase();
+						stateCell.textContent = array[i].state.toUpperCase();
 						newRow.appendChild(stateCell);
 						//edit button
 						let editCell = document.createElement("td");
-						if (stateCell.innerText == "ENTERED" || stateCell.innerText == "NOT ENTERED") {
+						if (stateCell.textContent == "ENTERED" || stateCell.textContent == "NOT ENTERED") {
 							let form = document.createElement("form");
 							//set student input
 							let studentInput = document.createElement("input");
@@ -219,6 +226,7 @@
 							form.appendChild(button);
 							//insert button in td and add event listener to it
 							editCell.appendChild(form);
+							//add event listener to show edit form after clicking an edit button
 							button.addEventListener("click", (e) => {
 								e.preventDefault();
 								editForm.clear();
@@ -234,13 +242,14 @@
 				else {
 					document.querySelector("div.main").appendChild(errorManager(req));
 					buttons.hide();
-					document.querySelector("div.subscribers").style.display = "none";
+					subscribers.hide();
 				}
 			}
 		}
 	}
 
 	function EditForm() {
+		//get all DOM elements of the form to edit a single grade
 		this.studentId = document.querySelector("div.Edit div.studentId");
 		this.appealId = document.querySelector("div.Edit input[name='appeal']");
 		this.name = document.querySelector("div.Edit div.name");
@@ -250,71 +259,79 @@
 		this.grade = document.querySelector("div.Edit div.grade");
 		this.element = document.querySelector("div.Edit");
 		this.button = document.querySelector("div.Edit input[type='submit']")
+		// function to hide form
 		this.hide = function hide() {
 			this.element.style.display = "none";
 		}
+		//function to request form content to the server and show it
 		this.show = function show(appealId, studentId) {
 			makeCall("GET", "GetModifyRIA?appeal=" + appealId + "&studentId=" + studentId, null, this.update);
-			//may want to find a better way to express the url
 			this.studentId.setAttribute("value", studentId);
 			this.appealId.setAttribute("value", appealId);
 			this.element.removeAttribute("style");
 		}
+		//function to clear form content
 		this.clear = function clear() {
-			this.studentId.children[2].innerText = "";
-			this.name.children[1].innerText = "";
-			this.surname.children[1].innerText = "";
-			this.courseTitle.children[1].innerText = "";
-			this.appealDate.children[1].innerText = "";
+			this.studentId.children[2].textContent = "";
+			this.name.children[1].textContent = "";
+			this.surname.children[1].textContent = "";
+			this.courseTitle.children[1].textContent = "";
+			this.appealDate.children[1].textContent = "";
 			removeError();
 		}
 		this.hide();
 		this.clear();
+		//function to update form content
 		this.update = function update(req) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
-					let objectStrings = req.responseText.split("}"); //needed to parse two different objects
+					//little hack needed to parse two different objects
+					let objectStrings = req.responseText.split("}");
 					let grade = JSON.parse(objectStrings[0] + "}");
 					let appeal = JSON.parse(objectStrings[1] + "}");
 					//introducing content in <nobr> tags
-					editForm.studentId.children[2].innerText = grade.studentId;
-					editForm.name.children[1].innerText = grade.studentName;
-					editForm.surname.children[1].innerText = grade.studentSurname;
-					editForm.courseTitle.children[1].innerText = appeal.courseTitle;
-					editForm.appealDate.children[1].innerText = appeal.date;
+					editForm.studentId.children[2].textContent = grade.studentId;
+					editForm.name.children[1].textContent = grade.studentName;
+					editForm.surname.children[1].textContent = grade.studentSurname;
+					editForm.courseTitle.children[1].textContent = appeal.courseTitle;
+					editForm.appealDate.children[1].textContent = appeal.date;
 					editForm.studentId.children[1].setAttribute("value", grade.studentId);
+					//add event listener to edit grade after clicking on edit button
 					editForm.button.addEventListener("click", (e) => {
 						e.preventDefault();
 						let form = e.target.closest("form");
-						makeCall("POST", "EditRIA", new FormData(form), function(req) {
-							if (req.readyState === 4) {
-								if (req.status === 200) {
-									let appeal = JSON.parse(req.responseText);
-									subscribers.show(appeal.appealId, appeal.date);
+						if (form.checkValidity()) {
+							makeCall("POST", "EditRIA", new FormData(form), function(req) {
+								if (req.readyState === 4) {
+									if (req.status === 200) {
+										let appeal = JSON.parse(req.responseText);
+										subscribers.show(appeal.appealId, appeal.date);
+									}
+									else {
+										removeError();
+										document.querySelector("div.main").appendChild(errorManager(req));
+									}
 								}
-								else {
-									document.querySelector("div.main").appendChild(errorManager(req));
-									//document.querySelector("div.Edit").style.display="none";
-								}
-							}
-						});
+							});
+						}
 					})
-					makeCall("GET", "GetAppealsRIA?courseId=" + courseId, null, subscribers.update);
 				}
 				else {
 					document.querySelector("div.main").appendChild(errorManager(req));
-					document.querySelector("div.Edit").style.display = "none";
+					editForm.hide();
 				}
 			}
 		}
 	}
 
 	function Buttons() {
+		//get all DOM button elements
 		this.element = document.querySelector("div.Buttons");
 		this.publish = document.querySelector("div.Buttons form.publish input[type='hidden']");
 		this.report = document.querySelector("div.Buttons form.report input[type='hidden']");
 		this.allReports = document.querySelector("div.Buttons form.allReports input[type='hidden']");
 		this.multipleEdit = document.querySelector("div.Buttons form.multipleEdit input[type='hidden']");
+		// function to hide buttons
 		this.hide = function hide() {
 			this.element.style.display = "none";
 			this.publish.removeAttribute("value");
@@ -322,6 +339,7 @@
 			this.allReports.removeAttribute("value");
 			this.multipleEdit.removeAttribute("value");
 		}
+		// function to show button and link to them and appealId
 		this.show = function show(appealId) {
 			this.publish.setAttribute("value", appealId);
 			this.report.setAttribute("value", appealId);
@@ -330,9 +348,10 @@
 			this.element.removeAttribute("style");
 		}
 		this.hide();
+		// function used on object creation to add event listeners to buttons
 		this.registerEvents = function registerEvents() {
+			//add event listener to Publish button
 			let publishSubmit = this.publish.nextSibling.nextSibling; //line to get the buttons
-			//may want to find a better way to get the button
 			publishSubmit.addEventListener("click", (e) => {
 				e.preventDefault();
 				editForm.hide();
@@ -352,8 +371,8 @@
 					}
 				});
 			});
+			//add event listener to Report button
 			let reportSubmit = this.report.nextSibling.nextSibling; //line to get the buttons
-			//may want to find a better way to get the button
 			reportSubmit.addEventListener("click", (e) => {
 				e.preventDefault();
 				editForm.hide();
@@ -374,7 +393,6 @@
 			});
 			//add event listener to allReports button
 			let allReportsSubmit = this.allReports.nextSibling.nextSibling; //line to get the buttons
-			//may want to find a better way to get the button
 			allReportsSubmit.addEventListener("click", (e) => {
 				e.preventDefault();
 				editForm.hide();
@@ -383,7 +401,6 @@
 			});
 			//add event listener to multipleEdit button
 			let multipleEditSubmit = this.multipleEdit.nextSibling.nextSibling; //line to get the buttons
-			//may want to find a better way to get the button
 			multipleEditSubmit.addEventListener("click", (e) => {
 				e.preventDefault();
 				editForm.hide();
@@ -397,6 +414,7 @@
 	}
 
 	function Reports() {
+		//get all DOM elements of the reports div
 		this.element = document.querySelector("div.Reports");
 		this.summary = document.querySelector("div.Reports div.summary");
 		this.courseTitle = document.querySelector("div.Reports div.summary div.courseTitle");
@@ -407,21 +425,23 @@
 		this.reportDate = document.querySelector("div.Reports div.details div.reportDate");
 		this.reportHour = document.querySelector("div.Reports div.details div.reportHour");
 		this.reportGrades = document.querySelector("div.Reports div.details div.reportGrades tbody");
-		//methods
+		// function to hide reports
 		this.hide = function hide() {
 			this.element.style.display = "none";
 		}
+		// function to change message to reports section based on request type
 		this.showMessage = function showMessage(msgType) {
-			if (msgType === "last") this.message.innerText = "Created report for the appeal:";
-			if (msgType === "all") this.message.innerText = "Here is shown all information about reports for the appeal:";
+			if (msgType === "last") this.message.textContent = "Created report for the appeal:";
+			if (msgType === "all") this.message.textContent = "Here is shown all information about reports for the appeal:";
 		}
+		// function to show reports
 		this.show = function show(msgType, appealId) {
 			reports.clear();
 			makeCall("GET", "GetReportsRIA?type=" + msgType + "&appeal=" + appealId, null, this.update);
-			//may want to find a better way to express the url
 			this.showMessage(msgType);
 			this.element.removeAttribute("style");
 		}
+		// function to clear reports (and delete the ones after the first)
 		this.clear = function clear() {
 			removeError();
 			//get all report details
@@ -433,11 +453,11 @@
 				}
 			}
 			//clear all static (or previously-shown) report content
-			this.courseTitle.children[1].innerText = "";
-			this.appealDate.children[1].innerText = "";
-			this.reportId.children[1].innerText = "";
-			this.reportDate.children[1].innerText = "";
-			this.reportHour.children[1].innerText = "";
+			this.courseTitle.children[1].textContent = "";
+			this.appealDate.children[1].textContent = "";
+			this.reportId.children[1].textContent = "";
+			this.reportDate.children[1].textContent = "";
+			this.reportHour.children[1].textContent = "";
 			//remove all static (or previously-shown) rows in the table
 			while (this.reportGrades.children.length > 0) {
 				this.reportGrades.removeChild(this.reportGrades.children[0]);
@@ -445,13 +465,14 @@
 		}
 		this.hide();
 		this.clear();
+		// function to update reports
 		this.update = function update(req) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
 					let reportsArr = JSON.parse(req.responseText);
 					let course = reportsArr[0].appeal.courseTitle;
-					reports.courseTitle.children[1].innerText = reportsArr[0].appeal.courseTitle;
-					reports.appealDate.children[1].innerText = reportsArr[0].appeal.date;
+					reports.courseTitle.children[1].textContent = reportsArr[0].appeal.courseTitle;
+					reports.appealDate.children[1].textContent = reportsArr[0].appeal.date;
 					for (let i = 0; i < reportsArr.length; i++) {
 						let currentReport = reportsArr[i];
 						//select report details section or duplicate an existent one
@@ -466,31 +487,30 @@
 						let reportDate = detailsElement.children[2].children[1];
 						let reportHour = detailsElement.children[3].children[1];
 						let reportGrades = detailsElement.children[4].children[1].children[1];
-						reportId.innerText = currentReport.reportId;
-						reportDate.innerText = currentReport.creationDate;
-						reportHour.innerText = currentReport.creationTime;
+						reportId.textContent = currentReport.reportId;
+						reportDate.textContent = currentReport.creationDate;
+						reportHour.textContent = currentReport.creationTime;
 						//add grades as rows of the table
 						let grades = currentReport.grades;
 						for (let j = 0; j < grades.length; j++) {
 							let newRow = document.createElement("tr");
 							//studentId
 							let studentIdCell = document.createElement("td");
-							studentIdCell.innerText = grades[j].studentId;
+							studentIdCell.textContent = grades[j].studentId;
 							newRow.appendChild(studentIdCell);
 							//studentSurname
 							let surnameCell = document.createElement("td");
-							surnameCell.innerText = grades[j].studentSurname;
+							surnameCell.textContent = grades[j].studentSurname;
 							newRow.appendChild(surnameCell);
 							//studentName
 							let nameCell = document.createElement("td");
-							nameCell.innerText = grades[j].studentName;
+							nameCell.textContent = grades[j].studentName;
 							newRow.appendChild(nameCell);
 							//grade
 							let gradeCell = document.createElement("td");
-							gradeCell.innerText = grades[j].grade.toUpperCase();
-							if (gradeCell.innerText == "FAILED" || gradeCell.innerText == "RECALLED" ||
-								gradeCell.innerText == "ABSENT") {
-								//may want to use a more formal method to compare strings
+							gradeCell.textContent = grades[j].grade.toUpperCase();
+							if (gradeCell.textContent == "FAILED" || gradeCell.textContent == "RECALLED" ||
+								gradeCell.textContent == "ABSENT") {
 								gradeCell.setAttribute("class", "fail");
 							}
 							else gradeCell.setAttribute("class", "passed");
@@ -511,13 +531,16 @@
 		this.element = document.querySelector("div.MultipleEdit");
 		this.closer = document.querySelector("div.MultipleEdit span.closer");
 		this.enter = document.querySelector("div.MultipleEdit input[type='submit']");
+		//function to request the server "not entered" grades
 		this.show = function show(appealId) {
 			makeCall("GET", "GetNotEnteredRIA?appeal=" + appealId, null, multipleEdit.update);
 		}
+		//function to hide modal window
 		this.hide = function hide() {
 			let mebg = this.element.closest("div.mebg");
 			mebg.classList.remove("active");
 		}
+		//function to clear list of grades
 		this.clear = function clear() {
 			removeError();
 			let tbody = this.element.children[2].children[1];
@@ -525,20 +548,24 @@
 				tbody.removeChild(tbody.children[1]);
 			}
 			for (let i = 0; i < 5; i++) {
-				tbody.children[0].children[i].innerText = "";
+				tbody.children[0].children[i].textContent = "";
 			}
 			let form = tbody.children[0].children[5].children[0];
 			form.children[0].selectedIndex = 0;
 			form.children[1].removeAttribute("value");
 			form.children[2].removeAttribute("value");
 		}
+		// function used on object creation to add event listeners to buttons
 		this.registerEvents = function registerEvents() {
+			//add event listener to close modal window
 			this.closer.addEventListener("click", function() {
 				multipleEdit.hide();
 			})
+			//add event listener to submit multiple edit request
 			this.enter.addEventListener("click", function(e) {
 				e.preventDefault();
 				let forms = document.querySelectorAll("div.MultipleEdit tbody tr form");
+				//create array of objects to send to the server
 				let array = new Array(forms.length);
 				for (let i = 0; i < forms.length; i++) {
 					let content = new Object();
@@ -565,6 +592,7 @@
 		}
 		this.clear();
 		this.registerEvents();
+		//function to update list of "not entered" grades
 		this.update = function update(req) {
 			if (req.readyState === 4) {
 				if (req.status === 200) {
@@ -575,22 +603,23 @@
 						let newRow;
 						if (i === 0) {
 							newRow = tbody.children[0];
+							//needed when multipleEdit is used repeatedly (not to add multiple listeners to a single row)
 							newRow.removeEventListener("click", rowSelector);
-							//may be useful when multipleEdit is used repeatedly
 						}
 						else {
 							newRow = tbody.children[0].cloneNode("deep");
 							//used cloning to avoid creation of select forms
 						}
-						newRow.children[0].innerText = array[i].studentId;
-						newRow.children[1].innerText = array[i].studentSurname;
-						newRow.children[2].innerText = array[i].studentName;
-						newRow.children[3].innerText = array[i].email;
-						newRow.children[4].innerText = array[i].degreeCourse;
+						newRow.children[0].textContent = array[i].studentId;
+						newRow.children[1].textContent = array[i].studentSurname;
+						newRow.children[2].textContent = array[i].studentName;
+						newRow.children[3].textContent = array[i].email;
+						newRow.children[4].textContent = array[i].degreeCourse;
 						let form = newRow.children[5].children[0];
 						form.children[1].setAttribute("value", array[i].appealId);
 						form.children[2].setAttribute("value", array[i].studentId);
 						let select = form.children[0];
+						//add event listener to select element to enter selection for multiple lines (selected ones)
 						select.addEventListener("change", (e) => {
 							if (e.target.closest("tr").getAttribute("selected") === "true") {
 								let allSelects = document.querySelectorAll("div.MultipleEdit tr[selected='true'] select");
@@ -600,6 +629,7 @@
 							}
 						})
 						tbody.appendChild(newRow);
+						//add event listener to row to allow selection of multiple rows
 						newRow.addEventListener("click", rowSelector);
 					}
 					multipleEdit.element.setAttribute("appeal", array[0].appealId);
@@ -613,6 +643,7 @@
 		}
 	}
 
+	//function to select multiple rows in multiple edit
 	function rowSelector(e) {
 		if (!(e.target instanceof HTMLSelectElement)) {
 			if (e.target.closest("tr").getAttribute("selected") === "true")
@@ -621,6 +652,7 @@
 		}
 	}
 
+	//object used to start the behavior of the website
 	function PageOrchestrator() {
 		this.start = function() {
 			courseList = new CourseList();
@@ -630,12 +662,9 @@
 			buttons = new Buttons();
 			reports = new Reports();
 			multipleEdit = new MultipleEdit();
-		}
-		this.clearAll = function clearAll() {
-			let temp = document.querySelector("div[class='appeals']");
-			temp.remove();
-			temp = document.querySelector("div[class='subscribers']");
-			temp.remove();
+			document.querySelector("a[href='LogoutRIA']").addEventListener('click', () => {
+				window.sessionStorage.removeItem('username');
+			})
 		}
 	}
 
