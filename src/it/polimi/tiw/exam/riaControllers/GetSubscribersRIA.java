@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.exam.dao.AppealDAO;
 import it.polimi.tiw.exam.dao.GradeDAO;
@@ -102,7 +103,9 @@ public class GetSubscribersRIA extends HttpServlet {
 			return;
 		}
 		
-		String json = new Gson().toJson(grades);
+		//build response object and send it
+		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
+		String json = gson.toJson(grades);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);

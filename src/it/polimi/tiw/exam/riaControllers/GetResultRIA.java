@@ -109,8 +109,8 @@ public class GetResultRIA extends HttpServlet {
 		}
 
 		response.setStatus(HttpServletResponse.SC_OK);
-		String json = new Gson().toJson(grade);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
+		String json = new Gson().toJson(grade);
 		String json1 = gson.toJson(appeal);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

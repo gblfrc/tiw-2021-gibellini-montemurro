@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.exam.dao.GradeDAO;
 import it.polimi.tiw.exam.objects.Grade;
@@ -60,8 +61,9 @@ public class GetNotEnteredRIA extends HttpServlet {
 			return;
 		}
 
-		// create response object and send it
-		String json = new Gson().toJson(grades);
+		//build response object and send it
+		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
+		String json = gson.toJson(grades);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);

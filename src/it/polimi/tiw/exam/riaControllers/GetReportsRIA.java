@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.exam.dao.ReportDAO;
 import it.polimi.tiw.exam.objects.Report;
@@ -79,7 +80,8 @@ public class GetReportsRIA extends HttpServlet {
 		}
 
 		//build response object and send it
-		String json = new Gson().toJson(reports);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
+		String json = gson.toJson(reports);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);

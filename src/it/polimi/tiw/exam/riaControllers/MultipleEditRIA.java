@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -169,7 +170,9 @@ public class MultipleEditRIA extends HttpServlet {
 			}
 		}
 
-		String json = new Gson().toJson(appeal);
+		//build response object and send it
+		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
+		String json = gson.toJson(appeal);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
