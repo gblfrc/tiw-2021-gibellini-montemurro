@@ -54,6 +54,8 @@
 							appealList.clear();
 							subscribers.hide();
 							subscribers.clear();
+							editForm.hide();
+							editForm.clear();
 							reports.hide();
 							reports.clear();
 							let title = e.target.parentElement.previousSibling.textContent;
@@ -115,7 +117,10 @@
 							e.preventDefault();
 							subscribers.hide();
 							subscribers.clear();
+							editForm.hide();
+							editForm.clear();
 							reports.hide();
+							reports.clear();
 							let date = e.target.textContent;
 							subscribers.show(e.target.getAttribute('appeal'), date);
 						});
@@ -229,6 +234,9 @@
 							//add event listener to show edit form after clicking an edit button
 							button.addEventListener("click", (e) => {
 								e.preventDefault();
+								reports.hide();
+								reports.clear();
+								editForm.hide();
 								editForm.clear();
 								let appealId = e.target.closest("form").children[1].getAttribute("value");
 								let studentId = e.target.closest("form").children[0].getAttribute("value");
@@ -375,6 +383,7 @@
 			let reportSubmit = this.report.nextSibling.nextSibling; //line to get the buttons
 			reportSubmit.addEventListener("click", (e) => {
 				e.preventDefault();
+				editForm.clear();
 				editForm.hide();
 				let form = e.target.closest("form");
 				makeCall("POST", "ReportRIA", new FormData(form), function(req) {
@@ -395,6 +404,7 @@
 			let allReportsSubmit = this.allReports.nextSibling.nextSibling; //line to get the buttons
 			allReportsSubmit.addEventListener("click", (e) => {
 				e.preventDefault();
+				editForm.clear();
 				editForm.hide();
 				appealId = this.allReports.getAttribute("value");
 				reports.show("all", appealId);
@@ -404,10 +414,11 @@
 			multipleEditSubmit.addEventListener("click", (e) => {
 				e.preventDefault();
 				editForm.hide();
+				editForm.clear();
 				reports.hide();
+				reports.clear();
 				multipleEdit.clear();
 				multipleEdit.show(buttons.multipleEdit.getAttribute("value"));
-				editForm.hide();
 			});
 		}
 		this.registerEvents();

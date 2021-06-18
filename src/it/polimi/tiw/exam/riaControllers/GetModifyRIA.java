@@ -55,7 +55,6 @@ public class GetModifyRIA extends HttpServlet {
 		AppealDAO appealDAO = new AppealDAO(connection);
 		Appeal appeal;
 		try {
-			
 			appeal = appealDAO.getAppealById(appId);  //Can throw SQLException
 			if(appeal==null)throw new Exception();
 		}catch(Exception e) {

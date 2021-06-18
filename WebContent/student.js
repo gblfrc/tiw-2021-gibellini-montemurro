@@ -147,7 +147,7 @@
 			this.message.innerText = "Here is the result of the exam you took on " + date.toUpperCase();
 			if (button !== undefined) button.hide();
 		}
-		
+		//function to clear content of result section
 		this.clear = function clear() {
 			removeError();
 			this.mainContent.style.display = "none";
