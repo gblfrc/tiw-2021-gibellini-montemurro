@@ -101,16 +101,17 @@ public class ReportDAO {
 		ResultSet rs = null;
 		connection.setAutoCommit(false);
 		try {
+			//set as failed refused grades
+			gradeDao.failRefused(appealId);
+			//create new report in report table
 			pstatement = connection.prepareStatement(query);
 			pstatement.setInt(1, appealId);
 			pstatement.setDate(2, new Date(Calendar.getInstance().getTime().getTime())); // introduces the current date
 			pstatement.setTime(3, new Time(Calendar.getInstance().getTime().getTime())); // introduces the current time
 			pstatement.executeUpdate();
-
 			int reportId = getLastReport(appealId);
-			
+			//set reportable grades as reported
 			gradeDao.reportGrade(appealId, reportId);
-
 			connection.commit();
 		} catch (SQLException e) {
 			connection.rollback();

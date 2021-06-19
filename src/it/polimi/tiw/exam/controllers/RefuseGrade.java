@@ -53,6 +53,7 @@ public class RefuseGrade extends HttpServlet {
 			Grade grade = gradeDao.getResultByAppealAndStudent(appId, user.getPersonId());
 			if (grade.getState().equalsIgnoreCase("Refused") || grade.getState().equalsIgnoreCase("Recorded"))
 				throw new Exception("Grade has already been " + grade.getState().toLowerCase());
+			else if (!grade.getState().equalsIgnoreCase("Published")) throw new Exception("Illegal refuse request");
 		} catch (Exception e) {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			request.setAttribute("error", error);

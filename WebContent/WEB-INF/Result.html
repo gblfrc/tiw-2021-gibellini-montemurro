@@ -57,7 +57,8 @@
 			</p>
 			<p th:if="${#strings.equalsIgnoreCase(grade.state, 'not entered')}">Grade
 				not entered yet</p>
-
+			<p th:if="${#strings.equalsIgnoreCase(grade.state, 'refused')}">Grade
+				has been refused</p>
 		</div>
 
 		<div

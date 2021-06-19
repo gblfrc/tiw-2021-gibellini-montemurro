@@ -125,7 +125,7 @@
 		//get all DOM elements of the details div
 		this.element = document.querySelector("div[class='gradeDetails']");
 		this.message = document.querySelector("div[class='gradeDetails']>span");
-		this.mainContent = document.getElementById("mainContent");
+		this.gradeMessage = document.getElementById("gradeMessage");
 		this.studentId = document.getElementById("studentId");
 		this.studentName = document.getElementById("studentName");
 		this.studentSurname = document.getElementById("studentSurname");
@@ -150,7 +150,7 @@
 		//function to clear content of result section
 		this.clear = function clear() {
 			removeError();
-			this.mainContent.style.display = "none";
+			this.gradeMessage.style.display = "none";
 			this.studentId.innerText = "";
 			this.studentName.innerText = "";
 			this.studentSurname.innerText = "";
@@ -173,9 +173,14 @@
 					let appeal = JSON.parse(objectStrings[1] + "}");
 					if (gr.grade >= 18 && gr.state == 'published') { button.show(appeal.appealId); }
 					if (gr.state == "not entered") {
-						gradeDetails.mainContent.removeAttribute("style");
+						gradeDetails.gradeMessage.textContent = "Grade not entered yet";
+						gradeDetails.gradeMessage.removeAttribute("style");
 					}
 					else {
+						if (gr.state == "refused") {
+							gradeDetails.gradeMessage.textContent = "Grade has been refused";
+							gradeDetails.gradeMessage.removeAttribute("style");
+						}
 						document.querySelector("div.fields").removeAttribute("style");
 						gradeDetails.studentId.innerText = gr.studentId;
 						gradeDetails.studentName.innerText = gr.studentName;
@@ -217,8 +222,9 @@
 					makeCall("POST", 'RefuseGradeRIA', new FormData(form), function(req) {
 						if (req.readyState === 4) {
 							if (req.status === 200) {
+								let appeal = JSON.parse(req.responseText);
 								gradeDetails.clear();
-								gradeDetails.show(document.querySelector("div.Button form.refuse input[type='hidden']").getAttribute("value"));
+								gradeDetails.show(appeal.appealId);
 							}
 							else {
 								removeError();
