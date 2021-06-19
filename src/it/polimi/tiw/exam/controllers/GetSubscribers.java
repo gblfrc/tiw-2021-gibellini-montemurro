@@ -142,7 +142,8 @@ public class GetSubscribers extends HttpServlet {
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal sorting request");	
 		}
 				
-		if((session.getAttribute(field + "Order")==null||session.getAttribute(field+ "Order")=="DESC") && changeOrder) {
+		//if(((session.getAttribute(field + "Order")==null) && changeOrder)||((session.getAttribute(field+ "Order")=="DESC") && changeOrder)) {
+		if(((session.getAttribute(field + "Order")==null)||(session.getAttribute(field+ "Order")=="DESC")) && changeOrder) {
 			session.setAttribute(field + "Order", "ASC");
 		}
 		else if(session.getAttribute(field + "Order")=="ASC" && changeOrder) {
