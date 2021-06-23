@@ -144,7 +144,6 @@
 		<url-pattern>/StudentHome.html</url-pattern>
 		<url-pattern>/GetResultRIA</url-pattern>
 		<url-pattern>/RefuseGradeRIA</url-pattern>
-		<url-pattern>/LogoutRIA</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>AppealChecker</filter-name>
