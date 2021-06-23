@@ -156,9 +156,7 @@ public class GradeDAO {
 						break;
 			case "degree_course":{query="SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? ORDER BY s1.degree_course ASC";
 					break;}
-			case "grade": {query="((SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered')"+ "UNION" 
-											+ "(SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=?))ORDER BY absent DESC, failed DESC, "
-											+ "recalled DESC, grade ASC, merit ASC";
+			case "grade": {query="(SELECT * FROM student join exam on student.id_student=exam.id_student WHERE exam.id_appeal=? and exam.state='not entered')";
 											break;}
 			case"state":{query="(SELECT * FROM student AS s1 join exam AS e1 on s1.id_student=e1.id_student WHERE e1.id_appeal=? and e1.state='not entered')"+" UNION"
 											+ "(SELECT * FROM student AS s2 join exam AS e2 on s2.id_student=e2.id_student WHERE e2.id_appeal=? and e2.state='entered')"+" UNION"
@@ -171,49 +169,53 @@ public class GradeDAO {
 		
 		ResultSet result=null;
 		PreparedStatement pstatement=null;
+		int phase = 0;
 		
 		try {
-			pstatement=connection.prepareStatement(query);
-			pstatement.setInt(1, appealId);
-			if((field.equals("grade"))||(field.equals("state"))){
-				pstatement.setInt(2, appealId);
-			}
-			if(field.equals("state")) {
-				pstatement.setInt(3, appealId);
-				pstatement.setInt(4, appealId);
-				pstatement.setInt(5, appealId);
-			}
-			result=pstatement.executeQuery();
-			
-			while(result.next()) {
-				Grade grade=new Grade();
-				grade.setAppealId(result.getInt("id_appeal"));
-				grade.setStudentId(result.getInt("id_student"));
-				grade.setStudentSurname(result.getString("surname"));
-				grade.setStudentName(result.getString("name"));
-				grade.setEmail(result.getString("email"));
-				grade.setDegreeCourse(result.getString("degree_course"));
-				if(result.getBoolean("failed")==true) {
-					grade.setGrade("failed");
+			while (phase < 1 || (field.equals("grade") && phase < 2)) {
+				if (phase==1 && field.equals("grade")) {
+					query = "(SELECT * FROM student join exam on student.id_student=exam.id_student WHERE exam.id_appeal=? and state != 'not entered'" +
+							"ORDER BY absent DESC, failed DESC, recalled DESC, grade ASC, merit ASC)";
 				}
-				else if(result.getBoolean("recalled")==true) {
-					grade.setGrade("recalled");
+				pstatement = connection.prepareStatement(query);
+				pstatement.setInt(1, appealId);
+				if ((field.equals("state"))) {
+					pstatement.setInt(2, appealId);
 				}
-				else if(result.getBoolean("absent")==true) {
-					grade.setGrade("absent");
+				if (field.equals("state")) {
+					pstatement.setInt(3, appealId);
+					pstatement.setInt(4, appealId);
+					pstatement.setInt(5, appealId);
 				}
-				else {
-					if(result.getBoolean("merit")==true) {
-						grade.setGrade(Integer.toString(result.getInt("grade"))+" with merit");
+				result = pstatement.executeQuery();
+
+				while (result.next()) {
+					Grade grade = new Grade();
+					grade.setAppealId(result.getInt("id_appeal"));
+					grade.setStudentId(result.getInt("id_student"));
+					grade.setStudentSurname(result.getString("surname"));
+					grade.setStudentName(result.getString("name"));
+					grade.setEmail(result.getString("email"));
+					grade.setDegreeCourse(result.getString("degree_course"));
+					if (result.getBoolean("failed") == true) {
+						grade.setGrade("failed");
+					} else if (result.getBoolean("recalled") == true) {
+						grade.setGrade("recalled");
+					} else if (result.getBoolean("absent") == true) {
+						grade.setGrade("absent");
+					} else {
+						if (result.getBoolean("merit") == true) {
+							grade.setGrade(Integer.toString(result.getInt("grade")) + " with merit");
+						} else {
+							grade.setGrade(Integer.toString(result.getInt("grade")));
+						}
 					}
-					else {
-						grade.setGrade(Integer.toString(result.getInt("grade")));
-					}
+					grade.setState(result.getString("state"));
+					grades.add(grade);
+					phase++;
 				}
-				grade.setState(result.getString("state"));
-				grades.add(grade);	
 			}
-		
+
 		} catch (SQLException e) {
 			throw new SQLException(e);
 
@@ -231,9 +233,9 @@ public class GradeDAO {
 				throw new SQLException(e2);
 			}
 		}
-			
+
 		return grades;
-    }
+	   }
 	
 	public List<Grade> getGradesByFieldDesc(int appealId, String field) throws SQLException,InvalidParameterException{
 		List<Grade> grades=new ArrayList<Grade>();
