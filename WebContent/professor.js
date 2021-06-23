@@ -1,13 +1,20 @@
 (function() {
 
 	var courseList, appealList, subscribers, editForm,
-		buttons, reports, multipleEdit, pageOrchestrator;
+		buttons, reports, multipleEdit;
 
-	//add event listener on load to window object
 	//assign objects to DOM elements
 	window.addEventListener("load", () => {
-		pageOrchestrator = new PageOrchestrator();
-		pageOrchestrator.start();
+		courseList = new CourseList();
+		appealList = new AppealList();
+		subscribers = new Subscribers();
+		editForm = new EditForm();
+		buttons = new Buttons();
+		reports = new Reports();
+		multipleEdit = new MultipleEdit();
+		document.querySelector("a[href='LogoutRIA']").addEventListener('click', () => {
+			window.sessionStorage.removeItem('username');
+		})
 	});
 
 
@@ -660,22 +667,6 @@
 			if (e.target.closest("tr").getAttribute("selected") === "true")
 				e.target.closest("tr").removeAttribute("selected");
 			else e.target.closest("tr").setAttribute("selected", "true");
-		}
-	}
-
-	//object used to start the behavior of the website
-	function PageOrchestrator() {
-		this.start = function() {
-			courseList = new CourseList();
-			appealList = new AppealList();
-			subscribers = new Subscribers();
-			editForm = new EditForm();
-			buttons = new Buttons();
-			reports = new Reports();
-			multipleEdit = new MultipleEdit();
-			document.querySelector("a[href='LogoutRIA']").addEventListener('click', () => {
-				window.sessionStorage.removeItem('username');
-			})
 		}
 	}
 

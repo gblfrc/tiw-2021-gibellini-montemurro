@@ -1,12 +1,16 @@
 (function() {
 
-	var courseList, appealList, gradeDetails, pageOrchestrator, button;
+	var courseList, appealList, gradeDetails, button;
 
-	//add event listener on load to window object
 	//assign objects to DOM elements
 	window.addEventListener("load", () => {
-		pageOrchestrator = new PageOrchestrator();
-		pageOrchestrator.start();
+		courseList = new CourseList();
+		appealList = new AppealList();
+		gradeDetails = new GradeDetails();
+		button = new Button();
+		document.querySelector("a[href='LogoutRIA']").addEventListener('click', () => {
+			window.sessionStorage.removeItem('username');
+		})
 	});
 
 	function CourseList() {
@@ -236,21 +240,6 @@
 			});
 		}
 		this.registerEvents();
-	}
-
-	function PageOrchestrator() {
-		this.start = function() {
-			courseList = new CourseList();
-			appealList = new AppealList();
-			gradeDetails = new GradeDetails();
-			button = new Button();
-			//button.update();
-			//this.clearAll();
-			document.querySelector("a[href='LogoutRIA']").addEventListener('click', () => {
-				window.sessionStorage.removeItem('username');
-			})
-		}
-
 	}
 
 }())
