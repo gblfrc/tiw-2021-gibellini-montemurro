@@ -6,15 +6,18 @@
 	<display-name>TIW-Exam-Project</display-name>
 	<context-param>
 		<param-name>dbUrl</param-name>
+		<!-- replace 'tiw_project' with your personal DB schema name -->
 		<param-value>jdbc:mysql://localhost:3306/tiw_project</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbUser</param-name>
+		<!-- replace 'root' with your personal DB username -->
 		<param-value>root</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbPassword</param-name>
-		<param-value>ComeOnYouIrons1571@</param-value>
+		<!-- replace 'pwd' with your personal DB password -->
+		<param-value>pwd</param-value>
 	</context-param>
 	<context-param>
 		<param-name>dbDriver</param-name>
@@ -39,8 +42,24 @@
 		<url-pattern>/Edit</url-pattern>
 		<url-pattern>/CreateReport</url-pattern>
 		<url-pattern>/GetReports</url-pattern>
+		<url-pattern>/Logout</url-pattern>
 		<url-pattern>/ProfessorHome.html</url-pattern>
 		<url-pattern>/StudentHome.html</url-pattern>
+		<url-pattern>/GetCoursesRIA</url-pattern>
+		<url-pattern>/GetAppealsRIA</url-pattern>
+		<url-pattern>/GetResultRIA</url-pattern>
+		<url-pattern>/GetSubscribersRIA</url-pattern>
+		<url-pattern>/PublishRIA</url-pattern>
+		<url-pattern>/RefuseGradeRIA</url-pattern>
+		<url-pattern>/GetModifyRIA</url-pattern>
+		<url-pattern>/EditRIA</url-pattern>
+		<url-pattern>/MultipleEditRIA</url-pattern>
+		<url-pattern>/ReportRIA</url-pattern>
+		<url-pattern>/GetReportsRIA</url-pattern>
+		<url-pattern>/GetNotEnteredRIA</url-pattern>
+		<url-pattern>/ProfessorHome.html</url-pattern>
+		<url-pattern>/StudentHome.html</url-pattern>
+		<url-pattern>/LogoutRIA</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>GetMethodFilter</filter-name>
@@ -66,6 +85,32 @@
 		<url-pattern>/RefuseGrade</url-pattern>
 	</filter-mapping>
 	<filter>
+		<filter-name>GetMethodFilterRIA</filter-name>
+		<filter-class>it.polimi.tiw.exam.filters.GetMethodFilterRIA</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>GetMethodFilterRIA</filter-name>
+		<url-pattern>/GetAppealsRIA</url-pattern>
+		<url-pattern>/GetModifyRIA</url-pattern>
+		<url-pattern>/GetSubscribersRIA</url-pattern>
+		<url-pattern>/GetReportsRIA</url-pattern>
+		<url-pattern>/GetResultRIA</url-pattern>
+		<url-pattern>/GetNotEnteredRIA</url-pattern>
+		
+	</filter-mapping>
+	<filter>
+		<filter-name>PostMethodFilterRIA</filter-name>
+		<filter-class>it.polimi.tiw.exam.filters.PostMethodFilterRIA</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>PostMethodFilterRIA</filter-name>
+		<url-pattern>/EditRIA</url-pattern>
+		<url-pattern>/ReportRIA</url-pattern>
+		<url-pattern>/PublishRIA</url-pattern>
+		<url-pattern>/RefuseGradeRIA</url-pattern>
+		<url-pattern>/MultipleEditRIA</url-pattern>
+	</filter-mapping>
+	<filter>
 		<filter-name>ProfessorFilter</filter-name>
 		<filter-class>it.polimi.tiw.exam.filters.ProfessorFilter</filter-class>
 	</filter>
@@ -78,6 +123,15 @@
 		<url-pattern>/CreateReport</url-pattern>
 		<url-pattern>/GetReports</url-pattern>
 		<url-pattern>/ProfessorHome.html</url-pattern>
+		<url-pattern>/GetSubscribersRIA</url-pattern>
+		<url-pattern>/PublishRIA</url-pattern>
+		<url-pattern>/GetModifyRIA</url-pattern>
+		<url-pattern>/EditRIA</url-pattern>
+		<url-pattern>/MultipleEditRIA</url-pattern>
+		<url-pattern>/ReportRIA</url-pattern>
+		<url-pattern>/GetReportsRIA</url-pattern>
+		<url-pattern>/GetNotEnteredRIA</url-pattern>
+		<url-pattern>/ProfessorHome.html</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>StudentFilter</filter-name>
@@ -88,6 +142,9 @@
 		<url-pattern>/GetResult</url-pattern>
 		<url-pattern>/RefuseGrade</url-pattern>
 		<url-pattern>/StudentHome.html</url-pattern>
+		<url-pattern>/GetResultRIA</url-pattern>
+		<url-pattern>/RefuseGradeRIA</url-pattern>
+		<url-pattern>/LogoutRIA</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>AppealChecker</filter-name>

@@ -39,6 +39,10 @@ public class Logout extends HttpServlet {
 		response.sendRedirect(getServletContext().getContextPath() + "/GetLogin");
 	}
 	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);

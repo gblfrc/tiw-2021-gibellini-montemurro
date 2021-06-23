@@ -20,7 +20,7 @@ public class PostMethodFilter implements Filter{
 		System.out.print("Checking method ...\n");
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		// check if the logged user is a professor
+		// check if the method is allowed
 		ErrorMsg error = (ErrorMsg) request.getAttribute("error");
 		if(req.getMethod().equalsIgnoreCase("GET")){
 			RequestDispatcher rd = req.getRequestDispatcher("GetCourses");
