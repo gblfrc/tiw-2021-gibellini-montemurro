@@ -42,9 +42,20 @@ public class EditRIA extends HttpServlet {
 			appId=Integer.parseInt(request.getParameter("appeal"));
 			studentId=Integer.parseInt(request.getParameter("studentId"));
 			gradeValue=request.getParameter("gradeValue");
-		}catch(NumberFormatException e) {
+			// control on gradeValue validity
+			if (!gradeValue.equalsIgnoreCase("absent") && !gradeValue.equalsIgnoreCase("failed")
+					&& !gradeValue.equalsIgnoreCase("recalled") && !gradeValue.equalsIgnoreCase("18")
+					&& !gradeValue.equalsIgnoreCase("19") && !gradeValue.equalsIgnoreCase("20")
+					&& !gradeValue.equalsIgnoreCase("21") && !gradeValue.equalsIgnoreCase("22")
+					&& !gradeValue.equalsIgnoreCase("23") && !gradeValue.equalsIgnoreCase("24")
+					&& !gradeValue.equalsIgnoreCase("25") && !gradeValue.equalsIgnoreCase("26")
+					&& !gradeValue.equalsIgnoreCase("27") && !gradeValue.equalsIgnoreCase("28")
+					&& !gradeValue.equalsIgnoreCase("29") && !gradeValue.equalsIgnoreCase("30")
+					&& !gradeValue.equalsIgnoreCase("30 with merit"))
+				throw new Exception();
+		}catch(Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Incorrect param values");
+			response.getWriter().println("Illegal request");
 			return;
 		}
 		
