@@ -105,6 +105,24 @@ public class GetSubscribers extends HttpServlet {
 			return;
 		}
 		
+		//reset sort order when accessing a new appeal
+		try {
+			if(secDAO.getLastAppeal(user.getPersonId())!=appId) {
+				session.removeAttribute("studentIdOrder");
+				session.removeAttribute("surnameOrder");
+				session.removeAttribute("nameOrder");
+				session.removeAttribute("emailOrder");
+				session.removeAttribute("degree_courseOrder");
+				session.removeAttribute("gradeOrder");
+				session.removeAttribute("stateOrder");
+			}
+		}catch(Exception e) {
+			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Access denied for security reasons");
+			request.setAttribute("error", error);
+			rd.forward(request, response);
+			return;
+		}
+		
 		//controls on request parameters
 		try {			
 			List<String> params= Collections.list(request.getParameterNames());
