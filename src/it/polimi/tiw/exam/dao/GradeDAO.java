@@ -328,32 +328,6 @@ public class GradeDAO {
 		return grades;
     }
 	
-	
-	public int insertGrade(int appealId, int studentId) throws SQLException {
-		int code = 0;
-		String query = "INSERT into exam (id_appeal, id_student, state, failed, recalled, absent, grade, merit)   VALUES(?, ?, not entered , null, null, null, null, null)";
-
-		PreparedStatement pstatement = null;
-		try {
-			pstatement = connection.prepareStatement(query);
-
-			pstatement.setInt(1, appealId);
-			pstatement.setInt(2, studentId);
-
-			code = pstatement.executeUpdate();
-
-		} catch (SQLException e) {
-			throw new SQLException(e);
-		} finally {
-			try {
-				pstatement.close();
-			} catch (Exception e1) {
-
-			}
-		}
-		return code;
-	}
-	
 	public void enterGrade(int appealId, int studentId, String gradeValue) throws SQLException {
 		String query="UPDATE exam SET state='entered', failed=?, recalled=?, absent=?, grade=?, merit=? WHERE id_appeal=? and id_student=?";
 

@@ -177,30 +177,4 @@ public class CourseDAO {
 			
 		return courses;
     }
-    
-    public int createCourse(Course course) throws SQLException { //may not be necessary
-		int code = 0;
-		String query = "INSERT into courses (id_course,id_professor,title)   VALUES(?, ?, ?)";
-
-		PreparedStatement pstatement = null;
-		try {
-			pstatement = connection.prepareStatement(query);
-
-			pstatement.setInt(1, course.getCourseId());
-			pstatement.setInt(2, course.getProfessorId());
-			pstatement.setString(3, course.getTitle());
-
-			code = pstatement.executeUpdate();
-
-		} catch (SQLException e) {
-			throw new SQLException(e);
-		} finally {
-			try {
-				pstatement.close();
-			} catch (Exception e1) {
-
-			}
-		}
-		return code;
-	}
 }
