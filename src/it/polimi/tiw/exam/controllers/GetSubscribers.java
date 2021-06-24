@@ -132,7 +132,6 @@ public class GetSubscribers extends HttpServlet {
 			   !request.getParameter("changeOrder").equalsIgnoreCase("false")) {
 					entered=true;
 				}
-			//params.remove("changeOrder");
 			//checks "field" has legal values 
 			if(params.contains("field")) {
 				field=request.getParameter("field");  //saves "field" request parameter in a variable
@@ -145,22 +144,15 @@ public class GetSubscribers extends HttpServlet {
 			}
 			
 			if(entered==true) throw new Exception();
-			//params.remove("field");
-			
-			//params.remove("appeal");
-			//checks there aren't too many parameters in the request
-			//if(params.size()>0) throw new InvalidParameterException("Couldn't handle request"); 
 			
 			changeOrder=Boolean.parseBoolean(request.getParameter("changeOrder")); 
 			//if there is no "changeOrder" parameter, parseBoolean returns false
 			
-			//checks existence of the attribute related to "field" request parameter (and handles it)
 		} catch (Exception e) {
 			changeOrder=false;
 			error = new ErrorMsg(HttpServletResponse.SC_BAD_REQUEST, "Illegal sorting request");	
 		}
 				
-		//if(((session.getAttribute(field + "Order")==null) && changeOrder)||((session.getAttribute(field+ "Order")=="DESC") && changeOrder)) {
 		if(((session.getAttribute(field + "Order")==null)||(session.getAttribute(field+ "Order")=="DESC")) && changeOrder) {
 			session.setAttribute(field + "Order", "ASC");
 		}
