@@ -26,7 +26,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
@@ -34,8 +33,6 @@
 *.tar.gz
 *.rar
 
-# Ignore the whole .lib folder
-.lib/
-
+# Ignore folders
 /build/
 /bin/
