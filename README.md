@@ -9,7 +9,9 @@
 - [Evaluation](#evaluation)
 
 ## Description
-This repository contains all the material used for TIW exam in 2021. You can find the project task [here](https://github.com/gblfrc/tiw-2021-gibellini-montemurro/blob/main/deliverables/specifica_progetto_aggiornata.pdf).
+This repository contains all the material used for the contributors' TIW exam in 2021 at [Politecnico di Milano](https://www.polimi.it).
+
+You can find the project task [here](https://github.com/gblfrc/tiw-2021-gibellini-montemurro/blob/main/deliverables/specifica_progetto_aggiornata.pdf).
 
 ## Software requirements
 The project was produced using ***Eclipse (Java Enterprise Edition)***, which provides a built-in facet for web projects, but any IDE with the same functionality should work as fine. In addition, a server is needed to run the project and let it be usable by whichever browser; for this purpose, ***Apache Tomcat 9.0*** was used.
