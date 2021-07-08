@@ -5,6 +5,7 @@
 - [Software requirements](#software-requirements)
 - [Running](#running)
 - [Contributors](#contributors)
+- [Evaluation](#evaluation)
 
 ## Description
 This repository contains all the material used for TIW exam in 2021. You can find the task of the project [here](https://github.com/gblfrc/tiw-2021-gibellini-montemurro/blob/main/deliverables/specifica_progetto_aggiornata.pdf).
@@ -17,10 +18,19 @@ To run the project:
 - Import it on your IDE cloning this repository+
 - Add the project to the server
 - Start the server
-- Open a browser and head to the project's main page[^one].
+- Open a browser and head to the project's main page.
+
+**Note**
+
+If the project is running on localhost the project's path should be: 
+
+` localhost:8080/tiw-2021-gibellini-montemurro/ `
+
+Remember to replace 8080 with the actual number of the port assigned to the server
 
 ## Contributors
 - [Gibellini Federico](https://github.com/gblfrc)
 - [Montemurro Elena](https://github.com/ElenaMontemurro)
 
-[^one]: If the project is running on localhost the project's path should be: ` localhost:8080/tiw-2021-gibellini-montemurro/ `. Remember to replace 8080 with the actual number of the port assigned to the server
+## Evaluation
+The project was awarded a 30/30 grade at the exam
