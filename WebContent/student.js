@@ -182,6 +182,7 @@
 					}
 					else {
 						if (gr.state == "refused") {
+							if (button !== undefined) button.hide();
 							gradeDetails.gradeMessage.textContent = "Grade has been refused";
 							gradeDetails.gradeMessage.removeAttribute("style");
 						}
